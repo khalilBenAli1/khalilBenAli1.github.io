@@ -51,6 +51,11 @@ page.on("console", (m) => {
 page.on("pageerror", (e) => errors.push(String(e)));
 await page.goto(BASE + "/", { waitUntil: "networkidle" });
 await page.waitForTimeout(1600);
+for (const loc of ["fr", "it"]) {
+  await page.goto(`${BASE}/${loc}/`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(1200);
+  await page.screenshot({ path: `${SHOTS}/home-${loc}-top.png` });
+}
 await page.goto(BASE + "/resume/", { waitUntil: "networkidle" });
 await page.waitForTimeout(900);
 await page.screenshot({ path: `${SHOTS}/resume-screen.png`, fullPage: true });
@@ -66,11 +71,21 @@ await ogPage.screenshot({
 await ogPage.close();
 
 await page.emulateMedia({ media: "print" });
-await page.pdf({
-  path: "/Users/khalilbenali/portfolio/public/KhalilBenAli-CV.pdf",
-  format: "A4",
-  printBackground: true,
-  margin: { top: "14mm", right: "14mm", bottom: "14mm", left: "14mm" },
-});
+const routes = { en: "/resume/", fr: "/fr/resume/", it: "/it/resume/" };
+for (const [loc, route] of Object.entries(routes)) {
+  await page.goto(BASE + route, { waitUntil: "networkidle" });
+  await page.waitForTimeout(500);
+  await page.pdf({
+    path: `/Users/khalilbenali/portfolio/public/KhalilBenAli-CV-${loc}.pdf`,
+    format: "A4",
+    printBackground: true,
+    margin: { top: "14mm", right: "14mm", bottom: "14mm", left: "14mm" },
+  });
+}
+const { copyFileSync } = await import("fs");
+copyFileSync(
+  "/Users/khalilbenali/portfolio/public/KhalilBenAli-CV-en.pdf",
+  "/Users/khalilbenali/portfolio/public/KhalilBenAli-CV.pdf",
+);
 console.log("CONSOLE ERRORS:", errors.length ? errors : "none");
 await browser.close();

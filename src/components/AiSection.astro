@@ -1,61 +1,31 @@
 ---
 import { ui } from "../lib/icons";
+import { t, type Locale } from "../lib/i18n";
 
-const cards = [
-  {
-    icon: "brain-circuit",
-    title: "Shipped features",
-    body: "Call transcription & summaries, LLM adjudication with deterministic gates, LangGraph agents spanning seven systems, on-device CLIP vision, RAG with pgvector and Copilot connectors.",
-  },
-  {
-    icon: "shield-check",
-    title: "Built to not break",
-    body: "Provider-agnostic interfaces, graceful degradation, hardened LLM clients with timeouts and bounded retries, full token, latency and cost observability.",
-  },
-  {
-    icon: "workflow",
-    title: "AI-native workflow",
-    body: "Daily multi-agent engineering: an orchestrator model plans and reviews, executor models implement, verification gates everything. This site was built exactly that way.",
-  },
-];
+interface Props {
+  locale: Locale;
+}
 
-const logLines = [
-  ["plan", "architecture + design system approved"],
-  ["delegate", "implementation → executor model"],
-  ["verify", "4 viewports · console clean · one-page CV"],
-  ["ship", "khalilbenali1.github.io — live"],
-];
+const { locale } = Astro.props;
+const dict = t(locale);
+const icons = ["brain-circuit", "shield-check"];
 ---
 
 <section class="section ai-section" id="ai" aria-labelledby="ai-title">
   <div class="container">
     <div class="section-heading">
-      <p class="eyebrow">AI Engineering</p>
-      <h2 class="section-title" id="ai-title">
-        AI in production, <span class="gradient-text">not in demos.</span>
-      </h2>
+      <p class="eyebrow">{dict.ai.eyebrow}</p>
+      <h2 class="section-title" id="ai-title">{dict.ai.title}</h2>
     </div>
 
     <div class="ai-section__grid">
       {
-        cards.map((card) => (
+        dict.ai.cards.map((card, i) => (
           <div class="glass-card ai-section__card reveal">
-            <span class="ai-section__icon" set:html={ui[card.icon]} />
+            <span class="ai-section__icon" set:html={ui[icons[i]]} />
             <h3>{card.title}</h3>
             <p>{card.body}</p>
           </div>
-        ))
-      }
-    </div>
-
-    <div class="ai-section__terminal glass-card reveal" aria-hidden="true">
-      {
-        logLines.map(([verb, rest], i) => (
-          <p class:list={[{ "is-last": i === logLines.length - 1 }]}>
-            <span class="ai-section__prompt">▸</span>
-            <span class="ai-section__verb">{verb}</span>
-            {rest}
-          </p>
         ))
       }
     </div>
@@ -69,9 +39,8 @@ const logLines = [
 
   .ai-section__grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.4rem;
-    margin-bottom: 1.4rem;
   }
 
   .ai-section__card {
@@ -106,48 +75,6 @@ const logLines = [
     color: var(--muted);
     font-size: 0.98rem;
     line-height: 1.62;
-  }
-
-  .ai-section__terminal {
-    padding: 1.4rem 1.7rem;
-    font-family: var(--font-mono);
-    font-size: 0.9rem;
-    line-height: 2;
-  }
-
-  .ai-section__terminal p {
-    margin: 0;
-    color: var(--muted);
-  }
-
-  .ai-section__prompt {
-    margin-right: 0.65rem;
-    color: var(--violet);
-  }
-
-  .ai-section__verb {
-    display: inline-block;
-    min-width: 6.5ch;
-    margin-right: 0.5rem;
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  .ai-section__terminal p.is-last::after {
-    content: "";
-    display: inline-block;
-    width: 0.55em;
-    height: 1.05em;
-    margin-left: 0.35rem;
-    vertical-align: text-bottom;
-    background: var(--sky);
-    animation: caret 1.1s steps(1) infinite;
-  }
-
-  @keyframes caret {
-    50% {
-      opacity: 0;
-    }
   }
 
   @media (max-width: 56.25rem) {

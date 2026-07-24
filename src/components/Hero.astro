@@ -1,33 +1,35 @@
 ---
 import { ui, tech } from "../lib/icons";
+import { cvFile, t, type Locale } from "../lib/i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const dict = t(locale);
 ---
 
 <section class="hero" id="top">
   <div class="hero__inner container">
     <div class="hero__copy">
       <p class="eyebrow" data-hero-eyebrow>
-        Full-Stack &amp; AI Engineer · Faenza, Italy
+        {dict.hero.eyebrow}
       </p>
       <h1 class="hero__title" data-hero-title>
         <span class="hero__sheen">Khalil Ben Ali</span>
       </h1>
       <p class="hero__lead" data-hero-lead>
-        I build AI-powered platforms — Microsoft Teams ecosystems, on-device
-        vision, real-time pipelines — and take them all the way to production.
+        {dict.hero.lead}
       </p>
       <div class="hero__ctas" data-hero-ctas>
         <a class="btn btn--primary" href="#work" data-magnetic>
-          View my work
+          {dict.hero.viewWork}
           <span set:html={ui["arrow-down"]} />
         </a>
-        <a
-          class="btn btn--ghost"
-          href="/KhalilBenAli-CV.pdf"
-          download
-          data-magnetic
-        >
+        <a class="btn btn--ghost" href={cvFile(locale)} download data-magnetic>
           <span set:html={ui.download} />
-          Download CV
+          {dict.hero.downloadCv}
         </a>
       </div>
       <div class="hero__social" data-hero-social>
@@ -57,7 +59,7 @@ import { ui, tech } from "../lib/icons";
         <img
           class="hero__photo"
           src="/khalil.jpg"
-          alt="Portrait of Khalil Ben Ali"
+          alt={dict.resume.photoAlt}
           width="640"
           height="640"
           loading="eager"
@@ -81,7 +83,7 @@ import { ui, tech } from "../lib/icons";
 
   <a class="hero__scroll-cue" href="#work" data-scroll-cue>
     <span set:html={ui.mouse} />
-    <span>scroll</span>
+    <span>{dict.hero.scroll}</span>
   </a>
 </section>
 
@@ -176,6 +178,9 @@ import { ui, tech } from "../lib/icons";
 
   .hero__photo {
     width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
     border-radius: calc(var(--radius-lg) - 3px);
   }
 

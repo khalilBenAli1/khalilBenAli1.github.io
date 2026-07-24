@@ -13,13 +13,20 @@ interface Props {
   bodyClass?: string;
   /** page renders the fixed Three.js background + orbs (home only) */
   space?: boolean;
+  lang?: string;
+  skipLinkLabel?: string;
+  /** locale → path, rendered as hreflang alternates */
+  alternates?: Record<string, string>;
 }
 
 const {
   title = "Khalil Ben Ali — Full-Stack & AI Engineer",
-  description = "Khalil Ben Ali — Full-Stack & AI Engineer. AI-powered platforms, Microsoft Teams ecosystems, on-device vision — shipped to production.",
+  description = "Khalil Ben Ali, full-stack and AI engineer in Faenza, Italy. Microsoft Teams platforms, in-browser vision models and production AI systems.",
   bodyClass = "",
   space = false,
+  lang = "en",
+  skipLinkLabel = "Skip to content",
+  alternates,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -27,7 +34,7 @@ const socialImage = new URL("/og.png", Astro.site);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -35,6 +42,16 @@ const socialImage = new URL("/og.png", Astro.site);
     <meta name="theme-color" content="#06070C" />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {
+      alternates &&
+        Object.entries(alternates).map(([altLang, path]) => (
+          <link
+            rel="alternate"
+            hreflang={altLang}
+            href={new URL(path, Astro.site)}
+          />
+        ))
+    }
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
@@ -51,7 +68,7 @@ const socialImage = new URL("/og.png", Astro.site);
     <title>{title}</title>
   </head>
   <body class={bodyClass}>
-    <a class="skip-link" href="#main-content">Skip to content</a>
+    <a class="skip-link" href="#main-content">{skipLinkLabel}</a>
     {
       space && (
         <>

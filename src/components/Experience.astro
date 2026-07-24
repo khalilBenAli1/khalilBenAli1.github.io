@@ -1,42 +1,26 @@
 ---
-const entries = [
-  {
-    role: "Full-Stack & AI Engineer",
-    company: "nBold",
-    period: "2024 → now",
-    note: "Microsoft Teams templating & governance SaaS (Paris). Platform AI features plus lead engineering on client platforms: Cuddy Brain, L'OR Remix, Cuddy Scanner.",
-  },
-  {
-    role: "Software Developer",
-    company: "Freelance",
-    period: "2023 → 2024",
-    note: "Cross-platform apps: children's game (React Native), travel planner (React Native + Express/MongoDB).",
-  },
-  {
-    role: "Software Developer",
-    company: "SolvR",
-    period: "2023",
-    note: "Refactored and shipped a React Native chat app: real-time messaging, auth, state architecture.",
-  },
-  {
-    role: "Software Developer",
-    company: "Tynass IT",
-    period: "2019 → 2022",
-    note: "AR tourism app, job platform, e-commerce and corporate sites (React, Express, MongoDB).",
-  },
-];
+import { t, type Locale } from "../lib/i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const dict = t(locale);
 ---
 
 <section class="section" id="experience" aria-labelledby="experience-title">
   <div class="container">
     <div class="section-heading">
-      <p class="eyebrow">Experience</p>
-      <h2 class="section-title" id="experience-title">Where I've worked</h2>
+      <p class="eyebrow">{dict.experience.eyebrow}</p>
+      <h2 class="section-title" id="experience-title">
+        {dict.experience.title}
+      </h2>
     </div>
 
     <ol class="timeline">
       {
-        entries.map((e) => (
+        dict.experience.entries.map((e) => (
           <li class="timeline__entry reveal">
             <span class="timeline__node" aria-hidden="true" />
             <div>

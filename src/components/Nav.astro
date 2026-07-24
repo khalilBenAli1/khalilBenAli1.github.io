@@ -1,11 +1,19 @@
 ---
 import { ui } from "../lib/icons";
+import { homePath, locales, t, type Locale } from "../lib/i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const dict = t(locale);
 
 const links = [
-  { href: "#work", label: "Work" },
-  { href: "#ai", label: "AI" },
-  { href: "#experience", label: "Experience" },
-  { href: "#contact", label: "Contact" },
+  { href: "#work", id: "work", label: dict.nav.work },
+  { href: "#ai", id: "ai", label: dict.nav.ai },
+  { href: "#experience", id: "experience", label: dict.nav.experience },
+  { href: "#contact", id: "contact", label: dict.nav.contact },
 ];
 ---
 
@@ -19,7 +27,7 @@ const links = [
     <nav class="site-nav__links" aria-label="Primary">
       {
         links.map((link) => (
-          <a href={link.href} data-nav-link={link.href.slice(1)}>
+          <a href={link.href} data-nav-link={link.id}>
             {link.label}
           </a>
         ))
@@ -27,6 +35,19 @@ const links = [
     </nav>
 
     <div class="site-nav__actions">
+      <div class="site-nav__langs" aria-label="Language">
+        {
+          locales.map((l) => (
+            <a
+              href={homePath(l)}
+              class:list={[{ "is-current": l === locale }]}
+              aria-current={l === locale ? "page" : undefined}
+            >
+              {l.toUpperCase()}
+            </a>
+          ))
+        }
+      </div>
       <a
         class="icon-btn"
         href="https://github.com/khalilBenAli1"
@@ -39,11 +60,13 @@ const links = [
         aria-label="LinkedIn profile"
         set:html={ui.linkedin}
       />
-      <a class="btn btn--primary site-nav__resume" href="/resume/">Résumé</a>
+      <a class="btn btn--primary site-nav__resume" href={`/${locale === "en" ? "" : locale + "/"}resume/`}>
+        {dict.nav.resume}
+      </a>
       <button
         class="site-nav__burger icon-btn"
         data-nav-burger
-        aria-label="Open menu"
+        aria-label="Menu"
         aria-expanded="false"
         aria-controls="mobile-menu"
         set:html={ui.menu}
@@ -55,7 +78,7 @@ const links = [
     <button
       class="site-nav__close icon-btn"
       data-nav-close
-      aria-label="Close menu"
+      aria-label="Close"
       set:html={ui.x}
     />
     <nav aria-label="Mobile">
@@ -66,9 +89,26 @@ const links = [
           </a>
         ))
       }
-      <a href="/resume/" style={`--i:${links.length}`} data-nav-overlay-link>
-        Résumé
+      <a
+        href={`/${locale === "en" ? "" : locale + "/"}resume/`}
+        style={`--i:${links.length}`}
+        data-nav-overlay-link
+      >
+        {dict.nav.resume}
       </a>
+      <div class="site-nav__overlay-langs" style={`--i:${links.length + 1}`}>
+        {
+          locales.map((l) => (
+            <a
+              href={homePath(l)}
+              class:list={[{ "is-current": l === locale }]}
+              data-nav-overlay-link
+            >
+              {l.toUpperCase()}
+            </a>
+          ))
+        }
+      </div>
     </nav>
   </div>
 </header>
@@ -158,6 +198,31 @@ const links = [
     gap: 0.6rem;
   }
 
+  .site-nav__langs {
+    display: flex;
+    gap: 0.1rem;
+    margin-right: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .site-nav__langs a {
+    padding: 0.3rem 0.4rem;
+    border-radius: 6px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .site-nav__langs a:hover {
+    color: var(--text);
+  }
+
+  .site-nav__langs a.is-current {
+    background: rgba(124, 92, 255, 0.16);
+    color: var(--violet-soft);
+  }
+
   .site-nav__resume {
     min-height: 2.35rem;
     padding: 0.42rem 1.05rem;
@@ -199,7 +264,7 @@ const links = [
     transition:
       opacity 0.4s ease,
       transform 0.4s ease;
-    transition-delay: calc(var(--i) * 70ms);
+    transition-delay: calc(var(--i, 0) * 70ms);
   }
 
   .site-nav__overlay.is-open a {
@@ -211,6 +276,23 @@ const links = [
     color: var(--violet-soft);
   }
 
+  .site-nav__overlay-langs {
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+  }
+
+  .site-nav__overlay-langs a {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  .site-nav__overlay-langs a.is-current {
+    color: var(--violet-soft);
+  }
+
   .site-nav__close {
     position: absolute;
     top: 1rem;
@@ -219,7 +301,8 @@ const links = [
 
   @media (max-width: 51.25rem) {
     .site-nav__links,
-    .site-nav__resume {
+    .site-nav__resume,
+    .site-nav__langs {
       display: none;
     }
 

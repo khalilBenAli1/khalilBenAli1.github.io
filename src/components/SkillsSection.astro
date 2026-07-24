@@ -1,30 +1,38 @@
 ---
 import { tech, ui } from "../lib/icons";
+import { t, type Locale } from "../lib/i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const dict = t(locale);
 
 const groups: { icon: string; title: string; items: string[] }[] = [
   {
     icon: "monitor",
-    title: "Frontend",
+    title: dict.skills.groups.frontend,
     items: ["TypeScript", "React", "Next.js", "Astro", "React Native", "Tailwind", "GSAP", "WebGL"],
   },
   {
     icon: "server",
-    title: "Backend",
+    title: dict.skills.groups.backend,
     items: ["Node.js", "NestJS", "Express", "PostgreSQL", "MongoDB", "Redis", "RabbitMQ", "Socket.IO"],
   },
   {
     icon: "brain-circuit",
-    title: "AI & LLM",
+    title: dict.skills.groups.ailtm,
     items: ["Azure OpenAI", "Gemini", "LangChain / LangGraph", "RAG · pgvector", "transformers.js"],
   },
   {
     icon: "cpu",
-    title: "Native & Systems",
+    title: dict.skills.groups.native,
     items: ["C#", ".NET 9", "WPF", "C++20", "JUCE", "CMake", "SQLite"],
   },
   {
     icon: "wrench",
-    title: "Platform & Tools",
+    title: dict.skills.groups.platform,
     items: ["Microsoft Graph", "Microsoft Teams", "Salesforce", "Azure", "Docker", "GitHub Actions", "Vercel", "Git"],
   },
 ];
@@ -33,8 +41,8 @@ const groups: { icon: string; title: string; items: string[] }[] = [
 <section class="section" id="skills" aria-labelledby="skills-title">
   <div class="container">
     <div class="section-heading">
-      <p class="eyebrow">Skills</p>
-      <h2 class="section-title" id="skills-title">Toolbox</h2>
+      <p class="eyebrow">{dict.skills.eyebrow}</p>
+      <h2 class="section-title" id="skills-title">{dict.skills.title}</h2>
     </div>
 
     <div class="skills__grid">

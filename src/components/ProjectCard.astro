@@ -1,7 +1,9 @@
 ---
 import { tech, ui } from "../lib/icons";
+import { t, type Locale } from "../lib/i18n";
 
 interface Props {
+  locale: Locale;
   icon: string;
   name: string;
   subtitle: string;
@@ -16,6 +18,7 @@ interface Props {
 }
 
 const {
+  locale,
   icon,
   name,
   subtitle,
@@ -28,6 +31,8 @@ const {
   techNames,
   flip = false,
 } = Astro.props;
+
+const dict = t(locale);
 ---
 
 <article class:list={["project glass-card reveal", { "project--flip": flip }]} data-tilt-soft>
@@ -48,7 +53,7 @@ const {
         production && (
           <span class="chip chip--status">
             <span class="project__dot" aria-hidden="true" />
-            Production
+            {dict.work.production}
           </span>
         )
       }
@@ -56,7 +61,7 @@ const {
         privateRepo && !repoUrl && (
           <span class="chip">
             <span class="project__lock" set:html={ui.lock} />
-            Private repo
+            {dict.work.privateRepo}
           </span>
         )
       }
@@ -64,7 +69,7 @@ const {
         repoUrl && (
           <a class="chip project__repo" href={repoUrl}>
             <span class="project__lock" set:html={ui.github} />
-            View code
+            {dict.work.viewCode}
           </a>
         )
       }

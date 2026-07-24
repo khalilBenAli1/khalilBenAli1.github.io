@@ -1,16 +1,22 @@
 ---
 import { ui } from "../lib/icons";
+import { t, type Locale } from "../lib/i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const dict = t(locale);
 ---
 
 <section class="section contact" id="contact" aria-labelledby="contact-title">
   <div class="container contact__inner">
-    <p class="eyebrow">Contact</p>
+    <p class="eyebrow">{dict.contact.eyebrow}</p>
     <h2 class="section-title gradient-text" id="contact-title">
-      Let's build something.
+      {dict.contact.title}
     </h2>
-    <p class="contact__line">
-      Open to interesting problems — reach me any time.
-    </p>
+    <p class="contact__line">{dict.contact.line}</p>
     <div class="contact__actions">
       <a
         class="btn btn--primary"
@@ -18,7 +24,7 @@ import { ui } from "../lib/icons";
         data-magnetic
       >
         <span set:html={ui.mail} />
-        Email me
+        {dict.contact.email}
       </a>
       <a class="btn btn--ghost" href="https://github.com/khalilBenAli1" data-magnetic>
         <span set:html={ui.github} />
@@ -33,16 +39,18 @@ import { ui } from "../lib/icons";
         LinkedIn
       </a>
     </div>
-    <p class="contact__languages">
-      EN · FR · AR · IT — hello · bonjour · <span dir="rtl">أهلاً</span> · ciao
-    </p>
   </div>
 
   <footer class="contact__footer">
     <div class="container contact__footer-inner">
-      <p>© 2026 Khalil Ben Ali · Faenza, Italy</p>
-      <p>Designed &amp; engineered with an AI-native workflow</p>
-      <a class="icon-btn" href="#top" aria-label="Back to top" set:html={ui["arrow-up"]} />
+      <p>{dict.contact.footerLeft}</p>
+      <p>{dict.contact.footerRight}</p>
+      <a
+        class="icon-btn"
+        href="#top"
+        aria-label={dict.contact.backToTop}
+        set:html={ui["arrow-up"]}
+      />
     </div>
   </footer>
 </section>
@@ -77,14 +85,6 @@ import { ui } from "../lib/icons";
     justify-content: center;
     gap: 0.9rem;
     margin-top: 1.2rem;
-  }
-
-  .contact__languages {
-    margin-top: 1.6rem;
-    color: var(--muted);
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    letter-spacing: 0.05em;
   }
 
   .contact__footer {
