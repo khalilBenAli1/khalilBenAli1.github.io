@@ -1,0 +1,198 @@
+---
+export type PlateKind = 'grid' | 'nodes' | 'liquid' | 'scan' | 'wave';
+
+export interface WorkRowData {
+  number: string;
+  eyebrow: string;
+  title: string;
+  story: string;
+  built: string[];
+  chips: string[];
+}
+
+export interface Props {
+  data: WorkRowData;
+  plate: PlateKind;
+  reverse?: boolean;
+}
+
+const { data, plate, reverse = false } = Astro.props;
+const titleId = `work-${data.number.replace(/\D/g, '') || plate}`;
+---
+
+<article
+  class:list={['work-row', { 'work-row--reverse': reverse }]}
+  aria-labelledby={titleId}
+  data-work-row
+  data-plate-kind={plate}
+>
+  <div class="work-row__plate" data-plate-container aria-hidden="true">
+    <canvas
+      class="work-row__canvas"
+      data-plate={plate}
+      data-plate-canvas
+      aria-hidden="true"
+    ></canvas>
+  </div>
+
+  <div class="work-row__copy">
+    <p class="work-row__eyebrow">{data.number} · {data.eyebrow}</p>
+    <h3 id={titleId}>{data.title}</h3>
+    <p class="work-row__story">{data.story}</p>
+
+    <div class="work-row__built">
+      <h4>Built</h4>
+      <ul>
+        {data.built.map((item) => <li>{item}</li>)}
+      </ul>
+    </div>
+
+    <ul class="work-row__chips" aria-label="Technology stack">
+      {data.chips.map((chip) => <li>{chip}</li>)}
+    </ul>
+  </div>
+</article>
+
+<style>
+  .work-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(40px, 7vw, 96px);
+    align-items: center;
+    padding-block: clamp(72px, 11vw, 144px);
+    border-block-end: 1px solid color-mix(in srgb, var(--cobalt) 25%, transparent);
+  }
+
+  .work-row--reverse .work-row__plate {
+    order: 2;
+  }
+
+  .work-row--reverse .work-row__copy {
+    order: 1;
+  }
+
+  .work-row__plate {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 2px solid var(--cobalt);
+    border-radius: 5px;
+    background: var(--tint);
+  }
+
+  .work-row__canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--tint);
+  }
+
+  .work-row__eyebrow {
+    margin: 0 0 20px;
+    color: var(--cobalt);
+    font-family: var(--font-mono);
+    font-size: clamp(0.68rem, 0.9vw, 0.78rem);
+    font-weight: 500;
+    line-height: 1.55;
+    letter-spacing: 0.045em;
+  }
+
+  .work-row h3 {
+    max-width: 14ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 650;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+  }
+
+  .work-row__story {
+    margin: 28px 0 0;
+    font-size: clamp(1rem, 1.35vw, 1.12rem);
+    line-height: 1.62;
+  }
+
+  .work-row__built {
+    margin-block-start: 28px;
+  }
+
+  .work-row__built h4 {
+    margin: 0 0 10px;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .work-row__built ul {
+    display: grid;
+    gap: 9px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .work-row__built li {
+    position: relative;
+    padding-inline-start: 17px;
+    font-size: 0.96rem;
+    line-height: 1.52;
+  }
+
+  .work-row__built li::before {
+    position: absolute;
+    top: 0.69em;
+    left: 0;
+    width: 3px;
+    height: 3px;
+    background: var(--cobalt);
+    content: "";
+  }
+
+  .work-row__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 28px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .work-row__chips li {
+    padding: 6px 8px;
+    border: 1px solid var(--cobalt-2);
+    border-radius: 3px;
+    background: var(--tint);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  @media (max-width: 900px) {
+    .work-row {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .work-row--reverse .work-row__plate,
+    .work-row--reverse .work-row__copy {
+      order: initial;
+    }
+
+    .work-row__copy {
+      max-width: 680px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .work-row__plate {
+      aspect-ratio: 1 / 1;
+    }
+  }
+</style>

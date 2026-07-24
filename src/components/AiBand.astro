@@ -1,0 +1,154 @@
+<section class="ai-band" id="ai-native" aria-labelledby="ai-band-title" data-section>
+  <div class="ai-band__inner">
+    <p class="ai-band__eyebrow">THE AI PART</p>
+    <h2 id="ai-band-title">AI in production, not in slides.</h2>
+
+    <div class="ai-band__columns">
+      <article>
+        <h3>Ships AI features</h3>
+        <p>
+          call transcription &amp; summarization, LLM adjudication with
+          deterministic gates, LangGraph agents over seven systems, on-device
+          CLIP vision, RAG with pgvector and Microsoft Copilot Graph Connectors.
+        </p>
+      </article>
+
+      <article>
+        <h3>Engineers around models</h3>
+        <p>
+          provider-agnostic interfaces, graceful degradation, hardened LLM
+          clients (timeouts, bounded retries, usage tracking), full
+          observability with PostHog LLM analytics: tokens, latency, cost,
+          fallback events.
+        </p>
+      </article>
+
+      <article>
+        <h3>Works AI-native</h3>
+        <p>
+          daily multi-agent engineering: an orchestrator model for architecture
+          and review, executor models for implementation, verification gates
+          before anything ships. This site was built that way.
+        </p>
+      </article>
+    </div>
+
+    <div class="ai-band__log" aria-label="AI-native engineering session log">
+      <p><span aria-hidden="true">▸</span> plan      architecture approved — 5 plates, 1 signature</p>
+      <p><span aria-hidden="true">▸</span> delegate  implement hero kinetic type → executor</p>
+      <p><span aria-hidden="true">▸</span> verify    360px…4K screenshots — 60fps, AA contrast</p>
+      <p class="ai-band__log-last"><span aria-hidden="true">▸</span> ship      khalilbenali1.github.io — live<span class="ai-band__caret" aria-hidden="true"></span></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ai-band {
+    background: var(--cobalt);
+    color: var(--paper);
+    padding-block: clamp(80px, 12vw, 152px);
+  }
+
+  .ai-band__inner {
+    width: min(
+      calc(100% - var(--gutter) - var(--gutter)),
+      var(--container)
+    );
+    margin-inline: auto;
+  }
+
+  .ai-band__eyebrow {
+    margin: 0 0 20px;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.08em;
+  }
+
+  .ai-band h2 {
+    max-width: 16ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 650;
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+  }
+
+  .ai-band__columns {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(28px, 5vw, 64px);
+    margin-block-start: clamp(48px, 7vw, 80px);
+  }
+
+  .ai-band__columns article {
+    padding-block-start: 18px;
+    border-block-start: 2px solid var(--paper);
+  }
+
+  .ai-band__columns h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 2vw, 1.72rem);
+    font-weight: 650;
+    line-height: 1.1;
+  }
+
+  .ai-band__columns p {
+    margin: 16px 0 0;
+    font-size: 1rem;
+    line-height: 1.62;
+  }
+
+  .ai-band__log {
+    margin-block-start: clamp(48px, 7vw, 80px);
+    padding: clamp(22px, 3vw, 36px);
+    border: 1px solid color-mix(in srgb, var(--paper) 48%, transparent);
+    font-family: var(--font-mono);
+    font-size: clamp(0.68rem, 1.1vw, 0.82rem);
+    line-height: 1.85;
+    overflow-x: auto;
+  }
+
+  .ai-band__log p {
+    width: max-content;
+    min-width: 100%;
+    margin: 0;
+    white-space: pre;
+  }
+
+  .ai-band__log p span:first-child {
+    display: inline-block;
+    width: 2ch;
+  }
+
+  .ai-band__caret {
+    display: inline-block;
+    width: 0.7ch;
+    height: 1em;
+    margin-inline-start: 0.4ch;
+    vertical-align: -0.16em;
+    background: currentColor;
+    animation: caret-blink 900ms steps(1, end) infinite;
+  }
+
+  @keyframes caret-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 820px) {
+    .ai-band__columns {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-band__caret {
+      animation: none;
+    }
+  }
+</style>

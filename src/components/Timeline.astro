@@ -1,0 +1,144 @@
+---
+const entries = [
+  {
+    heading: 'nBold — Full-Stack & AI Engineer',
+    period: '2024 → now',
+    description:
+      "Paris-based Microsoft 365 SaaS (Teams workspace templating & governance). Designed and built the platform's Teams meeting-intelligence feature (Microsoft Graph, durable workflows, AI routing) and lead engineering on client platforms: Cuddy Brain, L'OR Remix, Cuddy Scanner.",
+  },
+  {
+    heading: 'Freelance — Software Developer',
+    period: '2023 → 2024',
+    description:
+      "Cross-platform apps: children's game (RN/Expo/Redux), travel planner (RN + MobX, Express/Mongo backend + React admin).",
+  },
+  {
+    heading: 'SolvR — Software Developer',
+    period: '2023',
+    description:
+      'Refactored & shipped a cross-platform chat app (React Native, Expo, MobX, Firebase): real-time messaging, auth, state architecture.',
+  },
+  {
+    heading: 'Tynass IT — Software Developer',
+    period: '2019 → 2022',
+    description:
+      'AR tourism app (Tynass Trips), job-seeker platform (Karriery), fashion e-commerce, corporate sites. React, Material-UI, Express, MongoDB.',
+  },
+];
+---
+
+<section class="timeline" id="experience" aria-labelledby="experience-title" data-section>
+  <div class="timeline__inner">
+    <h2 id="experience-title">Experience</h2>
+
+    <ol class="timeline__list">
+      {entries.map((entry) => (
+        <li class="timeline__item">
+          <article>
+            <h3>
+              {entry.heading}
+              <span> · {entry.period}</span>
+            </h3>
+            <p>{entry.description}</p>
+          </article>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .timeline {
+    padding-block: clamp(80px, 12vw, 152px);
+  }
+
+  .timeline__inner {
+    width: min(
+      calc(100% - var(--gutter) - var(--gutter)),
+      var(--container)
+    );
+    margin-inline: auto;
+  }
+
+  .timeline h2 {
+    margin: 0 0 clamp(48px, 7vw, 80px);
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 650;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+
+  .timeline__list {
+    position: relative;
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .timeline__list::before {
+    position: absolute;
+    inset-block: 0;
+    left: 7px;
+    width: 2px;
+    background: var(--cobalt);
+    content: "";
+  }
+
+  .timeline__item {
+    position: relative;
+    padding: 0 0 clamp(36px, 5vw, 56px) 48px;
+  }
+
+  .timeline__item:last-child {
+    padding-block-end: 0;
+  }
+
+  .timeline__item::before {
+    position: absolute;
+    top: 0.35rem;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--cobalt);
+    border-radius: 50%;
+    background: var(--paper);
+    content: "";
+  }
+
+  .timeline h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 2.5vw, 2rem);
+    font-weight: 650;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+
+  .timeline h3 span {
+    color: var(--cobalt);
+    font-family: var(--font-mono);
+    font-size: 0.72em;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .timeline p {
+    max-width: 840px;
+    margin: 12px 0 0;
+    line-height: 1.62;
+  }
+
+  @media (max-width: 560px) {
+    .timeline__item {
+      padding-inline-start: 36px;
+    }
+
+    .timeline h3 span {
+      display: block;
+      margin-block-start: 8px;
+    }
+  }
+</style>
