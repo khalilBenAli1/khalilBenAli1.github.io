@@ -1,0 +1,115 @@
+---
+const entries = [
+  {
+    role: "Full-Stack & AI Engineer",
+    company: "nBold",
+    period: "2024 → now",
+    note: "Microsoft Teams templating & governance SaaS (Paris). Platform AI features plus lead engineering on client platforms: Cuddy Brain, L'OR Remix, Cuddy Scanner.",
+  },
+  {
+    role: "Software Developer",
+    company: "Freelance",
+    period: "2023 → 2024",
+    note: "Cross-platform apps: children's game (React Native), travel planner (React Native + Express/MongoDB).",
+  },
+  {
+    role: "Software Developer",
+    company: "SolvR",
+    period: "2023",
+    note: "Refactored and shipped a React Native chat app: real-time messaging, auth, state architecture.",
+  },
+  {
+    role: "Software Developer",
+    company: "Tynass IT",
+    period: "2019 → 2022",
+    note: "AR tourism app, job platform, e-commerce and corporate sites (React, Express, MongoDB).",
+  },
+];
+---
+
+<section class="section" id="experience" aria-labelledby="experience-title">
+  <div class="container">
+    <div class="section-heading">
+      <p class="eyebrow">Experience</p>
+      <h2 class="section-title" id="experience-title">Where I've worked</h2>
+    </div>
+
+    <ol class="timeline">
+      {
+        entries.map((e) => (
+          <li class="timeline__entry reveal">
+            <span class="timeline__node" aria-hidden="true" />
+            <div>
+              <h3 class="timeline__role">
+                {e.role} — <span class="gradient-text">{e.company}</span>
+              </h3>
+              <p class="timeline__period">{e.period}</p>
+              <p class="timeline__note">{e.note}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .timeline {
+    position: relative;
+    display: grid;
+    gap: 2.4rem;
+    max-width: 46rem;
+    margin: 0;
+    padding: 0 0 0 2rem;
+    list-style: none;
+  }
+
+  .timeline::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 7px;
+    width: 2px;
+    background: linear-gradient(180deg, #7c5cff, #38bdf8);
+    opacity: 0.5;
+  }
+
+  .timeline__entry {
+    position: relative;
+  }
+
+  .timeline__node {
+    position: absolute;
+    top: 7px;
+    left: -2rem;
+    width: 16px;
+    height: 16px;
+    border: 3px solid var(--bg-0);
+    border-radius: 50%;
+    background: var(--violet);
+    box-shadow: 0 0 12px rgba(124, 92, 255, 0.8);
+  }
+
+  .timeline__role {
+    margin-bottom: 0.15rem;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .timeline__period {
+    margin-bottom: 0.5rem;
+    color: var(--violet-soft);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+  }
+
+  .timeline__note {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.6;
+  }
+</style>

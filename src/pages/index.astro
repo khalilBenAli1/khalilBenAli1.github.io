@@ -1,194 +1,182 @@
 ---
 import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
 import Hero from "../components/Hero.astro";
-import ProofStrip from "../components/ProofStrip.astro";
-import WorkRow from "../components/WorkRow.astro";
-import AiBand from "../components/AiBand.astro";
-import Timeline from "../components/Timeline.astro";
-import Skills from "../components/Skills.astro";
-import MoreWork from "../components/MoreWork.astro";
-import Footer from "../components/Footer.astro";
-
-interface Project {
-  data: {
-    number: string;
-    eyebrow: string;
-    title: string;
-    story: string;
-    built: string[];
-    chips: string[];
-  };
-  plate: "grid" | "nodes" | "liquid" | "scan" | "wave";
-}
-
-const projects: Project[] = [
-  {
-    plate: "nodes",
-    data: {
-      number: "01",
-      eyebrow:
-        "CUDDY FINANCIAL · 2024→NOW · NESTJS · POSTGRES · AZURE OPENAI · TEAMS",
-      title: "The operations brain for a wealth-advisory firm",
-      story:
-        "Cuddy Brain lives inside Microsoft Teams and mirrors ten SaaS systems — Salesforce, Microsoft 365, RingCentral, QuickBooks, Harvest and more — into one PostgreSQL hub, so staff work one screen instead of ten tabs. On top of the mirror: AI that listens, reads and files. I'm the platform's primary engineer — roughly 3,860 commits across backend and frontend.",
-      built: [
-        "AI call intelligence: every client call transcribed, summarized by Azure OpenAI, matched to the right household, follow-up tasks extracted, posted to Teams as an Adaptive Card — minutes after hang-up.",
-        "Obituary & address monitoring: AI adjudication with deterministic post-gates, fuzzy identity matching, public-records diffing (NYS assessment rolls) to protect estate work.",
-        "A LangGraph review agent that assembles full client-review documents from seven systems into DOCX/PDF.",
-        "Reliability layer: hardened shared Azure OpenAI client, BullMQ job orchestration, stale-while-revalidate caching, webhook HMAC verification, secret-scanning CI.",
-        "Champions: a full gamification engine with 40 parametric SVG badges and a simulation harness validated against production data.",
-      ],
-      chips: [
-        "NestJS",
-        "PostgreSQL (~115 tables)",
-        "BullMQ/Redis",
-        "Azure OpenAI",
-        "LangGraph",
-        "React 18",
-        "MUI",
-        "Socket.IO",
-        "MS Graph",
-        "Salesforce",
-      ],
-    },
-  },
-  {
-    plate: "liquid",
-    data: {
-      number: "02",
-      eyebrow:
-        "JDE × HLWN · 2026 · NEXT.JS 15 · GEMINI · ON-DEVICE CLIP · WEBGL",
-      title: "An AI barista for a Gen Z coffee campaign",
-      story:
-        "For L'OR Espresso Concentrate's summer 2026 activation, I was the sole developer — 129 of 129 commits — of a web app and live-event kiosk that turns your music taste or your outfit into a personalized coffee cocktail. A CLIP vision model runs entirely in the browser; Gemini writes the recipe; a WebGL fluid simulation pours it; a Bluetooth thermal printer hands you the ticket.",
-      built: [
-        "On-device computer vision: quantized CLIP ViT-B/32 (~147MB ONNX) in a Web Worker — selfies never leave the device. Zero server cost, GDPR-clean.",
-        "Gemini 2.5 Flash behind a provider-agnostic interface with deterministic fallback — three operational modes (online / degraded / fully-offline kiosk) on one codebase.",
-        "Custom WebGL Navier-Stokes fluid engine (688 lines) holding 60fps on an iPhone 12, Canvas 2D fallback for reduced motion.",
-        "Event hardware pipeline: Web Bluetooth ESC/POS thermal printing, a Postgres-backed print queue, per-station routing, offline-first PWA.",
-        "Bilingual FR/EN, 13-page admin back-office, SSR recipe permalinks powering JDE's in-store scan-to-recipe QR journey.",
-      ],
-      chips: [
-        "Next.js 15",
-        "React 19",
-        "TypeScript",
-        "Gemini",
-        "transformers.js",
-        "WebGL",
-        "GSAP",
-        "Drizzle/Neon",
-        "Vercel",
-        "PWA",
-        "PostHog LLM analytics",
-      ],
-    },
-  },
-  {
-    plate: "grid",
-    data: {
-      number: "03",
-      eyebrow: "NBOLD · 2026 · NESTJS · MICROSOFT GRAPH · RABBITMQ",
-      title: "Meeting intelligence for a Teams governance platform",
-      story:
-        "nBold turns business playbooks into governed Microsoft Teams workspaces at enterprise scale (ISO 27001, SOC 2). On its seven-app NestJS microservices monorepo, I designed and built the meeting-intelligence feature end to end: live Teams transcripts captured through Microsoft Graph change notifications, AI-summarized, and routed by a CRM-aware AI engine into the right channel as Adaptive Cards.",
-      built: [
-        "Architected the six-phase plan against live Graph docs — app-only auth, metered transcript APIs, application access policies — then built it solo: 67 files, ~11,000 lines, 321 tests.",
-        "Net-new app-only Graph auth path unlocking tenant-wide transcript subscriptions: validated webhooks, idempotent ingress, auto-renewal, reconciliation crons.",
-        "CRM-aware AI routing — Salesforce reverse-lookup plus LLM channel selection with deterministic fallbacks — inside a durable workflow proven crash-safe: no duplicate delivery across API restarts.",
-        "Evidence-first verification: live-tenant contract proofs plus a zero-external-call simulation harness and a 42-file verification toolkit.",
-      ],
-      chips: [
-        "NestJS",
-        "Microsoft Graph",
-        "RabbitMQ",
-        "Postgres/Drizzle",
-        "Durable workflows",
-        "Azure OpenAI",
-        "Adaptive Cards",
-        "Salesforce",
-      ],
-    },
-  },
-  {
-    plate: "scan",
-    data: {
-      number: "04",
-      eyebrow: "CUDDY FINANCIAL · .NET 9 · WPF · TWAIN",
-      title: "A production document scanner, rebuilt from the metal up",
-      story:
-        "A native Windows app that drives office TWAIN scanners, splits batches by barcode, assembles PDFs and files them into SharePoint — used daily in a financial office. Ground-up .NET 9 rewrite of the v1 I also built: clean architecture, MSIX-signed, session resume for interrupted scans.",
-      built: [
-        "Clean Architecture: App (WPF/Fluent) / Core (scan + PDF domain) / Infrastructure (SharePoint) / TwainBridge.",
-        "Barcode-based auto-separation, blank-page removal, duplex ADF, DPI 200–600, saved profiles, customer lookup & association.",
-        "MSAL OAuth → SharePoint upload with metadata tagging; LiteDB local store; MSIX packaging + code-signing pipeline.",
-      ],
-      chips: [
-        "C#",
-        ".NET 9",
-        "WPF",
-        "MVVM",
-        "TWAIN",
-        "PdfSharp",
-        "LiteDB",
-        "MSAL",
-        "MSIX",
-      ],
-    },
-  },
-  {
-    plate: "wave",
-    data: {
-      number: "05",
-      eyebrow: "R&D · C++20 · JUCE · DSP",
-      title: "GPU-accelerated and mesh-networked audio engines",
-      story:
-        "Two native audio systems built as serious R&D: HyperGpu DSP, a JUCE manager + VST3/AU wrapper that GPU-accelerates third-party audio plugins with clean CPU fallback; and HyperMesh DSP, a C++20 LAN mesh that offloads real-time DSP between machines — lock-free buffers, adaptive jitter compensation, XOR FEC, benchmark-graded links.",
-      built: [
-        "Crash-isolated plugin scanner workers, cross-platform IPC (named pipes / Unix sockets) with heartbeat & reconnect.",
-        "Lock-free NetworkBuffer, adaptive JitterBuffer, FEC codec, latency compensation manager, load-scored server discovery.",
-        "CI matrix shipping self-contained builds for Apple Silicon, Intel Mac, Windows x64, Linux x86/arm64.",
-      ],
-      chips: [
-        "C++20",
-        "JUCE",
-        "CMake",
-        "Protobuf",
-        "SQLite",
-        "GPU Audio SDK",
-        "DXGI/NVML",
-      ],
-    },
-  },
-];
+import TechMarquee from "../components/TechMarquee.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import Diagram from "../components/Diagram.astro";
+import AiSection from "../components/AiSection.astro";
+import Experience from "../components/Experience.astro";
+import SkillsSection from "../components/SkillsSection.astro";
+import Contact from "../components/Contact.astro";
+import { ui } from "../lib/icons";
+import {
+  audioDiagram,
+  cuddyDiagram,
+  lorDiagram,
+  meetingDiagram,
+  scannerDiagram,
+} from "../lib/diagrams-data";
 ---
 
-<Base>
-  <Hero />
-  <ProofStrip />
+<Base space>
+  <Nav />
 
   <main id="main-content">
-    <section class="work" id="selected-work" aria-labelledby="selected-work-title">
-      <div class="work__inner">
-        <h2 id="selected-work-title">Selected Work</h2>
-        {
-          projects.map((project, index) => (
-            <WorkRow
-              data={project.data}
-              plate={project.plate}
-              reverse={index % 2 === 1}
-            />
-          ))
-        }
+    <Hero />
+    <TechMarquee />
+
+    <section class="section" id="work" aria-labelledby="work-title">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Selected Work</p>
+          <h2 class="section-title" id="work-title">Things I've shipped</h2>
+        </div>
+
+        <ProjectCard
+          icon="brain-circuit"
+          name="Cuddy Brain"
+          subtitle="AI operations hub for a US wealth-advisory firm — one screen instead of ten tools."
+          year="2024 → now"
+          client="Cuddy Financial"
+          production
+          highlights={[
+            "Unified Salesforce, Microsoft 365, RingCentral, QuickBooks + 6 more into one PostgreSQL hub",
+            "Every client call auto-transcribed, AI-summarized and routed into Teams within minutes",
+            "AI monitoring with deterministic safety gates protects estate work",
+          ]}
+          techNames={[
+            "NestJS",
+            "PostgreSQL",
+            "Redis",
+            "Azure OpenAI",
+            "LangChain",
+            "React",
+            "Microsoft Teams",
+            "Salesforce",
+          ]}
+        >
+          <Diagram {...cuddyDiagram} />
+        </ProjectCard>
+
+        <ProjectCard
+          icon="coffee"
+          name="L'OR Unlimited Remix"
+          subtitle="AI brand experience and live-event kiosk for JDE's L'OR — sole developer, concept to production."
+          year="2026"
+          client="JDE × HLWN"
+          production
+          flip
+          highlights={[
+            "On-device CLIP vision: selfies analyzed in the browser, photos never leave the device",
+            "Gemini-generated recipes with a deterministic fallback — works even fully offline",
+            "WebGL fluid simulation at 60fps plus Bluetooth thermal ticket printing at events",
+          ]}
+          techNames={[
+            "Next.js",
+            "React",
+            "TypeScript",
+            "Gemini",
+            "transformers.js",
+            "WebGL",
+            "Tailwind",
+            "Vercel",
+          ]}
+        >
+          <Diagram {...lorDiagram} />
+        </ProjectCard>
+
+        <ProjectCard
+          icon="radio"
+          name="nBold Meeting Intelligence"
+          subtitle="Teams meeting transcripts captured via Microsoft Graph, AI-summarized, and routed to the right channel by CRM context."
+          year="2026"
+          client="nBold"
+          highlights={[
+            "Designed the architecture end to end, then built it solo — 321 tests",
+            "Net-new app-only Graph auth unlocking tenant-wide transcript capture",
+            "Durable workflows proven crash-safe — zero duplicate deliveries across restarts",
+          ]}
+          techNames={[
+            "NestJS",
+            "Microsoft Graph",
+            "RabbitMQ",
+            "PostgreSQL",
+            "Azure OpenAI",
+            "Salesforce",
+          ]}
+        >
+          <Diagram {...meetingDiagram} />
+        </ProjectCard>
+
+        <ProjectCard
+          icon="scan-line"
+          name="Cuddy Scanner"
+          subtitle="Native .NET 9 document scanner in daily production use at a financial office."
+          year="2025 → now"
+          client="Cuddy Financial"
+          production
+          flip
+          highlights={[
+            "Drives TWAIN office scanners with barcode-based automatic batch splitting",
+            "Assembles PDFs and files them straight into SharePoint with metadata",
+            "Clean Architecture, MSIX-signed, resumes interrupted scan sessions",
+          ]}
+          techNames={["C#", ".NET 9", "WPF", "SharePoint", "LiteDB", "MSAL"]}
+        >
+          <Diagram {...scannerDiagram} />
+        </ProjectCard>
+
+        <ProjectCard
+          icon="audio-waveform"
+          name="HyperMesh & HyperGpu DSP"
+          subtitle="C++ audio R&D: GPU-accelerated plugin hosting and a LAN mesh that offloads real-time DSP between machines."
+          year="2026"
+          client="R&D"
+          highlights={[
+            "Lock-free buffers, adaptive jitter compensation and FEC over the network",
+            "Crash-isolated plugin scanning and cross-platform manager⇄wrapper IPC",
+            "CI ships self-contained builds for five platforms",
+          ]}
+          techNames={["C++20", "JUCE", "CMake", "Protobuf", "SQLite"]}
+        >
+          <Diagram {...audioDiagram} />
+        </ProjectCard>
+
+        <div class="more-work glass-card reveal">
+          <div class="more-work__biat">
+            <span class="more-work__icon" set:html={ui.database} />
+            <div>
+              <h3>Assurances BIAT KB</h3>
+              <p>
+                Explainable RAG chatbot (pgvector + Ollama) with cited, auditable
+                answers and role-based access.
+              </p>
+            </div>
+            <a
+              class="btn btn--ghost more-work__code"
+              href="https://github.com/khalilBenAli1/knowledgebase-"
+            >
+              <span set:html={ui.github} />
+              View code
+            </a>
+          </div>
+          <div class="more-work__cta">
+            <p>More projects, experiments and earlier work —</p>
+            <a class="btn btn--ghost" href="https://github.com/khalilBenAli1">
+              <span set:html={ui.github} />
+              github.com/khalilBenAli1
+            </a>
+          </div>
+        </div>
       </div>
     </section>
 
-    <AiBand />
-    <Timeline />
-    <Skills />
-    <MoreWork />
+    <AiSection />
+    <Experience />
+    <SkillsSection />
+    <Contact />
   </main>
-
-  <Footer />
 
   <script>
     import "../scripts/site";
@@ -196,24 +184,65 @@ const projects: Project[] = [
 </Base>
 
 <style>
-  .work {
-    padding-block: clamp(80px, 12vw, 152px) 0;
+  .more-work {
+    display: grid;
+    gap: 1.6rem;
+    padding: clamp(1.5rem, 3vw, 2.2rem);
   }
 
-  .work__inner {
-    width: min(
-      calc(100% - var(--gutter) - var(--gutter)),
-      var(--container)
-    );
-    margin-inline: auto;
+  .more-work__biat {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.1rem;
   }
 
-  .work h2 {
-    margin: 0;
+  .more-work__biat > div {
+    flex: 1 1 18rem;
+  }
+
+  .more-work__icon {
+    display: inline-flex;
+    flex: none;
+    width: 2.4rem;
+    height: 2.4rem;
+    padding: 0.5rem;
+    border: 1px solid var(--border-accent);
+    border-radius: 11px;
+    background: rgba(124, 92, 255, 0.12);
+    color: var(--violet-soft);
+  }
+
+  .more-work__icon :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .more-work__biat h3 {
+    margin-bottom: 0.15rem;
     font-family: var(--font-display);
-    font-size: clamp(2rem, 5vw, 4rem);
-    font-weight: 650;
-    line-height: 0.98;
-    letter-spacing: -0.04em;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .more-work__biat p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .more-work__cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .more-work__cta p {
+    margin: 0;
+    color: var(--muted);
   }
 </style>

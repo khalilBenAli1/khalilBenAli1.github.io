@@ -1,0 +1,117 @@
+---
+import { ui } from "../lib/icons";
+---
+
+<section class="section contact" id="contact" aria-labelledby="contact-title">
+  <div class="container contact__inner">
+    <p class="eyebrow">Contact</p>
+    <h2 class="section-title gradient-text" id="contact-title">
+      Let's build something.
+    </h2>
+    <p class="contact__line">
+      Open to interesting problems — reach me any time.
+    </p>
+    <div class="contact__actions">
+      <a
+        class="btn btn--primary"
+        href="mailto:khalil.benali16121@gmail.com"
+        data-magnetic
+      >
+        <span set:html={ui.mail} />
+        Email me
+      </a>
+      <a class="btn btn--ghost" href="https://github.com/khalilBenAli1" data-magnetic>
+        <span set:html={ui.github} />
+        GitHub
+      </a>
+      <a
+        class="btn btn--ghost"
+        href="https://linkedin.com/in/khalil-ben-ali"
+        data-magnetic
+      >
+        <span set:html={ui.linkedin} />
+        LinkedIn
+      </a>
+    </div>
+    <p class="contact__languages">
+      EN · FR · AR · IT — hello · bonjour · <span dir="rtl">أهلاً</span> · ciao
+    </p>
+  </div>
+
+  <footer class="contact__footer">
+    <div class="container contact__footer-inner">
+      <p>© 2026 Khalil Ben Ali · Faenza, Italy</p>
+      <p>Designed &amp; engineered with an AI-native workflow</p>
+      <a class="icon-btn" href="#top" aria-label="Back to top" set:html={ui["arrow-up"]} />
+    </div>
+  </footer>
+</section>
+
+<style>
+  .contact {
+    padding-block-end: 0;
+    text-align: center;
+  }
+
+  .contact__inner {
+    display: grid;
+    justify-items: center;
+    gap: 0.9rem;
+    padding-block-end: clamp(4rem, 8vw, 6rem);
+  }
+
+  .contact .section-title {
+    max-width: none;
+  }
+
+  .contact__line {
+    max-width: 42ch;
+    margin: 0;
+    color: var(--muted);
+    font-size: 1.1rem;
+  }
+
+  .contact__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.9rem;
+    margin-top: 1.2rem;
+  }
+
+  .contact__languages {
+    margin-top: 1.6rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+  }
+
+  .contact__footer {
+    border-top: 1px solid var(--border);
+    background: rgba(6, 7, 12, 0.6);
+  }
+
+  .contact__footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding-block: 1.4rem;
+  }
+
+  .contact__footer p {
+    margin: 0;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  @media (max-width: 40rem) {
+    .contact__footer-inner {
+      justify-content: center;
+      text-align: center;
+    }
+  }
+</style>

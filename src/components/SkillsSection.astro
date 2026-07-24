@@ -1,0 +1,119 @@
+---
+import { tech, ui } from "../lib/icons";
+
+const groups: { icon: string; title: string; items: string[] }[] = [
+  {
+    icon: "monitor",
+    title: "Frontend",
+    items: ["TypeScript", "React", "Next.js", "Astro", "React Native", "Tailwind", "GSAP", "WebGL"],
+  },
+  {
+    icon: "server",
+    title: "Backend",
+    items: ["Node.js", "NestJS", "Express", "PostgreSQL", "MongoDB", "Redis", "RabbitMQ", "Socket.IO"],
+  },
+  {
+    icon: "brain-circuit",
+    title: "AI & LLM",
+    items: ["Azure OpenAI", "Gemini", "LangChain / LangGraph", "RAG · pgvector", "transformers.js"],
+  },
+  {
+    icon: "cpu",
+    title: "Native & Systems",
+    items: ["C#", ".NET 9", "WPF", "C++20", "JUCE", "CMake", "SQLite"],
+  },
+  {
+    icon: "wrench",
+    title: "Platform & Tools",
+    items: ["Microsoft Graph", "Microsoft Teams", "Salesforce", "Azure", "Docker", "GitHub Actions", "Vercel", "Git"],
+  },
+];
+---
+
+<section class="section" id="skills" aria-labelledby="skills-title">
+  <div class="container">
+    <div class="section-heading">
+      <p class="eyebrow">Skills</p>
+      <h2 class="section-title" id="skills-title">Toolbox</h2>
+    </div>
+
+    <div class="skills__grid">
+      {
+        groups.map((group) => (
+          <div class="glass-card skills__card reveal">
+            <h3>
+              <span class="skills__icon" set:html={ui[group.icon]} />
+              {group.title}
+            </h3>
+            <div class="skills__chips">
+              {group.items.map((item) => (
+                <span class="chip">
+                  {tech[item] && (
+                    <span class="skills__chip-icon" set:html={tech[item]} />
+                  )}
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .skills__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+    gap: 1.4rem;
+  }
+
+  .skills__card {
+    padding: 1.6rem;
+  }
+
+  .skills__card h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .skills__icon {
+    display: inline-flex;
+    width: 1.9rem;
+    height: 1.9rem;
+    padding: 0.4rem;
+    border: 1px solid var(--border-accent);
+    border-radius: 9px;
+    background: rgba(124, 92, 255, 0.12);
+    color: var(--violet-soft);
+  }
+
+  .skills__icon :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .skills__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .skills__chip-icon {
+    display: inline-flex;
+    width: 0.9rem;
+    height: 0.9rem;
+    color: rgba(242, 244, 250, 0.75);
+  }
+
+  .skills__chip-icon :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+</style>

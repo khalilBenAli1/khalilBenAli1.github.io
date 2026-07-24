@@ -1,8 +1,9 @@
 ---
-import "@fontsource-variable/bricolage-grotesque";
-import "@fontsource-variable/instrument-sans";
-import "@fontsource/ibm-plex-mono/400.css";
-import "@fontsource/ibm-plex-mono/500.css";
+import "@fontsource/space-grotesk/500.css";
+import "@fontsource/space-grotesk/700.css";
+import "@fontsource-variable/inter";
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/500.css";
 import "../styles/tokens.css";
 import "../styles/base.css";
 ---
@@ -16,7 +17,7 @@ import "../styles/base.css";
       name="description"
       content="Full-stack engineer (5+ yrs) shipping TypeScript platforms, .NET desktop apps and production AI features."
     />
-    <meta name="theme-color" content="#F2F1EC" />
+    <meta name="theme-color" content="#06070C" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Khalil Ben Ali — Full-Stack &amp; AI Engineer</title>
   </head>
@@ -33,6 +34,13 @@ import "../styles/base.css";
 
       <article class="resume-sheet" id="resume" aria-labelledby="resume-name">
         <header class="resume-header">
+          <img
+            class="resume-photo"
+            src="/khalil.jpg"
+            alt="Portrait of Khalil Ben Ali"
+            width="640"
+            height="640"
+          />
           <div class="identity-line">
             <h1 id="resume-name">KHALIL BEN ALI</h1>
             <p class="role">— Full-Stack &amp; AI Engineer</p>
@@ -215,14 +223,14 @@ import "../styles/base.css";
   }
 
   :global(html) {
-    background: var(--paper, #f2f1ec);
+    background: #06070c;
   }
 
   :global(body) {
     min-width: 0;
     margin: 0;
     color: var(--ink, #0e0e12);
-    background: var(--paper, #f2f1ec);
+    background: #06070c;
     font-family: var(--font-body);
   }
 
@@ -234,7 +242,7 @@ import "../styles/base.css";
     transform: translateY(-180%);
     padding: 0.6rem 0.8rem;
     color: var(--paper, #f2f1ec);
-    background: var(--cobalt, #2418f2);
+    background: var(--cobalt, #7c5cff);
   }
 
   .resume-skip:focus {
@@ -270,19 +278,19 @@ import "../styles/base.css";
   }
 
   .resume-actions a:focus-visible {
-    outline: 3px solid var(--cobalt, #2418f2);
+    outline: 3px solid var(--cobalt, #7c5cff);
     outline-offset: 3px;
   }
 
   .back-link {
     padding: 0.65rem 0.25rem;
-    color: var(--cobalt, #2418f2);
+    color: #9d8cff;
   }
 
   .download-link {
     padding: 0.65rem 0.9rem;
-    color: var(--ink, #0e0e12);
-    background: var(--signal, #ff4d1f);
+    color: #fff;
+    background: var(--signal, #7c5cff);
   }
 
   .resume-sheet {
@@ -299,8 +307,21 @@ import "../styles/base.css";
   }
 
   .resume-header {
+    position: relative;
+    padding-right: 92px;
     padding-bottom: 4mm;
-    border-bottom: 2px solid var(--cobalt, #2418f2);
+    border-bottom: 2px solid var(--cobalt, #7c5cff);
+  }
+
+  .resume-photo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 76px;
+    height: 76px;
+    border: 2px solid #7c5cff;
+    border-radius: 50%;
+    object-fit: cover;
   }
 
   .identity-line {
@@ -323,9 +344,7 @@ import "../styles/base.css";
     margin-bottom: 0;
     font-family: var(--font-display);
     font-size: 1.5rem;
-    font-variation-settings:
-      "wdth" 88,
-      "wght" 750;
+    font-weight: 700;
     line-height: 1;
     letter-spacing: -0.03em;
   }
@@ -334,9 +353,7 @@ import "../styles/base.css";
     margin-bottom: 0;
     font-family: var(--font-display);
     font-size: 0.86rem;
-    font-variation-settings:
-      "wdth" 94,
-      "wght" 580;
+    font-weight: 500;
     line-height: 1.1;
     white-space: nowrap;
   }
@@ -350,7 +367,7 @@ import "../styles/base.css";
 
   .contact-line a {
     color: inherit;
-    text-decoration-color: var(--cobalt, #2418f2);
+    text-decoration-color: var(--cobalt, #7c5cff);
     text-underline-offset: 0.12em;
   }
 
@@ -373,7 +390,7 @@ import "../styles/base.css";
   h2 {
     margin-bottom: 1.7mm;
     padding-bottom: 0.8mm;
-    border-bottom: 1px solid var(--cobalt, #2418f2);
+    border-bottom: 1px solid var(--cobalt, #7c5cff);
     font-family: var(--font-mono);
     font-size: 0.66rem;
     font-weight: 500;
@@ -420,7 +437,7 @@ import "../styles/base.css";
   }
 
   li::marker {
-    color: var(--cobalt, #2418f2);
+    color: var(--cobalt, #7c5cff);
   }
 
   .compact-entry {
@@ -433,7 +450,7 @@ import "../styles/base.css";
 
   .resume-side {
     padding-left: 5mm;
-    border-left: 1px solid var(--cobalt-2, #4e45ff);
+    border-left: 1px solid var(--cobalt-2, #9d8cff);
   }
 
   .resume-side section {
@@ -533,7 +550,15 @@ import "../styles/base.css";
     }
 
     .resume-header {
+      padding-right: 26mm;
       padding-bottom: 3mm;
+    }
+
+    .resume-photo {
+      width: 22mm;
+      height: 22mm;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
     }
 
     h1 {

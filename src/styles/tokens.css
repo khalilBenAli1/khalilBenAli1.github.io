@@ -1,30 +1,38 @@
 :root {
-  --ink: #0e0e12;
-  --paper: #f2f1ec;
-  --cobalt: #2418f2;
-  --cobalt-2: #4e45ff;
-  --tint: #dcdcff;
-  --signal: #ff4d1f;
+  --bg-0: #06070c;
+  --bg-1: #0c0e16;
+  --surface: #121522;
+  --surface-2: #161a28;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-accent: rgba(124, 92, 255, 0.35);
+  --text: #f2f4fa;
+  --muted: #97a0b8;
+  --violet: #7c5cff;
+  --violet-soft: #9d8cff;
+  --sky: #38bdf8;
+  --green: #34d399;
+  --gradient: linear-gradient(120deg, #7c5cff 0%, #38bdf8 100%);
+  --glow-violet: 0 0 80px rgba(124, 92, 255, 0.25);
+  --glow-sky: 0 0 80px rgba(56, 189, 248, 0.18);
+  --radius: 16px;
+  --radius-lg: 24px;
 
-  --font-display: "Bricolage Grotesque Variable", "Arial Narrow", sans-serif;
-  --font-body: "Instrument Sans Variable", Arial, sans-serif;
-  --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
-  --font-arabic: "Noto Kufi Arabic", sans-serif;
+  --font-display: "Space Grotesk", "Inter Variable", system-ui, sans-serif;
+  --font-body: "Inter Variable", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
 
   --space-1: 0.5rem;
   --space-2: 1rem;
   --space-3: 1.5rem;
   --space-4: 2rem;
-  --space-5: 2.5rem;
   --space-6: 3rem;
   --space-8: 4rem;
-  --space-10: 5rem;
   --space-12: 6rem;
-  --space-16: 8rem;
 
-  --container: 77.5rem;
-  --gutter: clamp(1.25rem, 4vw, 4rem);
-  --h1: clamp(2.75rem, 8vw, 7.5rem);
-  --section-title: clamp(2rem, 5vw, 4rem);
-  --focus-ring: 3px solid var(--cobalt);
+  --container: 72.5rem;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --nav-h: 68px;
+  --h1: clamp(2.9rem, 7vw, 5.2rem);
+  --section-title: clamp(2rem, 4.5vw, 3rem);
+  --focus-ring: 2px solid var(--sky);
 }

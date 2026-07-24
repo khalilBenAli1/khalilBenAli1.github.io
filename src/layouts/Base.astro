@@ -1,21 +1,25 @@
 ---
-import "@fontsource-variable/bricolage-grotesque";
-import "@fontsource-variable/instrument-sans";
-import "@fontsource/ibm-plex-mono/400.css";
-import "@fontsource/ibm-plex-mono/500.css";
-import "@fontsource/noto-kufi-arabic/400.css";
+import "@fontsource/space-grotesk/400.css";
+import "@fontsource/space-grotesk/500.css";
+import "@fontsource/space-grotesk/700.css";
+import "@fontsource-variable/inter";
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/500.css";
 import "../styles/base.css";
 
 interface Props {
   title?: string;
   description?: string;
   bodyClass?: string;
+  /** page renders the fixed Three.js background + orbs (home only) */
+  space?: boolean;
 }
 
 const {
   title = "Khalil Ben Ali — Full-Stack & AI Engineer",
-  description = "Full-stack engineer (5+ yrs) shipping TypeScript platforms, .NET desktop apps and production AI features.",
+  description = "Khalil Ben Ali — Full-Stack & AI Engineer. AI-powered platforms, Microsoft Teams ecosystems, on-device vision — shipped to production.",
   bodyClass = "",
+  space = false,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -28,7 +32,7 @@ const socialImage = new URL("/og.png", Astro.site);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#F2F1EC" />
+    <meta name="theme-color" content="#06070C" />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -48,7 +52,15 @@ const socialImage = new URL("/og.png", Astro.site);
   </head>
   <body class={bodyClass}>
     <a class="skip-link" href="#main-content">Skip to content</a>
+    {
+      space && (
+        <>
+          <div class="orb orb--violet" aria-hidden="true" />
+          <div class="orb orb--sky" aria-hidden="true" />
+          <canvas id="space-canvas" aria-hidden="true" />
+        </>
+      )
+    }
     <slot />
-    <span class="cursor-dot" data-cursor-dot aria-hidden="true"></span>
   </body>
 </html>

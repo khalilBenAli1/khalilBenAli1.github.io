@@ -1,0 +1,255 @@
+---
+import { tech, ui } from "../lib/icons";
+
+interface Props {
+  icon: string;
+  name: string;
+  subtitle: string;
+  year: string;
+  client: string;
+  production?: boolean;
+  privateRepo?: boolean;
+  repoUrl?: string;
+  highlights: string[];
+  techNames: string[];
+  flip?: boolean;
+}
+
+const {
+  icon,
+  name,
+  subtitle,
+  year,
+  client,
+  production = false,
+  privateRepo = true,
+  repoUrl,
+  highlights,
+  techNames,
+  flip = false,
+} = Astro.props;
+---
+
+<article class:list={["project glass-card reveal", { "project--flip": flip }]} data-tilt-soft>
+  <div class="project__diagram" data-diagram-holder>
+    <slot />
+  </div>
+
+  <div class="project__content">
+    <header class="project__head">
+      <span class="project__icon" set:html={ui[icon]} />
+      <h3 class="project__name">{name}</h3>
+    </header>
+
+    <div class="project__meta">
+      <span class="chip">{year}</span>
+      <span class="chip">{client}</span>
+      {
+        production && (
+          <span class="chip chip--status">
+            <span class="project__dot" aria-hidden="true" />
+            Production
+          </span>
+        )
+      }
+      {
+        privateRepo && !repoUrl && (
+          <span class="chip">
+            <span class="project__lock" set:html={ui.lock} />
+            Private repo
+          </span>
+        )
+      }
+      {
+        repoUrl && (
+          <a class="chip project__repo" href={repoUrl}>
+            <span class="project__lock" set:html={ui.github} />
+            View code
+          </a>
+        )
+      }
+    </div>
+
+    <p class="project__subtitle">{subtitle}</p>
+
+    <ul class="project__highlights">
+      {
+        highlights.map((h) => (
+          <li>
+            <span class="project__zap" set:html={ui.zap} />
+            {h}
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="project__tech">
+      {
+        techNames.map((t) => (
+          <span class="chip">
+            {tech[t] && <span class="project__tech-icon" set:html={tech[t]} />}
+            {t}
+          </span>
+        ))
+      }
+    </div>
+  </div>
+</article>
+
+<style>
+  .project {
+    display: grid;
+    grid-template-columns: 46fr 54fr;
+    gap: clamp(1.5rem, 3vw, 2.75rem);
+    align-items: center;
+    padding: clamp(1.5rem, 3.4vw, 2.75rem);
+    margin-block-end: clamp(1.75rem, 4vw, 3rem);
+  }
+
+  .project--flip {
+    grid-template-columns: 54fr 46fr;
+  }
+
+  .project--flip .project__diagram {
+    order: 2;
+  }
+
+  .project__head {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .project__icon {
+    display: inline-flex;
+    flex: none;
+    width: 2.6rem;
+    height: 2.6rem;
+    padding: 0.55rem;
+    border: 1px solid var(--border-accent);
+    border-radius: 12px;
+    background: rgba(124, 92, 255, 0.12);
+    color: var(--violet-soft);
+  }
+
+  .project__icon :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .project__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 2.4vw, 1.75rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .project__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+  }
+
+  .project__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+  }
+
+  .chip--status {
+    color: var(--green);
+  }
+
+  .project__lock {
+    display: inline-flex;
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+
+  .project__lock :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .project__repo {
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .project__repo:hover {
+    border-color: var(--border-accent);
+    color: var(--violet-soft);
+  }
+
+  .project__subtitle {
+    margin-bottom: 1.15rem;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+
+  .project__highlights {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0 0 1.3rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .project__highlights li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+
+  .project__zap {
+    display: inline-flex;
+    flex: none;
+    width: 0.85rem;
+    height: 0.85rem;
+    transform: translateY(1px);
+    color: var(--violet);
+  }
+
+  .project__zap :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .project__tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .project__tech-icon {
+    display: inline-flex;
+    width: 0.9rem;
+    height: 0.9rem;
+    color: rgba(242, 244, 250, 0.75);
+  }
+
+  .project__tech-icon :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (max-width: 56.25rem) {
+    .project,
+    .project--flip {
+      grid-template-columns: 1fr;
+    }
+
+    .project--flip .project__diagram {
+      order: 0;
+    }
+  }
+</style>

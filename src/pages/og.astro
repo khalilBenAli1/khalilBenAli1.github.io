@@ -1,0 +1,121 @@
+---
+/**
+ * Standalone 1200×630 social-image template.
+ * Not linked anywhere — screenshotted to /public/og.png during QA.
+ */
+import "@fontsource/space-grotesk/500.css";
+import "@fontsource/space-grotesk/700.css";
+import "@fontsource/jetbrains-mono/400.css";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex" />
+    <title>OG template</title>
+  </head>
+  <body>
+    <div class="og">
+      <div class="og__orb og__orb--violet"></div>
+      <div class="og__orb og__orb--sky"></div>
+      <img class="og__photo" src="/khalil.jpg" alt="" />
+      <div class="og__text">
+        <p class="og__name">Khalil Ben Ali</p>
+        <div class="og__bar"></div>
+        <p class="og__role">Full-Stack &amp; AI Engineer</p>
+        <p class="og__url">khalilbenali1.github.io</p>
+      </div>
+    </div>
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .og {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 70px;
+    width: 1200px;
+    height: 630px;
+    padding: 0 90px;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: #06070c;
+    color: #f2f4fa;
+    font-family: "Space Grotesk", sans-serif;
+  }
+
+  .og__orb {
+    position: absolute;
+    width: 560px;
+    height: 560px;
+    border-radius: 50%;
+    filter: blur(140px);
+    opacity: 0.22;
+  }
+
+  .og__orb--violet {
+    top: -200px;
+    left: -120px;
+    background: #7c5cff;
+  }
+
+  .og__orb--sky {
+    right: -160px;
+    bottom: -240px;
+    background: #38bdf8;
+  }
+
+  .og__photo {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    border: 5px solid transparent;
+    border-radius: 50%;
+    background:
+      linear-gradient(#06070c, #06070c) padding-box,
+      linear-gradient(120deg, #7c5cff, #38bdf8) border-box;
+    object-fit: cover;
+  }
+
+  .og__text {
+    position: relative;
+  }
+
+  .og__name {
+    margin: 0;
+    font-size: 84px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+
+  .og__bar {
+    width: 220px;
+    height: 8px;
+    margin: 26px 0;
+    border-radius: 6px;
+    background: linear-gradient(120deg, #7c5cff, #38bdf8);
+  }
+
+  .og__role {
+    margin: 0 0 18px;
+    color: #97a0b8;
+    font-size: 40px;
+    font-weight: 500;
+  }
+
+  .og__url {
+    margin: 0;
+    color: #9d8cff;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 24px;
+  }
+</style>

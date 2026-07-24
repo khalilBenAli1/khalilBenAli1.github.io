@@ -54,6 +54,17 @@ await page.waitForTimeout(1600);
 await page.goto(BASE + "/resume/", { waitUntil: "networkidle" });
 await page.waitForTimeout(900);
 await page.screenshot({ path: `${SHOTS}/resume-screen.png`, fullPage: true });
+// capture the OG social image from /og/
+const ogPage = await browser.newPage({
+  viewport: { width: 1200, height: 630 },
+});
+await ogPage.goto(BASE + "/og/", { waitUntil: "networkidle" });
+await ogPage.waitForTimeout(600);
+await ogPage.screenshot({
+  path: "/Users/khalilbenali/portfolio/public/og.png",
+});
+await ogPage.close();
+
 await page.emulateMedia({ media: "print" });
 await page.pdf({
   path: "/Users/khalilbenali/portfolio/public/KhalilBenAli-CV.pdf",

@@ -1,0 +1,259 @@
+---
+import { ui } from "../lib/icons";
+
+export interface DNode {
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h?: number;
+  icon: string;
+  label: string;
+  sub?: string;
+}
+
+export interface DEdge {
+  /** "nodeId@side" where side is left|right|top|bottom */
+  from: string;
+  to: string;
+  label?: string;
+  /** optional intermediate waypoints */
+  via?: [number, number][];
+}
+
+interface Props {
+  id: string;
+  title: string;
+  nodes: DNode[];
+  edges: DEdge[];
+}
+
+const { id, title, nodes, edges } = Astro.props;
+
+const H_DEFAULT = 48;
+const H_SUB = 64;
+
+function nodeRect(n: DNode) {
+  return { x: n.x, y: n.y, w: n.w, h: n.h ?? (n.sub ? H_SUB : H_DEFAULT) };
+}
+
+function anchor(ref: string): [number, number] {
+  const [nid, side = "right"] = ref.split("@");
+  const n = nodes.find((node) => node.id === nid);
+  if (!n) throw new Error(`Diagram ${id}: unknown node "${nid}"`);
+  const r = nodeRect(n);
+  switch (side) {
+    case "left":
+      return [r.x, r.y + r.h / 2];
+    case "top":
+      return [r.x + r.w / 2, r.y];
+    case "bottom":
+      return [r.x + r.w / 2, r.y + r.h];
+    default:
+      return [r.x + r.w, r.y + r.h / 2];
+  }
+}
+
+function edgePath(e: DEdge): string {
+  const pts = [anchor(e.from), ...(e.via ?? []), anchor(e.to)];
+  return pts
+    .map(([px, py], i) => `${i === 0 ? "M" : "L"}${px} ${py}`)
+    .join(" ");
+}
+
+function edgeLabelPos(e: DEdge): [number, number] {
+  const pts = [anchor(e.from), ...(e.via ?? []), anchor(e.to)];
+  const mid = Math.floor((pts.length - 1) / 2);
+  const [x1, y1] = pts[mid];
+  const [x2, y2] = pts[mid + 1];
+  return [(x1 + x2) / 2, (y1 + y2) / 2 - 7];
+}
+
+/** strip the outer <svg> wrapper from a lucide raw icon, keep inner markup */
+function inner(svg: string): string {
+  return svg.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
+}
+---
+
+<svg
+  class="diagram"
+  data-diagram
+  viewBox="0 0 640 400"
+  role="img"
+  aria-label={title}
+>
+  <title>{title}</title>
+  <defs>
+    <marker
+      id={`${id}-arrow`}
+      viewBox="0 0 8 8"
+      refX="7"
+      refY="4"
+      markerWidth="7"
+      markerHeight="7"
+      orient="auto-start-reverse"
+    >
+      <path d="M0 0 L8 4 L0 8 z" fill="#39415e"></path>
+    </marker>
+    <linearGradient id={`${id}-pulse`} x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c5cff"></stop>
+      <stop offset="1" stop-color="#38bdf8"></stop>
+    </linearGradient>
+  </defs>
+
+  {
+    edges.map((e, i) => (
+      <g class="diagram__edge-group">
+        <path
+          class="diagram__edge"
+          data-edge
+          d={edgePath(e)}
+          marker-end={`url(#${id}-arrow)`}
+          pathLength="1"
+          style={`--edge-delay:${i * 120}ms`}
+        />
+        {e.label && (
+          <text
+            class="diagram__edge-label"
+            x={edgeLabelPos(e)[0]}
+            y={edgeLabelPos(e)[1]}
+            text-anchor="middle"
+          >
+            {e.label}
+          </text>
+        )}
+      </g>
+    ))
+  }
+
+  {
+    nodes.map((n, i) => {
+      const r = nodeRect(n);
+      const iconSvg = ui[n.icon];
+      const textX = r.x + (iconSvg ? 40 : 14);
+      return (
+        <g
+          class="diagram__node"
+          data-node
+          style={`--node-delay:${i * 90 + 200}ms`}
+        >
+          <rect
+            x={r.x}
+            y={r.y}
+            width={r.w}
+            height={r.h}
+            rx="10"
+            class="diagram__box"
+          />
+          {iconSvg && (
+            <g
+              class="diagram__icon"
+              transform={`translate(${r.x + 13}, ${r.y + r.h / 2 - 9}) scale(0.75)`}
+              set:html={inner(iconSvg)}
+            />
+          )}
+          <text
+            class="diagram__label"
+            x={textX}
+            y={n.sub ? r.y + r.h / 2 - 4 : r.y + r.h / 2 + 4.5}
+          >
+            {n.label}
+          </text>
+          {n.sub && (
+            <text class="diagram__sub" x={textX} y={r.y + r.h / 2 + 14}>
+              {n.sub}
+            </text>
+          )}
+        </g>
+      );
+    })
+  }
+</svg>
+
+<style>
+  .diagram {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .diagram__box {
+    fill: var(--surface-2);
+    stroke: rgba(124, 92, 255, 0.4);
+    stroke-width: 1.25;
+  }
+
+  .diagram__icon {
+    color: var(--violet-soft);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .diagram__label {
+    fill: var(--text);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+
+  .diagram__sub {
+    fill: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+  }
+
+  .diagram__edge {
+    fill: none;
+    stroke: #39415e;
+    stroke-width: 1.5;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.9s ease var(--edge-delay, 0ms);
+  }
+
+  .diagram__edge-label {
+    fill: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  .diagram__node {
+    opacity: 0;
+    transform: scale(0.96);
+    transform-origin: center;
+    transform-box: fill-box;
+    transition:
+      opacity 0.5s ease var(--node-delay, 0ms),
+      transform 0.5s ease var(--node-delay, 0ms);
+  }
+
+  :global(.diagram.is-drawn) .diagram__edge {
+    stroke-dashoffset: 0;
+  }
+
+  :global(.diagram.is-drawn) .diagram__node {
+    opacity: 1;
+    transform: none;
+  }
+
+  :global(.diagram__pulse) {
+    fill: url(#pulse-fallback);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .diagram__edge {
+      stroke-dashoffset: 0;
+      transition: none;
+    }
+
+    .diagram__node {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>

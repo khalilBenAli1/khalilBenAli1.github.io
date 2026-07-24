@@ -1,236 +1,300 @@
 ---
-const rotatingWords = [
-  'AI copilots',
-  'Teams platforms',
-  'brand experiences',
-  'desktop tools',
-  'audio engines',
-];
+import { ui, tech } from "../lib/icons";
 ---
 
-<header class="hero" data-hero>
-  <div class="hero__inner">
-    <p class="hero__eyebrow" data-hero-eyebrow>
-      KHALIL BEN ALI · FULL-STACK &amp; AI ENGINEER
-    </p>
-
-    <h1 class="hero__title">
-      <span class="hero__line" data-hero-line>
-        I build
-        <span class="hero__word-slot">
-          <span
-            class="hero__word"
-            data-hero-word
-            data-words={JSON.stringify(rotatingWords)}
-            aria-live="off"
-          >
-            AI copilots
-          </span>
-        </span>
-      </span>
-      <span class="hero__line" data-hero-line>that ship.</span>
-    </h1>
-
-    <p class="hero__sub" data-hero-sub>
-      Five years, five stacks, two alphabets. Primary engineer on an AI
-      operations platform for a US financial firm, sole developer of an AI
-      brand experience for one of Europe's biggest coffee brands — and a few
-      audio engines for fun.
-    </p>
-
-    <div class="hero__foot" data-hero-meta>
-      <div class="hero__meta" aria-label="Location and availability">
-        <p>FAENZA, ITALY · CET</p>
-        <p>NOW: nBold — Teams &amp; AI platforms</p>
-        <p>OPEN TO INTERESTING PROBLEMS</p>
-      </div>
-
-      <div class="hero__actions">
-        <a class="hero__cta hero__cta--ghost" href="#selected-work">
-          See the work ↓
+<section class="hero" id="top">
+  <div class="hero__inner container">
+    <div class="hero__copy">
+      <p class="eyebrow" data-hero-eyebrow>
+        Full-Stack &amp; AI Engineer · Faenza, Italy
+      </p>
+      <h1 class="hero__title" data-hero-title>
+        <span class="hero__sheen">Khalil Ben Ali</span>
+      </h1>
+      <p class="hero__lead" data-hero-lead>
+        I build AI-powered platforms — Microsoft Teams ecosystems, on-device
+        vision, real-time pipelines — and take them all the way to production.
+      </p>
+      <div class="hero__ctas" data-hero-ctas>
+        <a class="btn btn--primary" href="#work" data-magnetic>
+          View my work
+          <span set:html={ui["arrow-down"]} />
         </a>
         <a
-          class="hero__cta hero__cta--resume"
+          class="btn btn--ghost"
           href="/KhalilBenAli-CV.pdf"
+          download
           data-magnetic
         >
-          Download résumé
+          <span set:html={ui.download} />
+          Download CV
         </a>
       </div>
+      <div class="hero__social" data-hero-social>
+        <a
+          class="icon-btn"
+          href="https://github.com/khalilBenAli1"
+          aria-label="GitHub"
+          set:html={ui.github}
+        />
+        <a
+          class="icon-btn"
+          href="https://linkedin.com/in/khalil-ben-ali"
+          aria-label="LinkedIn"
+          set:html={ui.linkedin}
+        />
+        <a
+          class="icon-btn"
+          href="mailto:khalil.benali16121@gmail.com"
+          aria-label="Email"
+          set:html={ui.mail}
+        />
+      </div>
+    </div>
+
+    <div class="hero__visual" data-hero-visual>
+      <div class="hero__photo-wrap" data-tilt>
+        <img
+          class="hero__photo"
+          src="/khalil.jpg"
+          alt="Portrait of Khalil Ben Ali"
+          width="640"
+          height="640"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+      <span class="hero__chip hero__chip--1" data-hero-chip>
+        <span class="hero__chip-icon" set:html={tech.TypeScript} />
+        TypeScript
+      </span>
+      <span class="hero__chip hero__chip--2" data-hero-chip>
+        <span class="hero__chip-icon" set:html={ui["brain-circuit"]} />
+        AI Engineering
+      </span>
+      <span class="hero__chip hero__chip--3" data-hero-chip>
+        <span class="hero__chip-icon" set:html={tech[".NET 9"]} />
+        .NET
+      </span>
     </div>
   </div>
-</header>
+
+  <a class="hero__scroll-cue" href="#work" data-scroll-cue>
+    <span set:html={ui.mouse} />
+    <span>scroll</span>
+  </a>
+</section>
 
 <style>
   .hero {
-    min-height: min(880px, 100svh);
+    position: relative;
     display: grid;
     align-items: center;
-    padding-block: clamp(112px, 15vh, 176px) clamp(64px, 10vh, 112px);
-    overflow: clip;
+    min-height: 92vh;
+    padding-top: calc(var(--nav-h) + 2rem);
+    padding-bottom: 3rem;
   }
 
   .hero__inner {
-    width: min(
-      calc(100% - var(--gutter) - var(--gutter)),
-      var(--container)
-    );
-    margin-inline: auto;
-  }
-
-  .hero__eyebrow,
-  .hero__meta {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: clamp(0.72rem, 1vw, 0.82rem);
-    font-weight: 500;
-    line-height: 1.55;
-    letter-spacing: 0.055em;
-  }
-
-  .hero__eyebrow {
-    color: var(--cobalt);
-    margin-block-end: clamp(20px, 4vw, 40px);
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: clamp(2rem, 5vw, 4.5rem);
   }
 
   .hero__title {
-    margin: 0;
+    margin-block: 1.1rem 1.2rem;
     font-family: var(--font-display);
-    font-size: clamp(2.75rem, 8vw, 7.5rem);
-    font-weight: 650;
-    line-height: 0.86;
-    letter-spacing: -0.055em;
+    font-size: var(--h1);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.02;
   }
 
-  .hero__line {
-    display: block;
-    white-space: nowrap;
+  .hero__sheen {
+    background: linear-gradient(
+      110deg,
+      #f2f4fa 0%,
+      #f2f4fa 38%,
+      #9d8cff 48%,
+      #38bdf8 54%,
+      #f2f4fa 64%,
+      #f2f4fa 100%
+    );
+    background-size: 220% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: sheen 7s ease-in-out infinite;
   }
 
-  .hero__word-slot {
-    display: inline-block;
-    min-width: 15ch;
-    margin-left: 0.24em;
-    color: var(--cobalt);
+  @keyframes sheen {
+    0%,
+    100% {
+      background-position: 110% 0;
+    }
+    50% {
+      background-position: -10% 0;
+    }
   }
 
-  .hero__word {
-    display: inline-block;
-    --hero-wdth: 100;
-    font-variation-settings:
-      "wght" 650,
-      "wdth" var(--hero-wdth),
-      "opsz" 48;
-    will-change: font-variation-settings;
+  .hero__lead {
+    max-width: 52ch;
+    margin-bottom: 2rem;
+    color: var(--muted);
+    font-size: 1.22rem;
+    line-height: 1.6;
   }
 
-  .hero__sub {
-    max-width: 850px;
-    margin: clamp(32px, 5vw, 56px) 0 0;
-    font-size: clamp(1rem, 1.7vw, 1.22rem);
-    line-height: 1.58;
-  }
-
-  .hero__foot {
+  .hero__ctas {
     display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 32px;
-    margin-block-start: clamp(32px, 6vw, 64px);
-  }
-
-  .hero__meta {
-    display: grid;
-    gap: 2px;
-  }
-
-  .hero__meta p {
-    margin: 0;
-  }
-
-  .hero__actions {
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 0.9rem;
+    margin-bottom: 1.6rem;
   }
 
-  .hero__cta {
+  .hero__social {
+    display: flex;
+    gap: 0.65rem;
+  }
+
+  .hero__visual {
+    position: relative;
+    justify-self: center;
+  }
+
+  .hero__photo-wrap {
+    position: relative;
+    width: clamp(250px, 26vw, 350px);
+    padding: 3px;
+    border-radius: var(--radius-lg);
+    background: var(--gradient);
+    box-shadow: var(--glow-violet), var(--glow-sky);
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  .hero__photo {
+    width: 100%;
+    border-radius: calc(var(--radius-lg) - 3px);
+  }
+
+  .hero__chip {
+    position: absolute;
     display: inline-flex;
-    min-height: 48px;
     align-items: center;
-    justify-content: center;
-    padding: 12px 18px;
-    border: 1px solid var(--cobalt);
-    border-radius: 3px;
+    gap: 0.45rem;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--border-accent);
+    border-radius: 999px;
+    background: rgba(18, 21, 34, 0.85);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
     font-family: var(--font-mono);
-    font-size: 0.84rem;
-    font-weight: 500;
-    line-height: 1;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .hero__chip-icon {
+    display: inline-flex;
+    width: 1rem;
+    height: 1rem;
+    color: var(--violet-soft);
+  }
+
+  .hero__chip-icon :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero__chip--1 {
+    top: 6%;
+    left: -3.4rem;
+  }
+
+  .hero__chip--2 {
+    right: -2.6rem;
+    bottom: 24%;
+    animation-delay: -2s;
+  }
+
+  .hero__chip--3 {
+    bottom: -1.1rem;
+    left: 12%;
+    animation-delay: -4s;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-9px);
+    }
+  }
+
+  .hero__scroll-cue {
+    position: absolute;
+    bottom: 1.6rem;
+    left: 50%;
+    display: grid;
+    justify-items: center;
+    gap: 0.2rem;
+    transform: translateX(-50%);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
     text-decoration: none;
-    transition:
-      background-color 180ms ease,
-      border-color 180ms ease,
-      color 180ms ease;
+    text-transform: uppercase;
+    transition: opacity 0.4s ease;
   }
 
-  .hero__cta--ghost {
-    color: var(--cobalt);
+  .hero__scroll-cue :global(svg) {
+    width: 1.2rem;
+    height: 1.2rem;
+    animation: float 2.4s ease-in-out infinite;
   }
 
-  .hero__cta--ghost:hover {
-    background: var(--tint);
-  }
-
-  .hero__cta--resume {
-    border-color: var(--signal);
-    background: var(--signal);
-    color: var(--ink);
-  }
-
-  .hero__cta--resume:hover {
-    border-color: var(--ink);
-  }
-
-  .hero__cta:focus-visible {
-    outline: 3px solid var(--cobalt);
-    outline-offset: 4px;
-  }
-
-  @media (max-width: 760px) {
-    .hero {
-      min-height: auto;
+  @media (max-width: 56.25rem) {
+    .hero__inner {
+      grid-template-columns: 1fr;
     }
 
-    .hero__foot {
-      align-items: start;
-      flex-direction: column;
-    }
-  }
-
-  @media (max-width: 419px) {
-    .hero__title {
-      font-size: clamp(1.72rem, 7.8vw, 2.05rem);
-      letter-spacing: -0.04em;
+    .hero__visual {
+      order: -1;
+      margin-top: 0.5rem;
     }
 
-    .hero__word-slot {
-      min-width: 14.75ch;
+    .hero__photo-wrap {
+      width: clamp(200px, 46vw, 280px);
     }
 
-    .hero__actions,
-    .hero__cta {
-      width: 100%;
+    .hero__chip--1 {
+      left: -1.2rem;
+    }
+
+    .hero__chip--2 {
+      right: -0.8rem;
+    }
+
+    .hero__scroll-cue {
+      display: none;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .hero__word {
-      will-change: auto;
+    .hero__sheen {
+      animation: none;
+      background: none;
+      color: var(--text);
     }
 
-    .hero__cta {
-      transition: none;
+    .hero__chip,
+    .hero__scroll-cue :global(svg) {
+      animation: none;
     }
   }
 </style>
