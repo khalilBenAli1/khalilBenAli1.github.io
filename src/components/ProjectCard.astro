@@ -4,6 +4,8 @@ import { t, type Locale } from "../lib/i18n";
 
 interface Props {
   locale: Locale;
+  /** "01"–"05", ghost index in the card header */
+  index: string;
   icon: string;
   name: string;
   subtitle: string;
@@ -19,6 +21,7 @@ interface Props {
 
 const {
   locale,
+  index,
   icon,
   name,
   subtitle,
@@ -35,8 +38,11 @@ const {
 const dict = t(locale);
 ---
 
-<article class:list={["project glass-card reveal", { "project--flip": flip }]} data-tilt-soft>
-  <div class="project__diagram" data-diagram-holder>
+<article
+  class:list={["project card-v3", { "project--flip": flip }]}
+  data-reveal="fade"
+>
+  <div class="project__diagram" data-diagram-holder data-parallax="4">
     <slot />
   </div>
 
@@ -44,6 +50,9 @@ const dict = t(locale);
     <header class="project__head">
       <span class="project__icon" set:html={ui[icon]} />
       <h3 class="project__name">{name}</h3>
+      <span class="project__index" data-section-index aria-hidden="true">
+        {index}
+      </span>
     </header>
 
     <div class="project__meta">
@@ -78,14 +87,7 @@ const dict = t(locale);
     <p class="project__subtitle">{subtitle}</p>
 
     <ul class="project__highlights">
-      {
-        highlights.map((h) => (
-          <li>
-            <span class="project__zap" set:html={ui.zap} />
-            {h}
-          </li>
-        ))
-      }
+      {highlights.map((h) => <li>{h}</li>)}
     </ul>
 
     <div class="project__tech">
@@ -133,7 +135,7 @@ const dict = t(locale);
     height: 2.6rem;
     padding: 0.55rem;
     border: 1px solid var(--border-accent);
-    border-radius: 12px;
+    border-radius: var(--r-btn);
     background: rgba(124, 92, 255, 0.12);
     color: var(--violet-soft);
   }
@@ -147,8 +149,18 @@ const dict = t(locale);
     margin: 0;
     font-family: var(--font-display);
     font-size: clamp(1.4rem, 2.4vw, 1.75rem);
-    font-weight: 700;
+    /* Bigger type, lighter weight — the same rule that governs h1/h2. */
+    font-weight: 500;
     letter-spacing: -0.02em;
+  }
+
+  .project__index {
+    margin-left: auto;
+    align-self: start;
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
   }
 
   .project__meta {
@@ -156,6 +168,13 @@ const dict = t(locale);
     flex-wrap: wrap;
     gap: 0.45rem;
     margin-bottom: 1rem;
+  }
+
+  /* D6: tags are chips (8px), not pills. Pills are reserved for live status
+     and section eyebrows. */
+  .project__meta .chip,
+  .project__tech .chip {
+    border-radius: var(--r-chip);
   }
 
   .project__dot {
@@ -184,7 +203,9 @@ const dict = t(locale);
   .project__repo {
     color: var(--text);
     text-decoration: none;
-    transition: border-color 0.2s ease, color 0.2s ease;
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease;
   }
 
   .project__repo:hover {
@@ -209,24 +230,22 @@ const dict = t(locale);
 
   .project__highlights li {
     display: flex;
-    gap: 0.6rem;
-    align-items: baseline;
+    gap: 0.7rem;
+    align-items: flex-start;
     font-size: 0.98rem;
     line-height: 1.55;
   }
 
-  .project__zap {
-    display: inline-flex;
+  /* A list marker, not an icon. The sparkle/zap glyph in front of every bullet
+     is the single most recognisable AI-generated-landing-page tell; a 3px square
+     does the same job and claims nothing. */
+  .project__highlights li::before {
+    content: "";
     flex: none;
-    width: 0.85rem;
-    height: 0.85rem;
-    transform: translateY(1px);
-    color: var(--violet);
-  }
-
-  .project__zap :global(svg) {
-    width: 100%;
-    height: 100%;
+    width: 3px;
+    height: 3px;
+    margin-top: 0.68em;
+    background: var(--violet);
   }
 
   .project__tech {

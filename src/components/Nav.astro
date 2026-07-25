@@ -1,4 +1,5 @@
 ---
+import RollLabel from "./RollLabel.astro";
 import { ui } from "../lib/icons";
 import { homePath, locales, t, type Locale } from "../lib/i18n";
 
@@ -27,8 +28,8 @@ const links = [
     <nav class="site-nav__links" aria-label="Primary">
       {
         links.map((link) => (
-          <a href={link.href} data-nav-link={link.id}>
-            {link.label}
+          <a class="link-roll" href={link.href} data-nav-link={link.id}>
+            <RollLabel label={link.label} />
           </a>
         ))
       }
@@ -123,8 +124,9 @@ const links = [
     height: var(--nav-h);
     border-bottom: 1px solid var(--border);
     background: rgba(6, 7, 12, 0.65);
-    backdrop-filter: blur(14px);
+    /* -webkit- first for older Safari; standard property last. */
     -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
   }
 
   .site-nav__progress {
@@ -149,7 +151,8 @@ const links = [
   .site-nav__brand {
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 700;
+    /* D2: nothing on the page carries 700, the wordmark included. */
+    font-weight: 600;
     letter-spacing: -0.02em;
     text-decoration: none;
   }
@@ -208,7 +211,7 @@ const links = [
 
   .site-nav__langs a {
     padding: 0.3rem 0.4rem;
-    border-radius: 6px;
+    border-radius: var(--r-chip);
     color: var(--muted);
     text-decoration: none;
     transition: color 0.2s ease, background-color 0.2s ease;
@@ -244,6 +247,7 @@ const links = [
     display: grid;
     place-content: center;
     background: rgba(6, 7, 12, 0.96);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
   }
 
@@ -259,7 +263,9 @@ const links = [
     color: var(--text);
     font-family: var(--font-display);
     font-size: 2rem;
-    font-weight: 700;
+    /* D2 again: display sizes never carry 700. */
+    font-weight: 500;
+    letter-spacing: -0.02em;
     text-decoration: none;
     transition:
       opacity 0.4s ease,

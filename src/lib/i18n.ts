@@ -23,8 +23,14 @@ interface ProjectCopy {
   highlights: string[];
 }
 
+/**
+ * Section titles and the hero lead carry exactly one `*marked*` word, rendered
+ * in Instrument Serif italic by `accent()` (src/lib/accent.ts). The marked word
+ * is the natural emphasis in that language — never a translation of the English
+ * choice. Any string that reaches the DOM as plain text must stay marker-free.
+ */
 export interface Dict {
-  meta: { description: string };
+  meta: { title: string; description: string };
   skipLink: string;
   nav: {
     work: string;
@@ -35,6 +41,9 @@ export interface Dict {
   };
   hero: {
     eyebrow: string;
+    /** availability pill next to the live LED dot */
+    status: string;
+    /** contains one `*accent*` marker */
     lead: string;
     viewWork: string;
     downloadCv: string;
@@ -77,6 +86,10 @@ export interface Dict {
     title: string;
     line: string;
     email: string;
+    /** label above the live Faenza clock in the footer */
+    localTime: string;
+    /** giant outlined word behind the section — decorative, aria-hidden */
+    ghost: string;
     footerLeft: string;
     footerRight: string;
     backToTop: string;
@@ -115,6 +128,7 @@ export interface Dict {
 
 const en: Dict = {
   meta: {
+    title: "Khalil Ben Ali — Full-Stack & AI Engineer",
     description:
       "Khalil Ben Ali, full-stack and AI engineer in Faenza, Italy. Microsoft Teams platforms, in-browser vision models and production AI systems.",
   },
@@ -122,14 +136,15 @@ const en: Dict = {
   nav: { work: "Work", ai: "AI", experience: "Experience", contact: "Contact", resume: "Résumé" },
   hero: {
     eyebrow: "Full-Stack & AI Engineer · Faenza, Italy",
-    lead: "I build platforms where AI does real work: Microsoft Teams products, vision models that run in the browser, and pipelines that hold up in production.",
+    status: "Available for work",
+    lead: "I build platforms where AI does *real* work: Microsoft Teams products, vision models that run in the browser, and pipelines that hold up in production.",
     viewWork: "View my work",
     downloadCv: "Download CV",
     scroll: "scroll",
   },
   work: {
     eyebrow: "Selected work",
-    title: "Things I've shipped",
+    title: "Things I've *shipped*",
     production: "Production",
     privateRepo: "Private repo",
     viewCode: "View code",
@@ -185,7 +200,7 @@ const en: Dict = {
   },
   ai: {
     eyebrow: "AI engineering",
-    title: "How I work with AI",
+    title: "How I *work* with AI",
     cards: [
       {
         title: "Shipped to real users",
@@ -199,7 +214,7 @@ const en: Dict = {
   },
   experience: {
     eyebrow: "Experience",
-    title: "Where I've worked",
+    title: "Where I've *worked*",
     now: "2024 → now",
     entries: [
       {
@@ -230,7 +245,7 @@ const en: Dict = {
   },
   skills: {
     eyebrow: "Skills",
-    title: "Toolbox",
+    title: "The *toolbox*",
     groups: {
       frontend: "Frontend",
       backend: "Backend",
@@ -241,10 +256,13 @@ const en: Dict = {
   },
   contact: {
     eyebrow: "Contact",
-    title: "Get in touch.",
+    title: "Get in *touch*.",
     line: "Want to talk about a project or a role? My inbox is open.",
     email: "Email me",
-    footerLeft: "© 2026 Khalil Ben Ali · Faenza, Italy",
+    localTime: "Local time",
+    ghost: "TALK",
+    /* No city here: the clock line beside it already reads "FAENZA · HH:MM". */
+    footerLeft: "© 2026 Khalil Ben Ali",
     footerRight: "Built with Astro and Three.js",
     backToTop: "Back to top",
   },
@@ -311,6 +329,7 @@ const en: Dict = {
 
 const fr: Dict = {
   meta: {
+    title: "Khalil Ben Ali — Développeur Full-Stack & IA",
     description:
       "Khalil Ben Ali, développeur full-stack et IA à Faenza, Italie. Plateformes Microsoft Teams, modèles de vision dans le navigateur et systèmes IA en production.",
   },
@@ -318,14 +337,15 @@ const fr: Dict = {
   nav: { work: "Projets", ai: "IA", experience: "Parcours", contact: "Contact", resume: "CV" },
   hero: {
     eyebrow: "Développeur Full-Stack & IA · Faenza, Italie",
-    lead: "Je construis des plateformes où l'IA travaille pour de vrai : des produits Microsoft Teams, des modèles de vision qui tournent dans le navigateur, et des pipelines qui tiennent en production.",
+    status: "Disponible",
+    lead: "Je construis des plateformes où l'IA travaille pour de *vrai* : des produits Microsoft Teams, des modèles de vision qui tournent dans le navigateur, et des pipelines qui tiennent en production.",
     viewWork: "Voir mes projets",
     downloadCv: "Télécharger le CV",
     scroll: "défiler",
   },
   work: {
     eyebrow: "Projets choisis",
-    title: "Ce que j'ai livré",
+    title: "Ce que j'ai *livré*",
     production: "En production",
     privateRepo: "Code privé",
     viewCode: "Voir le code",
@@ -381,7 +401,7 @@ const fr: Dict = {
   },
   ai: {
     eyebrow: "Ingénierie IA",
-    title: "Comment je travaille avec l'IA",
+    title: "Comment je *travaille* avec l'IA",
     cards: [
       {
         title: "Livré à de vrais utilisateurs",
@@ -395,7 +415,7 @@ const fr: Dict = {
   },
   experience: {
     eyebrow: "Parcours",
-    title: "Où j'ai travaillé",
+    title: "Où j'ai *travaillé*",
     now: "2024 → auj.",
     entries: [
       {
@@ -426,7 +446,7 @@ const fr: Dict = {
   },
   skills: {
     eyebrow: "Compétences",
-    title: "Boîte à outils",
+    title: "Boîte à *outils*",
     groups: {
       frontend: "Frontend",
       backend: "Backend",
@@ -437,10 +457,12 @@ const fr: Dict = {
   },
   contact: {
     eyebrow: "Contact",
-    title: "Parlons-en.",
+    title: "Prenons *contact*.",
     line: "Un projet, un poste, une question ? Ma boîte mail est ouverte.",
     email: "M'écrire",
-    footerLeft: "© 2026 Khalil Ben Ali · Faenza, Italie",
+    localTime: "Heure locale",
+    ghost: "PARLONS",
+    footerLeft: "© 2026 Khalil Ben Ali",
     footerRight: "Réalisé avec Astro et Three.js",
     backToTop: "Retour en haut",
   },
@@ -507,6 +529,7 @@ const fr: Dict = {
 
 const it: Dict = {
   meta: {
+    title: "Khalil Ben Ali — Sviluppatore Full-Stack & AI",
     description:
       "Khalil Ben Ali, sviluppatore full-stack e AI a Faenza. Piattaforme Microsoft Teams, modelli di visione nel browser e sistemi AI in produzione.",
   },
@@ -514,14 +537,15 @@ const it: Dict = {
   nav: { work: "Progetti", ai: "AI", experience: "Percorso", contact: "Contatti", resume: "CV" },
   hero: {
     eyebrow: "Sviluppatore Full-Stack & AI · Faenza, Italia",
-    lead: "Costruisco piattaforme in cui l'AI lavora davvero: prodotti per Microsoft Teams, modelli di visione che girano nel browser e pipeline che reggono in produzione.",
+    status: "Disponibile",
+    lead: "Costruisco piattaforme in cui l'AI lavora *davvero*: prodotti per Microsoft Teams, modelli di visione che girano nel browser e pipeline che reggono in produzione.",
     viewWork: "I miei progetti",
     downloadCv: "Scarica il CV",
     scroll: "scorri",
   },
   work: {
     eyebrow: "Progetti selezionati",
-    title: "Quello che ho realizzato",
+    title: "Quello che ho *realizzato*",
     production: "In produzione",
     privateRepo: "Repo privato",
     viewCode: "Vedi il codice",
@@ -577,7 +601,7 @@ const it: Dict = {
   },
   ai: {
     eyebrow: "Ingegneria AI",
-    title: "Come lavoro con l'AI",
+    title: "Come *lavoro* con l'AI",
     cards: [
       {
         title: "In produzione per utenti reali",
@@ -591,7 +615,7 @@ const it: Dict = {
   },
   experience: {
     eyebrow: "Percorso",
-    title: "Dove ho lavorato",
+    title: "Dove ho *lavorato*",
     now: "2024 → oggi",
     entries: [
       {
@@ -622,7 +646,7 @@ const it: Dict = {
   },
   skills: {
     eyebrow: "Competenze",
-    title: "Cassetta degli attrezzi",
+    title: "Cassetta degli *attrezzi*",
     groups: {
       frontend: "Frontend",
       backend: "Backend",
@@ -633,10 +657,12 @@ const it: Dict = {
   },
   contact: {
     eyebrow: "Contatti",
-    title: "Parliamone.",
+    title: "Mettiamoci in *contatto*.",
     line: "Un progetto, un ruolo, una domanda? La mia casella è aperta.",
     email: "Scrivimi",
-    footerLeft: "© 2026 Khalil Ben Ali · Faenza, Italia",
+    localTime: "Ora locale",
+    ghost: "PARLIAMO",
+    footerLeft: "© 2026 Khalil Ben Ali",
     footerRight: "Fatto con Astro e Three.js",
     backToTop: "Torna su",
   },

@@ -14,12 +14,12 @@
   --gradient: linear-gradient(120deg, #7c5cff 0%, #38bdf8 100%);
   --glow-violet: 0 0 80px rgba(124, 92, 255, 0.25);
   --glow-sky: 0 0 80px rgba(56, 189, 248, 0.18);
-  --radius: 16px;
-  --radius-lg: 24px;
 
   --font-display: "Space Grotesk", "Inter Variable", system-ui, sans-serif;
   --font-body: "Inter Variable", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  /* v3 second typographic voice — italic only, one accented word at a time */
+  --font-accent: "Instrument Serif", "Iowan Old Style", Georgia, serif;
 
   --space-1: 0.5rem;
   --space-2: 1rem;
@@ -32,7 +32,53 @@
   --container: 72.5rem;
   --gutter: clamp(1.25rem, 4vw, 3rem);
   --nav-h: 68px;
-  --h1: clamp(2.9rem, 7vw, 5.2rem);
+  /* D2 scale-up. Only ever change this together with .hero__title's
+     font-weight (500) — scale without the weight drop is bold-at-huge. */
+  --h1: clamp(3rem, 8vw, 6.5rem);
   --section-title: clamp(2rem, 4.5vw, 3rem);
   --focus-ring: 2px solid var(--sky);
+
+  /* ---------------------------------------------------------------------
+     v3 craft layer — ADDITIONS ONLY (nothing above is replaced).
+     Owner: Wave 1A "motion-core". See src/scripts/motion/README.md.
+     --------------------------------------------------------------------- */
+
+  /* Motion signature (D3): one easing family, two durations. Never
+     hand-write a bezier again — GSAP mirrors these via gsap.defaults(). */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --dur-hover: 150ms;
+  --dur-reveal: 900ms;
+
+  /* Text tiers (D2): #fff headings · --muted body · --faint meta/labels.
+     Lightened twice from the spec's #6b7594: --faint labels sit on the card
+     gradient's TOP stop (#1c2134), not on --bg-0, and only this value clears
+     AA there (5.2:1 measured; 6.7:1 on --bg-0). */
+  --faint: #8b95b2;
+
+  /* Radius vocabulary (D6) */
+  --r-pill: 999px;
+  --r-card: 20px;
+  --r-btn: 12px;
+  --r-chip: 8px;
+
+  /* One light source, upper-left, site-wide (D5) */
+  --bevel-top: inset 0 1px 0 rgba(167, 139, 250, 0.16);
+  --shadow-dir: 16px 24px 40px -12px rgba(0, 0, 0, 0.55);
+  /* Solid card surface — replaces glassmorphism, no backdrop-filter */
+  --card-surface: linear-gradient(
+    180deg,
+    #1c2134 0%,
+    #161a28 52%,
+    #12151f 100%
+  );
+
+  /* Film grain. plus-lighter only ever adds light, so this is the whole
+     amplitude of the effect — soft-light at the same value was invisible. */
+  --grain-opacity: 0.05;
+
+  /* Layer order for the craft chrome (skip-link stays 1000, top of all) */
+  --z-grain: 2;
+  --z-preloader: 900;
+  --z-cursor: 950;
 }

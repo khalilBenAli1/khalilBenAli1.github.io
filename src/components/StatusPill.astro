@@ -1,0 +1,80 @@
+---
+/**
+ * Availability pill with a live LED — hero and contact share it, so the pulse
+ * keyframes exist once. The outer circle scales out and fades; the core stays.
+ */
+interface Props {
+  label: string;
+}
+
+const { label } = Astro.props;
+---
+
+<p class="status-pill">
+  <span class="status-pill__led" aria-hidden="true">
+    <span class="status-pill__pulse"></span>
+    <span class="status-pill__core"></span>
+  </span>
+  {label}
+</p>
+
+<style>
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0.32rem 0.75rem 0.32rem 0.6rem;
+    border: 1px solid rgba(52, 211, 153, 0.28);
+    border-radius: var(--r-pill);
+    background: rgba(52, 211, 153, 0.08);
+    color: var(--green);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .status-pill__led {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    width: 8px;
+    height: 8px;
+  }
+
+  .status-pill__core,
+  .status-pill__pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  .status-pill__core {
+    box-shadow: 0 0 8px var(--green);
+  }
+
+  .status-pill__pulse {
+    animation: status-led 2s var(--ease-quart) infinite;
+  }
+
+  @keyframes status-led {
+    0% {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(2.4);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status-pill__pulse {
+      display: none;
+    }
+  }
+</style>

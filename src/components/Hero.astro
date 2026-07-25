@@ -1,4 +1,7 @@
 ---
+import RollLabel from "./RollLabel.astro";
+import StatusPill from "./StatusPill.astro";
+import { accent } from "../lib/accent";
 import { ui, tech } from "../lib/icons";
 import { cvFile, t, type Locale } from "../lib/i18n";
 
@@ -12,27 +15,43 @@ const dict = t(locale);
 
 <section class="hero" id="top">
   <div class="hero__inner container">
-    <div class="hero__copy">
-      <p class="eyebrow" data-hero-eyebrow>
+    <div class="hero__copy" data-reveal-group>
+      <div class="hero__status" data-reveal="fade">
+        <StatusPill label={dict.hero.status} />
+      </div>
+      <p class="eyebrow" data-reveal="fade">
         {dict.hero.eyebrow}
       </p>
-      <h1 class="hero__title" data-hero-title>
-        <span class="hero__sheen">Khalil Ben Ali</span>
+      {/*
+        Hand-built mask instead of data-reveal="chars".
+
+        SplitText replaces the text with block-level line boxes, and
+        background-clip:text can only mask an element's OWN inline text — so any
+        split kills the sheen and the name renders invisible. The sheen is a
+        protected identity element, so the h1 keeps its text intact and does the
+        masking itself: h1 clips, the inner block rises into it under
+        data-reveal="fade". The chars vocabulary lives on the section titles,
+        which carry no gradient.
+      */}
+      <h1 class="hero__title">
+        <span class="hero__sheen" data-reveal="fade">Khalil Ben Ali</span>
       </h1>
-      <p class="hero__lead" data-hero-lead>
-        {dict.hero.lead}
-      </p>
-      <div class="hero__ctas" data-hero-ctas>
-        <a class="btn btn--primary" href="#work" data-magnetic>
-          {dict.hero.viewWork}
-          <span set:html={ui["arrow-down"]} />
+      <p
+        class="hero__lead"
+        data-reveal="lines"
+        set:html={accent(dict.hero.lead)}
+      />
+      <div class="hero__ctas" data-reveal="fade">
+        <a class="btn btn--primary link-roll" href="#work" data-magnetic>
+          <RollLabel label={dict.hero.viewWork} magnetic />
+          <span class="btn__icon" set:html={ui["arrow-down"]} />
         </a>
-        <a class="btn btn--ghost" href={cvFile(locale)} download data-magnetic>
-          <span set:html={ui.download} />
-          {dict.hero.downloadCv}
+        <a class="btn btn--ghost link-roll" href={cvFile(locale)} download>
+          <RollLabel label={dict.hero.downloadCv} />
+          <span class="btn__icon" set:html={ui.download} />
         </a>
       </div>
-      <div class="hero__social" data-hero-social>
+      <div class="hero__social" data-reveal="fade">
         <a
           class="icon-btn"
           href="https://github.com/khalilBenAli1"
@@ -54,7 +73,12 @@ const dict = t(locale);
       </div>
     </div>
 
-    <div class="hero__visual" data-hero-visual>
+    {/*
+      Deliberately not tagged data-reveal: the portrait is the hero's other LCP
+      candidate, so it is painted at full opacity from the first frame rather
+      than primed hidden by the reveal engine.
+    */}
+    <div class="hero__visual">
       <div class="hero__photo-wrap" data-tilt>
         <img
           class="hero__photo"
@@ -65,19 +89,27 @@ const dict = t(locale);
           loading="eager"
           fetchpriority="high"
         />
+        {/*
+          Grading layers, CSS only — the source jpg is untouched. The shot was
+          taken against a saturated cyan wall that read as a sticker cut out of a
+          different page; the tint unifies it with the violet/sky field and the
+          vignette lets the backdrop fall off into the card instead of ending at
+          a hard edge.
+        */}
+        <span class="hero__grade" aria-hidden="true"></span>
+        <span class="hero__vignette" aria-hidden="true"></span>
       </div>
-      <span class="hero__chip hero__chip--1" data-hero-chip>
+      {/* .NET label carries no icon: the simple-icons mark is the ".NET"
+          wordmark itself, so the chip read ".NET .NET". */}
+      <span class="hero__chip hero__chip--1">
         <span class="hero__chip-icon" set:html={tech.TypeScript} />
         TypeScript
       </span>
-      <span class="hero__chip hero__chip--2" data-hero-chip>
+      <span class="hero__chip hero__chip--2">
         <span class="hero__chip-icon" set:html={ui["brain-circuit"]} />
         AI Engineering
       </span>
-      <span class="hero__chip hero__chip--3" data-hero-chip>
-        <span class="hero__chip-icon" set:html={tech[".NET 9"]} />
-        .NET
-      </span>
+      <span class="hero__chip hero__chip--3">.NET</span>
     </div>
   </div>
 
@@ -104,16 +136,28 @@ const dict = t(locale);
     gap: clamp(2rem, 5vw, 4.5rem);
   }
 
+  .hero__status {
+    margin-bottom: 0.9rem;
+  }
+
+  /* --- name -------------------------------------------------------------- */
   .hero__title {
     margin-block: 1.1rem 1.2rem;
+    /* The mask. line-height 1.02 sits inside the font's content area, so this
+       clips leading, not letterforms (the name has no descenders). */
+    overflow: clip;
     font-family: var(--font-display);
     font-size: var(--h1);
-    font-weight: 700;
+    /* D2: regular-at-huge. Weight and scale moved together — 700 at this size
+       is the amateur tell the whole v3 pass exists to remove. */
+    font-weight: 500;
     letter-spacing: -0.03em;
     line-height: 1.02;
   }
 
   .hero__sheen {
+    display: block;
+    width: fit-content;
     background: linear-gradient(
       110deg,
       #f2f4fa 0%,
@@ -124,8 +168,8 @@ const dict = t(locale);
       #f2f4fa 100%
     );
     background-size: 220% 100%;
-    background-clip: text;
     -webkit-background-clip: text;
+    background-clip: text;
     color: transparent;
     animation: sheen 7s ease-in-out infinite;
   }
@@ -155,6 +199,11 @@ const dict = t(locale);
     margin-bottom: 1.6rem;
   }
 
+  .hero__ctas .btn__icon {
+    display: inline-flex;
+    flex: none;
+  }
+
   .hero__social {
     display: flex;
     gap: 0.65rem;
@@ -165,13 +214,19 @@ const dict = t(locale);
     justify-self: center;
   }
 
+  /* --- portrait card ----------------------------------------------------- */
   .hero__photo-wrap {
     position: relative;
     width: clamp(250px, 26vw, 350px);
-    padding: 3px;
-    border-radius: var(--radius-lg);
-    background: var(--gradient);
-    box-shadow: var(--glow-violet), var(--glow-sky);
+    padding: 6px;
+    border: 1px solid var(--border);
+    /* D5/D6: solid surface, violet bevel, one light source — no gradient fill. */
+    border-radius: var(--r-card);
+    background: var(--card-surface);
+    box-shadow:
+      var(--bevel-top),
+      var(--shadow-dir),
+      0 0 70px -14px rgba(124, 92, 255, 0.45);
     transform-style: preserve-3d;
     will-change: transform;
   }
@@ -181,7 +236,52 @@ const dict = t(locale);
     height: auto;
     aspect-ratio: 1;
     object-fit: cover;
-    border-radius: calc(var(--radius-lg) - 3px);
+    border-radius: calc(var(--r-card) - 6px);
+    /* Pulls the cyan backdrop back toward the page's own range. Saturation does
+       most of the work; the rest is a nudge, because skin tone goes waxy fast —
+       below ~0.45 saturation the face reads grey, so this is the floor. */
+    filter: saturate(0.48) contrast(1.08) brightness(0.92);
+  }
+
+  /* --- grading layers ---------------------------------------------------- */
+  .hero__grade,
+  .hero__vignette {
+    position: absolute;
+    inset: 6px;
+    pointer-events: none;
+    border-radius: calc(var(--r-card) - 6px);
+  }
+
+  /*
+    Tints the backdrop into the violet field. Masked to the periphery on the same
+    geometry as the vignette, NOT flat across the frame: a flat violet overlay
+    strong enough to convert the wall also pushed blue past green on skin
+    (rgb(159,136,153) — measurably no longer a skin tone). Tinting only where the
+    wall is leaves the face at rgb(161,139,130) and still kills the cyan.
+  */
+  .hero__grade {
+    background: radial-gradient(
+      64% 72% at 50% 36%,
+      transparent 30%,
+      rgba(124, 92, 255, 0.34) 100%
+    );
+    mix-blend-mode: overlay;
+  }
+
+  /*
+    Bleeds the backdrop into the card so the portrait has no cut-out edge. The
+    falloff has to COMPLETE inside the frame — a radius wider than the box (the
+    obvious first try) only reaches its mid-tones at the corners and reads as a
+    slightly dirty photo instead of a vignette. Centred above the middle and
+    taller than wide so it tracks the head and spares the shirt print.
+  */
+  .hero__vignette {
+    background: radial-gradient(
+      64% 72% at 50% 36%,
+      transparent 22%,
+      rgba(6, 7, 12, 0.56) 60%,
+      rgba(6, 7, 12, 0.93) 100%
+    );
   }
 
   .hero__chip {
@@ -191,10 +291,12 @@ const dict = t(locale);
     gap: 0.45rem;
     padding: 0.5rem 0.85rem;
     border: 1px solid var(--border-accent);
-    border-radius: 999px;
-    background: rgba(18, 21, 34, 0.85);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+    border-radius: var(--r-pill);
+    /* D5: backdrop-filter survives only on the nav and the mobile overlay. */
+    background: var(--surface-2);
+    box-shadow:
+      var(--bevel-top),
+      var(--shadow-dir);
     font-family: var(--font-mono);
     font-size: 0.8rem;
     white-space: nowrap;
@@ -248,7 +350,7 @@ const dict = t(locale);
     justify-items: center;
     gap: 0.2rem;
     transform: translateX(-50%);
-    color: var(--muted);
+    color: var(--faint);
     font-family: var(--font-mono);
     font-size: 0.72rem;
     letter-spacing: 0.12em;
@@ -286,6 +388,14 @@ const dict = t(locale);
     }
 
     .hero__scroll-cue {
+      display: none;
+    }
+  }
+
+  /* Below this the chips have nowhere to float: they crowd the portrait, and
+     each one repeats a label the marquee and the skills grid already carry. */
+  @media (max-width: 52rem) {
+    .hero__chip {
       display: none;
     }
   }

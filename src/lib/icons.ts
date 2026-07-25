@@ -10,7 +10,6 @@ import {
   siCmake,
   siCplusplus,
   siDocker,
-  siDotnet,
   siExpress,
   siGit,
   siGithub,
@@ -154,7 +153,9 @@ export const tech: Record<string, string | null> = {
   MongoDB: brand(siMongodb),
   Redis: brand(siRedis),
   RabbitMQ: brand(siRabbitmq),
-  ".NET 9": brand(siDotnet),
+  /* The simple-icons .NET mark IS the wordmark ".NET", so pairing it with the
+     label printed ".NET .NET 9". Text-only. */
+  ".NET 9": null,
   "C++20": brand(siCplusplus),
   "C#": null,
   WPF: null,

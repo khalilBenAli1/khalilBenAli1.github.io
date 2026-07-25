@@ -11,7 +11,10 @@ html {
   color: var(--text);
   font-family: var(--font-body);
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--nav-h) + 22px);
+  /* Single source of truth for anchor landings: Lenis subtracts scroll-padding
+     itself (see motion/scroll.ts), so native anchors, deep links and the
+     smooth-scrolled nav clicks all clear the fixed nav by the same 10px. */
+  scroll-padding-top: calc(var(--nav-h) + 10px);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -123,6 +126,17 @@ footer {
   padding-block: clamp(4.5rem, 9vw, 7.5rem);
 }
 
+/* Rhythm variance: five sections at one interval read as a template. The two
+   card-grid sections (AI, skills) breathe tighter than the work list and the
+   contact close, so scrolling has a measure instead of a metronome. */
+.section--tight {
+  padding-block: clamp(3rem, 6vw, 4.5rem);
+}
+
+.section--tight .section-heading {
+  margin-block-end: clamp(1.8rem, 4vw, 2.6rem);
+}
+
 .section-heading {
   display: grid;
   gap: var(--space-1);
@@ -134,9 +148,11 @@ footer {
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--section-title);
-  font-weight: 700;
+  /* D2: regular-at-huge reads professional; bold-at-huge reads amateur */
+  font-weight: 500;
   letter-spacing: -0.03em;
   line-height: 1.05;
+  text-wrap: balance;
 }
 
 .eyebrow {
@@ -159,25 +175,41 @@ footer {
 
 /* shared UI atoms */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
   min-height: 2.9rem;
   padding: 0.7rem 1.35rem;
+  overflow: hidden;
   border: 1px solid transparent;
-  border-radius: 999px;
+  /* D6 radius vocabulary: buttons are 12px, pills stay pills */
+  border-radius: var(--r-btn);
   font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
+  isolation: isolate;
   transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    border-color 0.25s ease,
-    background-color 0.25s ease;
-  will-change: transform;
+    box-shadow var(--dur-hover) var(--ease-quart),
+    border-color var(--dur-hover) var(--ease-quart),
+    color var(--dur-hover) var(--ease-quart);
+}
+
+/* Fill sweep (D1 / item 8). z-index:-1 keeps it above the button background
+   but under the in-flow label, so it needs no markup change. Opt into a
+   .btn__label span only when you also want the roll-over label. */
+.btn::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.14);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform var(--dur-hover) var(--ease-quart);
 }
 
 .btn svg {
@@ -185,27 +217,48 @@ footer {
   height: 1.05em;
 }
 
+/* D1: solid violet + violet glow. The violet→sky gradient is the #1 AI tell
+   on big surfaces, so it survives only on hairlines, LEDs and the hero sheen. */
 .btn--primary {
-  background: var(--gradient);
-  color: #06070c;
+  background: var(--violet);
+  color: #0b0714;
+  box-shadow:
+    0 0 24px rgba(124, 92, 255, 0.45),
+    0 8px 40px -8px rgba(124, 92, 255, 0.35);
 }
 
-.btn--primary:hover {
-  box-shadow: 0 6px 30px rgba(124, 92, 255, 0.45);
-  transform: translateY(-2px);
+.btn--primary::after {
+  background: var(--violet-soft);
 }
 
 .btn--ghost {
   border-color: var(--border);
   background: rgba(255, 255, 255, 0.03);
   color: var(--text);
-  backdrop-filter: blur(8px);
 }
 
-.btn--ghost:hover {
-  border-color: var(--border-accent);
-  box-shadow: var(--glow-violet);
-  transform: translateY(-2px);
+.btn--ghost::after {
+  background: rgba(124, 92, 255, 0.14);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover::after,
+  .btn:focus-visible::after {
+    transform: scaleY(1);
+  }
+
+  .btn--primary:hover,
+  .btn--primary:focus-visible {
+    box-shadow:
+      0 0 30px rgba(124, 92, 255, 0.55),
+      0 14px 46px -10px rgba(124, 92, 255, 0.45);
+  }
+
+  .btn--ghost:hover,
+  .btn--ghost:focus-visible {
+    border-color: var(--border-accent);
+    box-shadow: var(--bevel-top);
+  }
 }
 
 .icon-btn {
@@ -256,95 +309,57 @@ footer {
   flex: none;
 }
 
-.glass-card {
+/* D5: no new glassmorphism. `.glass-card` keeps its name (components still
+   reference it) but is now the solid v3 surface — see `.card-v3` below, which
+   is the name Wave 2 should migrate to. backdrop-filter survives only on the
+   nav bar and the mobile overlay. */
+.glass-card,
+.card-v3 {
+  position: relative;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: rgba(18, 21, 34, 0.72);
-  backdrop-filter: blur(12px);
+  border-radius: var(--r-card);
+  background: var(--card-surface);
+  box-shadow:
+    var(--bevel-top),
+    var(--shadow-dir);
   transition:
-    border-color 0.3s ease,
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+    border-color 0.3s var(--ease-quart),
+    box-shadow 0.3s var(--ease-quart),
+    opacity 0.3s var(--ease-quart),
+    transform 0.3s var(--ease-quart);
 }
 
-.glass-card:hover {
-  border-color: var(--border-accent);
-  box-shadow: var(--glow-violet);
-  transform: translateY(-4px);
+@media (hover: hover) and (pointer: fine) {
+  .glass-card:hover,
+  .card-v3:hover {
+    border-color: var(--border-accent);
+    box-shadow:
+      var(--bevel-top),
+      var(--shadow-dir),
+      0 0 0 1px rgba(124, 92, 255, 0.1);
+    transform: translateY(-3px);
+  }
 }
 
-/* scroll reveal primitives (JS adds .revealed) */
-.reveal {
-  opacity: 0;
-  transform: translateY(26px);
-  transition:
-    opacity 0.7s ease,
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
+/* Legacy scroll-reveal classes. The IntersectionObserver that used to add
+   `.revealed` is gone — motion/reveal.ts drives these now and sets the
+   hidden state from JS, so with JS off the content is simply visible.
+   Kept as no-ops so existing markup keeps rendering until Wave 2 swaps
+   class="reveal" for data-reveal. Do not delete. */
+.reveal,
 .reveal.revealed {
   opacity: 1;
   transform: none;
 }
 
-/* hero load sequence (body.is-loaded added by site.ts) */
-[data-hero-eyebrow],
-[data-hero-title],
-[data-hero-lead],
-[data-hero-ctas],
-[data-hero-social],
-[data-hero-visual] {
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 0.7s ease,
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-[data-hero-eyebrow] {
-  transition-delay: 0.05s;
-}
-
-[data-hero-title] {
-  transition-delay: 0.15s;
-}
-
-[data-hero-visual] {
-  transition-delay: 0.2s;
-}
-
-[data-hero-lead] {
-  transition-delay: 0.25s;
-}
-
-[data-hero-ctas] {
-  transition-delay: 0.35s;
-}
-
-[data-hero-social] {
-  transition-delay: 0.45s;
-}
-
-body.is-loaded [data-hero-eyebrow],
-body.is-loaded [data-hero-title],
-body.is-loaded [data-hero-lead],
-body.is-loaded [data-hero-ctas],
-body.is-loaded [data-hero-social],
-body.is-loaded [data-hero-visual] {
-  opacity: 1;
-  transform: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-hero-eyebrow],
-  [data-hero-title],
-  [data-hero-lead],
-  [data-hero-ctas],
-  [data-hero-social],
-  [data-hero-visual] {
-    opacity: 1;
-    transform: none;
-  }
+/* Reveal priming. Without this, everything paints at full opacity in the window
+   between the curtain lifting and the reveal engine building, then snaps to
+   hidden — a visible pop-out. `kb-js` is added by the inline <head> script in
+   Base.astro (never under reduced motion) and dropped again after 5s, so a dead
+   bundle degrades to "content appears late", never "content never appears". */
+html.kb-js [data-reveal],
+html.kb-js .reveal {
+  opacity: 0.001;
 }
 
 .skip-link {
@@ -402,5 +417,279 @@ body.is-loaded [data-hero-visual] {
   .reveal {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* =========================================================================
+   V3 CRAFT LAYER — appended utilities (Wave 1A "motion-core").
+   Every class and data-attribute here is documented in
+   src/scripts/motion/README.md. Nothing above this line was reordered.
+   ========================================================================= */
+
+/* --- Lenis smooth scroll -------------------------------------------------
+   Lenis stamps `lenis`, `lenis-smooth`, `lenis-scrolling`, `lenis-stopped`
+   on <html> itself. `lenis-smooth` must beat html{scroll-behavior:smooth}
+   or anchor jumps fight the lerp. Add data-lenis-prevent to any inner
+   scroll area (none today; the mobile overlay may need it in Wave 2). */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* --- Film grain ----------------------------------------------------------
+   Static data-URI feTurbulence tile, desaturated, soft-light blended.
+   Never a live `filter:` — that costs real frames on low-end devices. */
+.grain {
+  position: fixed;
+  z-index: var(--z-grain);
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+  opacity: var(--grain-opacity);
+  /* soft-light against a near-black page is a no-op — it darkens what is
+     already dark and the tile never showed. plus-lighter only adds, so the
+     noise actually lands on #06070c. */
+  mix-blend-mode: plus-lighter;
+}
+
+/* --- Preloader -----------------------------------------------------------
+   Real content stays in the DOM and painted underneath, so LCP is not
+   inflated by the curtain. Skipped for repeat visits and reduced motion
+   via html.kb-preload-skip, set by an inline <head> script before paint. */
+.preloader {
+  position: fixed;
+  z-index: var(--z-preloader);
+  inset: 0;
+  /* Hidden unless JS is present AND this is a first visit AND motion is fine —
+     only the inline <head> script can opt in. A curtain that no script can lift
+     would blank the page for a JS-disabled visitor. */
+  display: none;
+  grid-auto-flow: column;
+  align-content: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+  background: var(--bg-0);
+  clip-path: inset(0 0 0 0);
+}
+
+.preloader__mark {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 12vw, 7.5rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+}
+
+.preloader__count {
+  align-self: end;
+  padding-bottom: 0.6rem;
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+html.kb-js .preloader {
+  display: grid;
+}
+
+/* Must stay AFTER the kb-js rule: on a repeat visit both classes are set and
+   "skip" has to win. */
+html.kb-preload-skip .preloader {
+  display: none;
+}
+
+/* --- Custom cursor ------------------------------------------------------
+   Augments the native cursor (never `cursor: none`). Fine pointers only. */
+.cursor {
+  position: fixed;
+  z-index: var(--z-cursor);
+  top: 0;
+  left: 0;
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease-quart);
+}
+
+.cursor.is-live {
+  opacity: 1;
+}
+
+.cursor__dot,
+.cursor__ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+}
+
+.cursor__dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--text);
+}
+
+.cursor__ring {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  transition:
+    border-color var(--dur-hover) var(--ease-quart),
+    background-color var(--dur-hover) var(--ease-quart);
+}
+
+.cursor.is-hover .cursor__ring {
+  border-color: var(--violet);
+  background: rgba(124, 92, 255, 0.08);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cursor {
+    display: block;
+  }
+}
+
+@media (pointer: coarse) {
+  .cursor {
+    display: none !important;
+  }
+}
+
+/* --- Roll-over link ------------------------------------------------------
+   <a class="link-roll" href="…">
+     <span class="link-roll__mask">
+       <span class="link-roll__inner">
+         <span>Label</span><span aria-hidden="true">Label</span>
+       </span>
+     </span>
+   </a>
+   The mask is an inner element so the focus ring on the <a> is not clipped. */
+.link-roll {
+  display: inline-block;
+  vertical-align: top;
+  text-decoration: none;
+}
+
+/* A button that is also a roll-link still has to lay its icon and label out in
+   a row. Two classes beat `.link-roll`'s one, so this holds wherever the pair
+   is used and no component needs a local display patch. */
+.btn.link-roll {
+  display: inline-flex;
+}
+
+.link-roll__mask {
+  display: block;
+  overflow: hidden;
+}
+
+.link-roll__inner,
+.link-roll__inner > * {
+  display: block;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link-roll__inner {
+    transition: transform var(--dur-hover) var(--ease-quart);
+  }
+
+  .link-roll:hover .link-roll__inner,
+  .link-roll:focus-visible .link-roll__inner {
+    transform: translateY(-100%);
+  }
+}
+
+/* --- Dim siblings -------------------------------------------------------
+   Put .dim-siblings on the container of a card list. */
+@media (hover: hover) and (pointer: fine) {
+  .dim-siblings:has(.card-v3:hover) .card-v3:not(:hover),
+  .dim-siblings:has(.glass-card:hover) .glass-card:not(:hover) {
+    opacity: 0.55;
+  }
+}
+
+/* --- Second typographic voice (D2) --------------------------------------
+   One accented word per heading. Wave 2's accent() helper emits
+   <em class="accent-serif">word</em>. Italic 400 is the only face loaded. */
+.accent-serif {
+  font-family: var(--font-accent);
+  font-size: 1.06em;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* 1.06em is tuned against Space Grotesk at display sizes. Instrument Serif's
+   x-height sits far below Inter's, so the same multiplier in body copy reads as
+   a shrunken word rather than an emphasised one. */
+.hero__lead .accent-serif {
+  font-size: 1.24em;
+}
+
+/* --- Numeric UI --------------------------------------------------------- */
+.tnum,
+[data-local-time],
+[data-section-index] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* --- Craft layer: print ------------------------------------------------- */
+@media print {
+  .grain,
+  .cursor,
+  .preloader {
+    display: none !important;
+  }
+}
+
+/* --- Craft layer: reduced motion ---------------------------------------
+   Opacity-only feedback, no curtain, no follower, no lift. */
+@media (prefers-reduced-motion: reduce) {
+  .preloader,
+  .cursor {
+    display: none !important;
+  }
+
+  .glass-card:hover,
+  .card-v3:hover {
+    transform: none;
+  }
+
+  .link-roll__inner {
+    transform: none !important;
+  }
+
+  .link-roll:hover {
+    color: var(--violet-soft);
+  }
+
+  .btn::after {
+    opacity: 0;
+    transform: scaleY(1);
+  }
+
+  .btn:hover::after,
+  .btn:focus-visible::after {
+    opacity: 1;
+    transform: scaleY(1);
   }
 }

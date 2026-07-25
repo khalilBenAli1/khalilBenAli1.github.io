@@ -1,0 +1,46 @@
+---
+/**
+ * Roll-over label for `.link-roll` elements (nav links, buttons).
+ *
+ * Put `class="link-roll"` on the interactive element and drop this inside:
+ *   <a class="btn btn--primary link-roll"><RollLabel label="Email me" /></a>
+ *
+ * base.css owns the hover transition; what it does NOT own is a height
+ * contract. Its `.link-roll__inner { transform: translateY(-100%) }` assumes the
+ * inner is exactly one label tall, but the documented markup puts both labels
+ * inside it — so a plain implementation slides both out and the label goes
+ * blank on hover. Pinning the duplicate at top:100% restores the assumption:
+ * inner = one label, the copy waits directly below the mask edge.
+ */
+interface Props {
+  label: string;
+  /** counter-move the label inside a [data-magnetic] parent */
+  magnetic?: boolean;
+}
+
+const { label, magnetic = false } = Astro.props;
+---
+
+<span class="link-roll__mask" data-magnetic-label={magnetic ? "" : undefined}>
+  <span class="link-roll__inner">
+    <span>{label}</span><span aria-hidden="true">{label}</span>
+  </span>
+</span>
+
+<style>
+  .link-roll__inner {
+    position: relative;
+  }
+
+  .link-roll__inner > span {
+    display: block;
+    line-height: 1.35;
+  }
+
+  .link-roll__inner > span + span {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+  }
+</style>

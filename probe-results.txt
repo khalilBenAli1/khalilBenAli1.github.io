@@ -1,0 +1,56 @@
+ARIA SNAPSHOT #experience:
+- region "Where I've worked":
+  - text: Experience
+  - heading "Where I've worked" [level=2]
+  - list:
+    - listitem:
+      - heading "Full-Stack & AI Engineer nBold" [level=3]
+      - paragraph: 2024 → now
+      - paragraph
+    - listitem:
+      - heading "Software Developer Freelance" [level=3]
+      - paragraph: 2023 → 2024
+      - paragraph
+    - listitem:
+      - heading "Software Developer SolvR" [level=3]
+      - paragraph: "2023"
+      - paragraph
+    - listitem:
+      - heading "Software Developer Tynass IT" [level=3]
+      - paragraph: 2019 → 2022
+      - paragraph
+B1 level-3 headings in a11y tree: 4
+B1 heading rows: ["- heading \"Full-Stack & AI Engineer nBold\" [level=3]","- heading \"Software Developer Freelance\" [level=3]","- heading \"Software Developer SolvR\" [level=3]"]
+B1 role of h3 element: H3 children:2
+B1 entry structure: {"roleTag":"H3","roleSplit":false,"noteSplit":true,"periodTag":"P"} ×4
+B1 aria-labels inside #experience: 5
+B2 inert while open: {"main":true,"navInner":true,"skip":true,"overlay":false}
+B2 focus escaped overlay in 9 Tabs: false
+B2 tab ring: ["A.","A.","A.","A.","A.","A.is-current","A.","A.","BUTTON.site-nav__close"]
+B2 shift-tab from first wraps: {"inside":true,"tag":"A","text":"IT"}
+B2 scrollY before/after open+Tab×9+Esc: 900 / 900 (delta 0)
+B2 inert cleared on close: true
+B2 focus returned to burger: true
+M1 luma sd grain on/off: 15.9437 / 15.5011 (rise 0.4426), mean 25.067 / 20.95
+M1 blend mode: plus-lighter @ 0.05
+M3 nav-click #work top: 78px (settled 78px)
+M3 deep-link #work top: 78px
+M3 nav height / clearance below nav: 68px / 10px
+M4 sessionStorage kb-loaded set: 1
+M4 repeat visit: sheen readable: 307ms
+M4 repeat visit: lead readable: 93ms
+M4 curtain present on repeat: false
+M5 reduced-motion reveal targets: {"total":40,"inlineOpacity":0,"inlineTransform":0,"hidden":0}
+M5 skills cards with inline opacity: {"cards":5,"inlineOpacity":0}
+M6 scrollY before focus: 0
+M6 focused element rect.top / scrollY: 675 / 5961  then 674 / 5962 (drift 1)
+M6 focused element in viewport: true
+M6 focused element effective opacity: 1 (focus held: true)
+M6 more-work card opacity (already revealed by scroll): {"beforeFocus":1}
+M7 --faint contrast: {"faint":"#8b95b2","onCardTop":5.35,"onSurface2":5.81,"onBg0":6.75,"onBg1":6.46}
+RESP 360px: hscroll=false (360/360) chips=none marker=3px×3px rgb(124, 92, 255) accent=24.2048px in 19.52px
+RESP 390px: hscroll=false (390/390) chips=none marker=3px×3px rgb(124, 92, 255) accent=24.2048px in 19.52px
+RESP 768px: hscroll=false (768/768) chips=none marker=3px×3px rgb(124, 92, 255) accent=24.2048px in 19.52px
+RESP 1024px: hscroll=false (1024/1024) chips=flex marker=3px×3px rgb(124, 92, 255) accent=24.2048px in 19.52px
+RESP 1440px: hscroll=false (1440/1440) chips=flex marker=3px×3px rgb(124, 92, 255) accent=24.2048px in 19.52px
+RESP 1920px: hscroll=false (1920/1920) chips=flex marker=3px×3px rgb(124, 92, 255) accent=24.2048px in 19.52px

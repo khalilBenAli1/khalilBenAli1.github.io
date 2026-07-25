@@ -1,4 +1,7 @@
 ---
+import RollLabel from "./RollLabel.astro";
+import SectionHeading from "./SectionHeading.astro";
+import StatusPill from "./StatusPill.astro";
 import { ui } from "../lib/icons";
 import { t, type Locale } from "../lib/i18n";
 
@@ -12,64 +15,131 @@ const dict = t(locale);
 
 <section class="section contact" id="contact" aria-labelledby="contact-title">
   <div class="container contact__inner">
-    <p class="eyebrow">{dict.contact.eyebrow}</p>
-    <h2 class="section-title gradient-text" id="contact-title">
-      {dict.contact.title}
-    </h2>
-    <p class="contact__line">{dict.contact.line}</p>
-    <div class="contact__actions">
+    {/*
+      The one ghost-type moment on the page: outlined, huge, decorative, and
+      localized. aria-hidden and unselectable — it is texture, not content.
+    */}
+    <div class="contact__ghost-frame" aria-hidden="true">
+      <span class="contact__ghost" data-parallax="9">{dict.contact.ghost}</span>
+    </div>
+
+    <SectionHeading
+      index="05"
+      eyebrow={dict.contact.eyebrow}
+      title={dict.contact.title}
+      titleId="contact-title"
+      centered
+    />
+
+    <p class="contact__line" data-reveal="lines">{dict.contact.line}</p>
+
+    <div class="contact__status" data-reveal="fade">
+      <StatusPill label={dict.hero.status} />
+    </div>
+
+    <div class="contact__actions" data-reveal="fade">
       <a
-        class="btn btn--primary"
+        class="btn btn--primary link-roll"
         href="mailto:khalil.benali16121@gmail.com"
         data-magnetic
       >
-        <span set:html={ui.mail} />
-        {dict.contact.email}
-      </a>
-      <a class="btn btn--ghost" href="https://github.com/khalilBenAli1" data-magnetic>
-        <span set:html={ui.github} />
-        GitHub
+        <span class="btn__icon" set:html={ui.mail} />
+        <RollLabel label={dict.contact.email} magnetic />
       </a>
       <a
-        class="btn btn--ghost"
-        href="https://linkedin.com/in/khalil-ben-ali"
-        data-magnetic
+        class="btn btn--ghost link-roll"
+        href="https://github.com/khalilBenAli1"
       >
-        <span set:html={ui.linkedin} />
-        LinkedIn
+        <span class="btn__icon" set:html={ui.github} />
+        <RollLabel label="GitHub" />
+      </a>
+      <a
+        class="btn btn--ghost link-roll"
+        href="https://linkedin.com/in/khalil-ben-ali"
+      >
+        <span class="btn__icon" set:html={ui.linkedin} />
+        <RollLabel label="LinkedIn" />
       </a>
     </div>
   </div>
 
   <footer class="contact__footer">
     <div class="container contact__footer-inner">
-      <p>{dict.contact.footerLeft}</p>
-      <p>{dict.contact.footerRight}</p>
-      <a
-        class="icon-btn"
-        href="#top"
-        aria-label={dict.contact.backToTop}
-        set:html={ui["arrow-up"]}
-      />
+      <p class="contact__copy">{dict.contact.footerLeft}</p>
+
+      {/* Live clock: the cheapest proof a specific person still maintains this. */}
+      <p class="contact__clock">
+        <span class="contact__clock-label">{dict.contact.localTime}</span>
+        <span class="contact__clock-value">
+          FAENZA · <span data-local-time>--:--</span>
+        </span>
+      </p>
+
+      <div class="contact__footer-end">
+        <p class="contact__built">{dict.contact.footerRight}</p>
+        <a
+          class="icon-btn"
+          href="#top"
+          aria-label={dict.contact.backToTop}
+          set:html={ui["arrow-up"]}
+        />
+      </div>
     </div>
   </footer>
 </section>
 
 <style>
   .contact {
+    position: relative;
     padding-block-end: 0;
     text-align: center;
   }
 
   .contact__inner {
+    position: relative;
     display: grid;
     justify-items: center;
     gap: 0.9rem;
     padding-block-end: clamp(4rem, 8vw, 6rem);
   }
 
-  .contact .section-title {
-    max-width: none;
+  /* --- ghost type --------------------------------------------------------- */
+  .contact__ghost-frame {
+    position: absolute;
+    /* Behind the copy without needing a z-index on every sibling. */
+    z-index: -1;
+    inset: -8% 0 auto 0;
+    display: grid;
+    place-items: center;
+    height: 100%;
+    /* The word is wider than the viewport on purpose; clip it here so the page
+       never gains a horizontal scrollbar. */
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* A 0.1 stroke over the space canvas was below the noise floor — the word
+     read as a smudge. The stroke carries it; the near-nothing fill gives the
+     counters just enough body to be letterforms rather than outlines. */
+  .contact__ghost {
+    color: rgba(255, 255, 255, 0.02);
+    font-family: var(--font-display);
+    font-size: clamp(4.5rem, 18vw, 15rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.18);
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  /* --- copy -------------------------------------------------------------- */
+  .contact__inner :global(.section-heading) {
+    margin-block-end: 0.4rem;
+  }
+
+  .contact__inner :global(.section-title) {
+    max-width: 30ch;
   }
 
   .contact__line {
@@ -79,15 +149,27 @@ const dict = t(locale);
     font-size: 1.1rem;
   }
 
+  .contact__status {
+    margin-top: 0.4rem;
+  }
+
   .contact__actions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.9rem;
-    margin-top: 1.2rem;
+    margin-top: 1rem;
   }
 
+  .contact__actions .btn__icon {
+    display: inline-flex;
+    flex: none;
+  }
+
+  /* --- footer ------------------------------------------------------------ */
   .contact__footer {
+    position: relative;
+    z-index: 1;
     border-top: 1px solid var(--border);
     background: rgba(6, 7, 12, 0.6);
   }
@@ -97,7 +179,7 @@ const dict = t(locale);
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 0.8rem;
+    gap: 0.8rem 1.4rem;
     padding-block: 1.4rem;
   }
 
@@ -108,10 +190,41 @@ const dict = t(locale);
     font-size: 0.78rem;
   }
 
-  @media (max-width: 40rem) {
+  .contact__clock {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .contact__clock-label {
+    color: var(--faint);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .contact__clock-value {
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+
+  .contact__footer-end {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  @media (max-width: 52rem) {
     .contact__footer-inner {
       justify-content: center;
       text-align: center;
+    }
+  }
+
+  /* Phone: the outlined word would cross the copy instead of sitting behind it. */
+  @media (max-width: 40rem) {
+    .contact__ghost-frame {
+      display: none;
     }
   }
 </style>

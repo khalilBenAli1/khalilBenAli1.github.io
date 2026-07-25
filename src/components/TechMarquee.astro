@@ -40,14 +40,14 @@ import { marqueeItems, tech } from "../lib/icons";
     );
   }
 
+  /* motion/marquee.ts takes this over (inline `animation: none`) and drives
+     xPercent + skewX from scroll velocity, including the hover pause. The
+     keyframes below stay as the no-JS and reduced-motion fallback. */
   .marquee__track {
     display: flex;
     width: max-content;
     animation: marquee 40s linear infinite;
-  }
-
-  .marquee:hover .marquee__track {
-    animation-play-state: paused;
+    will-change: transform;
   }
 
   .marquee__list {

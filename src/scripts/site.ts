@@ -1,123 +1,46 @@
-/** Site runtime: nav, reveals, diagram animation, tilt, magnetic buttons. */
-
-const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const finePointer = window.matchMedia("(pointer: fine)").matches;
+/**
+ * Site runtime — slim orchestrator.
+ *
+ * Everything animated lives in ./motion/* (see motion/README.md for the full
+ * list of primitives, data-attributes and classes). What stays here is the page
+ * chrome that isn't a motion primitive: the lazy three.js boot, the nav
+ * progress bar / active link / mobile menu, and the hero scroll cue.
+ *
+ * The old inline diagram runtime and the old IntersectionObserver reveal system
+ * are gone: diagrams moved to ./diagrams.ts, reveals to ./motion/reveal.ts.
+ */
+import { initDiagrams } from "./diagrams";
+import { initCursor } from "./motion/cursor";
+import { initMagnetic, initTilt } from "./motion/hover";
+import { initMarquee } from "./motion/marquee";
+import { initScrollLinked } from "./motion/parallax";
+import { initPreloader } from "./motion/preloader";
+import { initReveal } from "./motion/reveal";
+import { initScroll, lockScroll } from "./motion/scroll";
+import { initLocalTime } from "./motion/time";
 
 /* ---------- three.js background (lazy) ---------- */
-const spaceCanvas = document.getElementById(
-  "space-canvas",
-) as HTMLCanvasElement | null;
-if (spaceCanvas) {
-  const boot = () =>
-    import("./space").then(({ initSpace }) => initSpace(spaceCanvas));
-  if ("requestIdleCallback" in window) {
+function initSpaceCanvas(): void {
+  const canvas = document.getElementById(
+    "space-canvas",
+  ) as HTMLCanvasElement | null;
+  if (!canvas) return;
+  const boot = (): void => {
+    void import("./space").then(({ initSpace }) => initSpace(canvas));
+  };
+  if (typeof requestIdleCallback === "function") {
     requestIdleCallback(() => boot(), { timeout: 1200 });
   } else {
-    setTimeout(boot, 250);
+    window.setTimeout(boot, 250);
   }
 }
 
-/* ---------- hero load sequence ---------- */
-requestAnimationFrame(() =>
-  requestAnimationFrame(() => document.body.classList.add("is-loaded")),
-);
-
-/* ---------- scroll reveals ---------- */
-const revealIO = new IntersectionObserver(
-  (entries) => {
-    for (const entry of entries) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("revealed");
-        revealIO.unobserve(entry.target);
-      }
-    }
-  },
-  { threshold: 0.16 },
-);
-document.querySelectorAll(".reveal").forEach((el) => revealIO.observe(el));
-
-/* ---------- diagrams: draw-in + traveling pulses ---------- */
-interface Pulse {
-  path: SVGPathElement;
-  dot: SVGCircleElement;
-  length: number;
-  offset: number;
-  card: HTMLElement | null;
-}
-
-const pulses: Pulse[] = [];
-const activeDiagrams = new Set<SVGSVGElement>();
-
-const diagramIO = new IntersectionObserver(
-  (entries) => {
-    for (const entry of entries) {
-      const svg = entry.target as SVGSVGElement;
-      if (entry.isIntersecting) {
-        svg.classList.add("is-drawn");
-        activeDiagrams.add(svg);
-      } else {
-        activeDiagrams.delete(svg);
-      }
-    }
-  },
-  { threshold: 0.25 },
-);
-
-document.querySelectorAll<SVGSVGElement>("svg[data-diagram]").forEach((svg) => {
-  diagramIO.observe(svg);
-  if (reduced) {
-    svg.classList.add("is-drawn");
-    return;
-  }
-  const gradient = svg.querySelector("linearGradient");
-  const fill = gradient ? `url(#${gradient.id})` : "#7c5cff";
-  const card = svg.closest<HTMLElement>(".project");
-  svg.querySelectorAll<SVGPathElement>("path[data-edge]").forEach((path, i) => {
-    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    dot.setAttribute("r", "3.2");
-    dot.setAttribute("fill", fill);
-    dot.setAttribute("opacity", "0");
-    svg.appendChild(dot);
-    pulses.push({
-      path,
-      dot,
-      length: path.getTotalLength(),
-      offset: i * 0.24,
-      card,
-    });
-  });
-});
-
-if (pulses.length && !reduced) {
-  const DURATION = 2600;
-  const tickPulses = (now: number) => {
-    for (const p of pulses) {
-      const svg = p.path.ownerSVGElement;
-      if (
-        !svg ||
-        !activeDiagrams.has(svg) ||
-        !svg.classList.contains("is-drawn")
-      ) {
-        p.dot.setAttribute("opacity", "0");
-        continue;
-      }
-      const speed = p.card?.matches(":hover") ? 1.5 : 1;
-      const t = ((now * speed) / DURATION + p.offset) % 1;
-      const pt = p.path.getPointAtLength(t * p.length);
-      p.dot.setAttribute("cx", String(pt.x));
-      p.dot.setAttribute("cy", String(pt.y));
-      p.dot.setAttribute("opacity", t < 0.04 || t > 0.96 ? "0" : "0.95");
-    }
-    requestAnimationFrame(tickPulses);
-  };
-  requestAnimationFrame(tickPulses);
-}
-
-/* ---------- nav: progress bar, active link, mobile menu ---------- */
-const progress = document.querySelector<HTMLElement>("[data-nav-progress]");
-if (progress) {
+/* ---------- nav: progress bar ---------- */
+function initNavProgress(): void {
+  const progress = document.querySelector<HTMLElement>("[data-nav-progress]");
+  if (!progress) return;
   let raf = 0;
-  const update = () => {
+  const update = (): void => {
     raf = 0;
     const max = document.documentElement.scrollHeight - window.innerHeight;
     progress.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
@@ -132,12 +55,14 @@ if (progress) {
   update();
 }
 
-const navLinks = new Map<string, HTMLAnchorElement>();
-document
-  .querySelectorAll<HTMLAnchorElement>("[data-nav-link]")
-  .forEach((a) => navLinks.set(a.dataset.navLink ?? "", a));
+/* ---------- nav: active section link ---------- */
+function initNavActive(): void {
+  const navLinks = new Map<string, HTMLAnchorElement>();
+  document
+    .querySelectorAll<HTMLAnchorElement>("[data-nav-link]")
+    .forEach((a) => navLinks.set(a.dataset.navLink ?? "", a));
+  if (!navLinks.size) return;
 
-if (navLinks.size) {
   const sectionIO = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
@@ -156,32 +81,77 @@ if (navLinks.size) {
   });
 }
 
-const burger = document.querySelector<HTMLButtonElement>("[data-nav-burger]");
-const overlay = document.querySelector<HTMLElement>("[data-nav-overlay]");
-const closeBtn = document.querySelector<HTMLButtonElement>("[data-nav-close]");
+/* ---------- nav: mobile menu ----------
+   The overlay is a modal, so nothing behind it may be reachable. Two mechanisms,
+   because either alone leaks: `inert` takes the rest of the page out of the tab
+   order *and* out of the accessible tree (screen-reader swipe included), and the
+   Tab wrap keeps a cycle inside the overlay. Note that the overlay is a sibling
+   of the nav bar inside <header>, so the bar container is inerted, never the
+   header itself. */
+function initNavMenu(): void {
+  const burger = document.querySelector<HTMLButtonElement>("[data-nav-burger]");
+  const overlay = document.querySelector<HTMLElement>("[data-nav-overlay]");
+  const closeBtn =
+    document.querySelector<HTMLButtonElement>("[data-nav-close]");
+  if (!burger || !overlay) return;
 
-function setMenu(open: boolean): void {
-  if (!overlay || !burger) return;
-  overlay.hidden = !open;
-  burger.setAttribute("aria-expanded", String(open));
-  requestAnimationFrame(() => overlay.classList.toggle("is-open", open));
-  document.documentElement.style.overflow = open ? "hidden" : "";
-  if (open) closeBtn?.focus();
-  else burger.focus();
+  // Everything focusable in the document that is NOT inside the overlay.
+  const outside = Array.from(
+    document.querySelectorAll<HTMLElement>(
+      "main, footer, .site-nav__inner, .skip-link",
+    ),
+  );
+
+  const stops = (): HTMLElement[] =>
+    Array.from(
+      overlay.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
+    ).filter((el) => el.offsetParent !== null);
+
+  const setMenu = (open: boolean): void => {
+    overlay.hidden = !open;
+    burger.setAttribute("aria-expanded", String(open));
+    requestAnimationFrame(() => overlay.classList.toggle("is-open", open));
+    // Stops Lenis as well as native scroll.
+    lockScroll(open);
+    for (const el of outside) el.inert = open;
+    // preventScroll: the overlay is position:fixed, so a scroll-into-view here
+    // would move the page underneath it and the position would be lost on close.
+    if (open) closeBtn?.focus({ preventScroll: true });
+    else burger.focus({ preventScroll: true });
+  };
+
+  burger.addEventListener("click", () => setMenu(true));
+  closeBtn?.addEventListener("click", () => setMenu(false));
+  overlay
+    .querySelectorAll("[data-nav-overlay-link]")
+    .forEach((a) => a.addEventListener("click", () => setMenu(false)));
+
+  document.addEventListener("keydown", (e) => {
+    if (overlay.hidden) return;
+    if (e.key === "Escape") {
+      setMenu(false);
+      return;
+    }
+    if (e.key !== "Tab") return;
+    const items = stops();
+    if (items.length === 0) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    const active = document.activeElement;
+    if (e.shiftKey && (active === first || !overlay.contains(active))) {
+      e.preventDefault();
+      last.focus({ preventScroll: true });
+    } else if (!e.shiftKey && active === last) {
+      e.preventDefault();
+      first.focus({ preventScroll: true });
+    }
+  });
 }
 
-burger?.addEventListener("click", () => setMenu(true));
-closeBtn?.addEventListener("click", () => setMenu(false));
-overlay
-  ?.querySelectorAll("[data-nav-overlay-link]")
-  .forEach((a) => a.addEventListener("click", () => setMenu(false)));
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && overlay && !overlay.hidden) setMenu(false);
-});
-
-/* ---------- scroll cue fade ---------- */
-const cue = document.querySelector<HTMLElement>("[data-scroll-cue]");
-if (cue) {
+/* ---------- hero scroll cue fade ---------- */
+function initScrollCue(): void {
+  const cue = document.querySelector<HTMLElement>("[data-scroll-cue]");
+  if (!cue) return;
   window.addEventListener(
     "scroll",
     () => {
@@ -191,48 +161,32 @@ if (cue) {
   );
 }
 
-/* ---------- hero photo tilt ---------- */
-const tiltEl = document.querySelector<HTMLElement>("[data-tilt]");
-if (tiltEl && finePointer && !reduced) {
-  let tx = 0;
-  let ty = 0;
-  let cx = 0;
-  let cy = 0;
-  let rafTilt = 0;
-  const render = () => {
-    cx += (tx - cx) * 0.12;
-    cy += (ty - cy) * 0.12;
-    tiltEl.style.transform = `perspective(900px) rotateX(${cy}deg) rotateY(${cx}deg)`;
-    if (Math.abs(tx - cx) > 0.01 || Math.abs(ty - cy) > 0.01) {
-      rafTilt = requestAnimationFrame(render);
-    } else {
-      rafTilt = 0;
-    }
-  };
-  tiltEl.addEventListener("mousemove", (e) => {
-    const r = tiltEl.getBoundingClientRect();
-    tx = ((e.clientX - r.left) / r.width - 0.5) * 12;
-    ty = -((e.clientY - r.top) / r.height - 0.5) * 12;
-    if (!rafTilt) rafTilt = requestAnimationFrame(render);
-  });
-  tiltEl.addEventListener("mouseleave", () => {
-    tx = 0;
-    ty = 0;
-    if (!rafTilt) rafTilt = requestAnimationFrame(render);
-  });
+/* ---------- boot ---------- */
+function boot(): void {
+  // Curtain first so its counter starts on the same frame the script runs.
+  initPreloader();
+  initScroll();
+
+  initNavProgress();
+  initNavActive();
+  initNavMenu();
+  initScrollCue();
+
+  initCursor();
+  initMagnetic();
+  initTilt();
+  initMarquee();
+  initScrollLinked();
+  initLocalTime();
+
+  initDiagrams();
+  void initReveal();
+
+  initSpaceCanvas();
 }
 
-/* ---------- magnetic buttons ---------- */
-if (finePointer && !reduced) {
-  document.querySelectorAll<HTMLElement>("[data-magnetic]").forEach((el) => {
-    el.addEventListener("mousemove", (e) => {
-      const r = el.getBoundingClientRect();
-      const mx = ((e.clientX - r.left) / r.width - 0.5) * 12;
-      const my = ((e.clientY - r.top) / r.height - 0.5) * 12;
-      el.style.transform = `translate(${mx}px, ${my}px)`;
-    });
-    el.addEventListener("mouseleave", () => {
-      el.style.transform = "";
-    });
-  });
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", boot, { once: true });
+} else {
+  boot();
 }

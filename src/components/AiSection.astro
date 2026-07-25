@@ -1,4 +1,5 @@
 ---
+import SectionHeading from "./SectionHeading.astro";
 import { ui } from "../lib/icons";
 import { t, type Locale } from "../lib/i18n";
 
@@ -11,17 +12,23 @@ const dict = t(locale);
 const icons = ["brain-circuit", "shield-check"];
 ---
 
-<section class="section ai-section" id="ai" aria-labelledby="ai-title">
+<section
+  class="section section--tight ai-section"
+  id="ai"
+  aria-labelledby="ai-title"
+>
   <div class="container">
-    <div class="section-heading">
-      <p class="eyebrow">{dict.ai.eyebrow}</p>
-      <h2 class="section-title" id="ai-title">{dict.ai.title}</h2>
-    </div>
+    <SectionHeading
+      index="02"
+      eyebrow={dict.ai.eyebrow}
+      title={dict.ai.title}
+      titleId="ai-title"
+    />
 
-    <div class="ai-section__grid">
+    <div class="ai-section__grid dim-siblings" data-reveal-group>
       {
         dict.ai.cards.map((card, i) => (
-          <div class="glass-card ai-section__card reveal">
+          <div class="card-v3 ai-section__card" data-reveal="fade">
             <span class="ai-section__icon" set:html={ui[icons[i]]} />
             <h3>{card.title}</h3>
             <p>{card.body}</p>
@@ -37,9 +44,10 @@ const icons = ["brain-circuit", "shield-check"];
     background: var(--bg-1);
   }
 
+  /* Asymmetric on purpose: two equal cards read as a template. */
   .ai-section__grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 3fr 2fr;
     gap: 1.4rem;
   }
 
@@ -53,9 +61,11 @@ const icons = ["brain-circuit", "shield-check"];
     height: 2.9rem;
     padding: 0.65rem;
     margin-bottom: 1.1rem;
-    border-radius: 50%;
-    background: var(--gradient);
-    color: #06070c;
+    /* D1: the violet→sky gradient does not fill shapes any more. */
+    border: 1px solid var(--border-accent);
+    border-radius: var(--r-btn);
+    background: rgba(124, 92, 255, 0.12);
+    color: var(--violet-soft);
   }
 
   .ai-section__icon :global(svg) {
@@ -67,7 +77,8 @@ const icons = ["brain-circuit", "shield-check"];
     margin-bottom: 0.5rem;
     font-family: var(--font-display);
     font-size: 1.2rem;
-    font-weight: 700;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
   .ai-section__card p {

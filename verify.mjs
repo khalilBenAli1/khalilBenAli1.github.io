@@ -19,7 +19,7 @@ for (const v of viewports) {
     viewport: { width: v.w, height: v.h },
   });
   await page.goto(BASE + "/", { waitUntil: "networkidle" });
-  await page.waitForTimeout(2200);
+  await page.waitForTimeout(3600);
   await page.screenshot({ path: `${SHOTS}/home-${v.name}-top.png` });
   await page.evaluate(async () => {
     const h = document.body.scrollHeight;

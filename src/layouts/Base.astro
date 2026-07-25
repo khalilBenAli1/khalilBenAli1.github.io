@@ -1,10 +1,16 @@
 ---
 import "@fontsource/space-grotesk/400.css";
 import "@fontsource/space-grotesk/500.css";
+/* 600 is genuinely used (nav wordmark, buttons, card h3s). Without the file,
+   CSS font matching resolves those requests UP to 700 — the bold-at-display-size
+   tell the v3 pass exists to remove. 700 stays for the résumé sheet. */
+import "@fontsource/space-grotesk/600.css";
 import "@fontsource/space-grotesk/700.css";
 import "@fontsource-variable/inter";
 import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource/jetbrains-mono/500.css";
+/* Second typographic voice (D2) — italic 400 only, used by .accent-serif */
+import "@fontsource/instrument-serif/400-italic.css";
 import "../styles/base.css";
 
 interface Props {
@@ -66,9 +72,58 @@ const socialImage = new URL("/og.png", Astro.site);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
     <title>{title}</title>
+    {/*
+      Preloader skip decision, made BEFORE first paint so a repeat visit never
+      flashes a curtain. Must stay inline (no bundling, no defer).
+    */}
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        try {
+          if (sessionStorage.getItem("kb-loaded")) {
+            root.classList.add("kb-preload-skip");
+          }
+        } catch (e) {
+          /* storage disabled */
+        }
+        var quiet =
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (quiet) {
+          root.classList.add("kb-preload-skip");
+        }
+        /*
+          Primes reveal targets hidden from the very first paint so nothing
+          paints at full opacity and then snaps to hidden once the reveal engine
+          builds. Never applied under reduced motion — those users must never
+          have content withheld. The timer is the dead-bundle safety net: if the
+          motion layer never boots, content appears anyway.
+        */
+        if (!quiet) {
+          root.classList.add("kb-js");
+          window.setTimeout(function () {
+            root.classList.remove("kb-js");
+            /* motion/preloader.ts removes this itself; if it's still here the
+               bundle never booted and the curtain would blank the page. */
+            var curtain = document.querySelector("[data-preloader]");
+            if (curtain) curtain.remove();
+          }, 5000);
+        }
+      })();
+    </script>
   </head>
   <body class={bodyClass}>
     <a class="skip-link" href="#main-content">{skipLinkLabel}</a>
+
+    {/*
+      Curtain. Content below stays in the DOM and painted underneath, so the
+      hero remains the LCP element. motion/preloader.ts removes this node.
+    */}
+    <div class="preloader" data-preloader aria-hidden="true">
+      <span class="preloader__mark">KB<span class="gradient-text">.</span></span>
+      <span class="preloader__count" data-preloader-count>00</span>
+    </div>
+
     {
       space && (
         <>
@@ -79,5 +134,18 @@ const socialImage = new URL("/og.png", Astro.site);
       )
     }
     <slot />
+
+    {/* Film grain — static noise tile, soft-light, above content, below nav. */}
+    <div class="grain" aria-hidden="true"></div>
+
+    {/*
+      Cursor augment. CSS keeps it display:none unless the pointer is fine, and
+      the native cursor is never hidden. Add data-lenis-prevent to any inner
+      scroll container if one is ever introduced.
+    */}
+    <div class="cursor" data-cursor-root aria-hidden="true">
+      <span class="cursor__ring"></span>
+      <span class="cursor__dot"></span>
+    </div>
   </body>
 </html>

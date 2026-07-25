@@ -4,6 +4,7 @@ import Nav from "./Nav.astro";
 import Hero from "./Hero.astro";
 import TechMarquee from "./TechMarquee.astro";
 import ProjectCard from "./ProjectCard.astro";
+import SectionHeading from "./SectionHeading.astro";
 import Diagram from "./Diagram.astro";
 import AiSection from "./AiSection.astro";
 import Experience from "./Experience.astro";
@@ -33,6 +34,7 @@ const alternates = Object.fromEntries(locales.map((l) => [l, homePath(l)]));
 <Base
   space
   lang={locale}
+  title={dict.meta.title}
   description={dict.meta.description}
   skipLinkLabel={dict.skipLink}
   alternates={alternates}
@@ -45,13 +47,22 @@ const alternates = Object.fromEntries(locales.map((l) => [l, homePath(l)]));
 
     <section class="section" id="work" aria-labelledby="work-title">
       <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">{dict.work.eyebrow}</p>
-          <h2 class="section-title" id="work-title">{dict.work.title}</h2>
-        </div>
+        <SectionHeading
+          index="01"
+          eyebrow={dict.work.eyebrow}
+          title={dict.work.title}
+          titleId="work-title"
+        />
 
+        {/*
+          No .dim-siblings here on purpose. It works on a grid you can take in at
+          a glance; these cards are full-width and taller than the viewport, so
+          dimming "the others" only ever dims something off-screen while the
+          pointer is simply travelling across the card you are already reading.
+        */}
         <ProjectCard
           locale={locale}
+          index="01"
           icon="brain-circuit"
           name="Cuddy Brain"
           subtitle={p.cuddy.subtitle}
@@ -75,6 +86,7 @@ const alternates = Object.fromEntries(locales.map((l) => [l, homePath(l)]));
 
         <ProjectCard
           locale={locale}
+          index="02"
           icon="coffee"
           name="L'OR Unlimited Remix"
           subtitle={p.lor.subtitle}
@@ -99,6 +111,7 @@ const alternates = Object.fromEntries(locales.map((l) => [l, homePath(l)]));
 
         <ProjectCard
           locale={locale}
+          index="03"
           icon="radio"
           name="nBold Meeting Intelligence"
           subtitle={p.meeting.subtitle}
@@ -119,6 +132,7 @@ const alternates = Object.fromEntries(locales.map((l) => [l, homePath(l)]));
 
         <ProjectCard
           locale={locale}
+          index="04"
           icon="scan-line"
           name="Cuddy Scanner"
           subtitle={p.scanner.subtitle}
@@ -134,6 +148,7 @@ const alternates = Object.fromEntries(locales.map((l) => [l, homePath(l)]));
 
         <ProjectCard
           locale={locale}
+          index="05"
           icon="audio-waveform"
           name="HyperMesh & HyperGpu DSP"
           subtitle={p.audio.subtitle}
@@ -145,7 +160,7 @@ const alternates = Object.fromEntries(locales.map((l) => [l, homePath(l)]));
           <Diagram {...audioDiagram} />
         </ProjectCard>
 
-        <div class="more-work glass-card reveal">
+        <div class="more-work card-v3" data-reveal="fade">
           <div class="more-work__biat">
             <span class="more-work__icon" set:html={ui.database} />
             <div>
@@ -207,7 +222,7 @@ const alternates = Object.fromEntries(locales.map((l) => [l, homePath(l)]));
     height: 2.4rem;
     padding: 0.5rem;
     border: 1px solid var(--border-accent);
-    border-radius: 11px;
+    border-radius: var(--r-btn);
     background: rgba(124, 92, 255, 0.12);
     color: var(--violet-soft);
   }
@@ -221,7 +236,7 @@ const alternates = Object.fromEntries(locales.map((l) => [l, homePath(l)]));
     margin-bottom: 0.15rem;
     font-family: var(--font-display);
     font-size: 1.15rem;
-    font-weight: 700;
+    font-weight: 600;
   }
 
   .more-work__biat p {

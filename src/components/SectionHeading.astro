@@ -1,0 +1,105 @@
+---
+/**
+ * The section grammar, identical in every section (Wave 2 item 1):
+ *
+ *   [ eyebrow pill ] [ 01 ] ────────────────────────
+ *   H2 with one serif-italic accent word
+ *
+ * The repeated pill is the page's chromatic beat; the mono index + hairline
+ * rule is what makes five sections read as one system instead of five blocks.
+ * `centered` mirrors the rule on both sides for the contact section.
+ */
+import { accent } from "../lib/accent";
+
+interface Props {
+  /** "01"–"05" — mono, tabular, decorative */
+  index: string;
+  eyebrow: string;
+  /** may contain one `*accent*` marker */
+  title: string;
+  titleId: string;
+  centered?: boolean;
+}
+
+const { index, eyebrow, title, titleId, centered = false } = Astro.props;
+---
+
+<div
+  class:list={["section-heading", "section-head", { "section-head--center": centered }]}
+>
+  <div class="section-head__top" data-reveal="fade">
+    {centered && <span class="section-head__rule" aria-hidden="true" />}
+    <span class="section-head__pill">{eyebrow}</span>
+    <span class="section-head__index" data-section-index aria-hidden="true">
+      {index}
+    </span>
+    <span class="section-head__rule" aria-hidden="true"></span>
+  </div>
+  <h2
+    class="section-title"
+    id={titleId}
+    data-reveal="chars"
+    set:html={accent(title)}
+  />
+</div>
+
+<style>
+  .section-head {
+    gap: clamp(1rem, 2vw, 1.4rem);
+  }
+
+  .section-head__top {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .section-head__pill {
+    flex: none;
+    padding: 0.34rem 0.7rem;
+    border: 1px solid rgba(124, 92, 255, 0.25);
+    border-radius: var(--r-pill);
+    background: rgba(124, 92, 255, 0.1);
+    color: var(--violet-soft);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    /* Optical tracking: small type gets it, display type does not. */
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .section-head__index {
+    flex: none;
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+
+  .section-head__rule {
+    flex: 1;
+    height: 1px;
+    min-width: 1.5rem;
+    background: var(--border);
+  }
+
+  .section-head--center {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .section-head--center .section-head__top {
+    width: 100%;
+    max-width: 34rem;
+  }
+
+  @media (max-width: 30rem) {
+    .section-head__pill {
+      font-size: 0.625rem;
+      letter-spacing: 0.08em;
+    }
+  }
+</style>

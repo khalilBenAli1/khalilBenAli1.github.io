@@ -1,4 +1,5 @@
 ---
+import SectionHeading from "./SectionHeading.astro";
 import { tech, ui } from "../lib/icons";
 import { t, type Locale } from "../lib/i18n";
 
@@ -38,17 +39,23 @@ const groups: { icon: string; title: string; items: string[] }[] = [
 ];
 ---
 
-<section class="section" id="skills" aria-labelledby="skills-title">
+<section
+  class="section section--tight"
+  id="skills"
+  aria-labelledby="skills-title"
+>
   <div class="container">
-    <div class="section-heading">
-      <p class="eyebrow">{dict.skills.eyebrow}</p>
-      <h2 class="section-title" id="skills-title">{dict.skills.title}</h2>
-    </div>
+    <SectionHeading
+      index="04"
+      eyebrow={dict.skills.eyebrow}
+      title={dict.skills.title}
+      titleId="skills-title"
+    />
 
-    <div class="skills__grid">
+    <div class="skills__grid dim-siblings" data-reveal-group>
       {
         groups.map((group) => (
-          <div class="glass-card skills__card reveal">
+          <div class="card-v3 skills__card" data-reveal="fade">
             <h3>
               <span class="skills__icon" set:html={ui[group.icon]} />
               {group.title}
@@ -88,7 +95,7 @@ const groups: { icon: string; title: string; items: string[] }[] = [
     margin-bottom: 1rem;
     font-family: var(--font-display);
     font-size: 1.1rem;
-    font-weight: 700;
+    font-weight: 600;
   }
 
   .skills__icon {
@@ -97,7 +104,7 @@ const groups: { icon: string; title: string; items: string[] }[] = [
     height: 1.9rem;
     padding: 0.4rem;
     border: 1px solid var(--border-accent);
-    border-radius: 9px;
+    border-radius: var(--r-chip);
     background: rgba(124, 92, 255, 0.12);
     color: var(--violet-soft);
   }
@@ -111,6 +118,10 @@ const groups: { icon: string; title: string; items: string[] }[] = [
     display: flex;
     flex-wrap: wrap;
     gap: 0.45rem;
+  }
+
+  .skills__chips .chip {
+    border-radius: var(--r-chip);
   }
 
   .skills__chip-icon {

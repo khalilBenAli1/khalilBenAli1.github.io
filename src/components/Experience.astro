@@ -1,4 +1,5 @@
 ---
+import SectionHeading from "./SectionHeading.astro";
 import { t, type Locale } from "../lib/i18n";
 
 interface Props {
@@ -11,25 +12,41 @@ const dict = t(locale);
 
 <section class="section" id="experience" aria-labelledby="experience-title">
   <div class="container">
-    <div class="section-heading">
-      <p class="eyebrow">{dict.experience.eyebrow}</p>
-      <h2 class="section-title" id="experience-title">
-        {dict.experience.title}
-      </h2>
-    </div>
+    <SectionHeading
+      index="03"
+      eyebrow={dict.experience.eyebrow}
+      title={dict.experience.title}
+      titleId="experience-title"
+    />
 
+    {/*
+      data-reveal="lines" must never wrap the role heading: SplitText rebuilds
+      the subtree as block-level line boxes, which drops the h3 out of the
+      accessible tree and glues role, separator and company into one string.
+      The entry fades as a whole; only the note — plain prose — gets split.
+    */}
     <ol class="timeline">
       {
         dict.experience.entries.map((e) => (
-          <li class="timeline__entry reveal">
+          <li class="timeline__entry" data-reveal="fade">
             <span class="timeline__node" aria-hidden="true" />
-            <div>
+            <div class="timeline__row">
+              {/*
+                The explicit {" "} are load-bearing. Astro collapses the
+                whitespace around an expression, and the em dash is aria-hidden —
+                with nothing between them the accessible name came out as
+                "…AI EngineernBold". CSS padding cannot fix a name.
+              */}
               <h3 class="timeline__role">
-                {e.role} — <span class="gradient-text">{e.company}</span>
+                {e.role}
+                {" "}
+                <span class="timeline__sep" aria-hidden="true">—</span>
+                {" "}
+                <span class="timeline__company">{e.company}</span>
               </h3>
               <p class="timeline__period">{e.period}</p>
-              <p class="timeline__note">{e.note}</p>
             </div>
+            <p class="timeline__note" data-reveal="lines">{e.note}</p>
           </li>
         ))
       }
@@ -75,25 +92,57 @@ const dict = t(locale);
     box-shadow: 0 0 12px rgba(124, 92, 255, 0.8);
   }
 
+  /* role — company on the left, period right-aligned in mono: the meta row
+     form lifted from the benchmark's experience list. */
+  .timeline__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 1.2rem;
+    margin-bottom: 0.45rem;
+  }
+
   .timeline__role {
-    margin-bottom: 0.15rem;
+    margin: 0;
     font-family: var(--font-display);
     font-size: 1.25rem;
-    font-weight: 700;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  /* Real spaces sit on both sides now (see the h3 above), so this only tops up
+     the optical gap around a full-width em dash. */
+  .timeline__sep {
+    padding-inline: 0.12rem;
+    color: var(--faint);
+  }
+
+  .timeline__company {
+    color: var(--violet-soft);
   }
 
   .timeline__period {
-    margin-bottom: 0.5rem;
-    color: var(--violet-soft);
+    margin: 0 0 0 auto;
+    color: var(--faint);
     font-family: var(--font-mono);
     font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
     letter-spacing: 0.06em;
+    white-space: nowrap;
   }
 
   .timeline__note {
     margin: 0;
+    max-width: 48ch;
     color: var(--muted);
     font-size: 0.98rem;
     line-height: 1.6;
+  }
+
+  @media (max-width: 34rem) {
+    .timeline__period {
+      margin-left: 0;
+    }
   }
 </style>
