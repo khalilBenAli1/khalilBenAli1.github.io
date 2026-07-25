@@ -17,7 +17,7 @@ interface Props {
   title?: string;
   description?: string;
   bodyClass?: string;
-  /** page renders the fixed Three.js background + orbs (home only) */
+  /** page renders the fixed Three.js background (home only) */
   space?: boolean;
   lang?: string;
   skipLinkLabel?: string;
@@ -124,15 +124,13 @@ const socialImage = new URL("/og.png", Astro.site);
       <span class="preloader__count" data-preloader-count>00</span>
     </div>
 
-    {
-      space && (
-        <>
-          <div class="orb orb--violet" aria-hidden="true" />
-          <div class="orb orb--sky" aria-hidden="true" />
-          <canvas id="space-canvas" aria-hidden="true" />
-        </>
-      )
-    }
+    {/*
+      The orbs are gone: the canvas is later in the DOM at the same z-index, so
+      it always painted over them — two blur(120px) compositor jobs for nothing.
+      Their glow is now the aurora wash inside the canvas, which is also what
+      lets the GL context run with alpha:false. See scripts/space.ts.
+    */}
+    {space && <canvas id="space-canvas" aria-hidden="true" />}
     <slot />
 
     {/* Film grain — static noise tile, soft-light, above content, below nav. */}

@@ -9,6 +9,7 @@
  * The old inline diagram runtime and the old IntersectionObserver reveal system
  * are gone: diagrams moved to ./diagrams.ts, reveals to ./motion/reveal.ts.
  */
+import { bgTier, staticBackdrop } from "./bg/tier";
 import { initDiagrams } from "./diagrams";
 import { initCursor } from "./motion/cursor";
 import { initMagnetic, initTilt } from "./motion/hover";
@@ -19,19 +20,47 @@ import { initReveal } from "./motion/reveal";
 import { initScroll, lockScroll } from "./motion/scroll";
 import { initLocalTime } from "./motion/time";
 
-/* ---------- three.js background (lazy) ---------- */
+/* ---------- three.js background (lazy) ----------
+   The tier gate runs BEFORE the dynamic import on purpose: bg/tier.ts pulls in
+   no three.js, so a reduced-motion / small / low-core / Save-Data visitor never
+   downloads or parses the three chunk and never gets a GL context. */
 function initSpaceCanvas(): void {
   const canvas = document.getElementById(
     "space-canvas",
   ) as HTMLCanvasElement | null;
   if (!canvas) return;
+  const tier = bgTier();
+  if (tier === 0) {
+    staticBackdrop(canvas);
+    return;
+  }
   const boot = (): void => {
-    void import("./space").then(({ initSpace }) => initSpace(canvas));
+    void import("./space")
+      .then(({ initSpace }) => initSpace(canvas, tier))
+      // A context that cannot be created or a shader that will not link must
+      // degrade to the tier-0 wash, not to an unhandled rejection and a canvas
+      // that never reveals itself.
+      .catch(() => staticBackdrop(canvas));
   };
   if (typeof requestIdleCallback === "function") {
     requestIdleCallback(() => boot(), { timeout: 1200 });
   } else {
-    window.setTimeout(boot, 250);
+    // Safari has neither requestIdleCallback nor scheduler.postTask, and a bare
+    // setTimeout can land the whole init inside the LCP window. Wait for load,
+    // then whichever comes first of a short timer or the first scroll.
+    const once = { done: false };
+    const go = (): void => {
+      if (once.done) return;
+      once.done = true;
+      window.removeEventListener("scroll", go);
+      boot();
+    };
+    const arm = (): void => {
+      window.setTimeout(go, 600);
+      window.addEventListener("scroll", go, { passive: true, once: true });
+    };
+    if (document.readyState === "complete") arm();
+    else window.addEventListener("load", arm, { once: true });
   }
 }
 
