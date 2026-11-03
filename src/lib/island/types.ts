@@ -26,6 +26,8 @@ export interface IslandProject {
   readonly name: string;
   readonly kind: "frontend" | "professional";
   readonly sector: Exclude<Sector, "all">;
+  /** Preserve the original translated sector independently of filter grouping. */
+  readonly sectorLabel?: Readonly<Record<Locale, string>>;
   readonly year: string | null;
   readonly description: Readonly<Record<Locale, string>>;
   readonly technologies: readonly string[];

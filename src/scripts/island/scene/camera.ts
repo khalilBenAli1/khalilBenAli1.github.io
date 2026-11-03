@@ -4,10 +4,10 @@ import type { Destination, WorldDestination } from "../../../lib/island/types";
 /** A single retargetable transition: changing destinations never queues a tour. */
 export class IslandCamera {
   readonly camera = new THREE.OrthographicCamera(-10, 10, 8, -8, 0.1, 100);
-  private readonly target = new THREE.Vector3(0, 1.1, 0);
+  private readonly target = new THREE.Vector3(-0.35, 3.65, 0.7);
   private readonly from = this.target.clone();
   private readonly to = this.target.clone();
-  private readonly direction = new THREE.Vector3(0.85, 0.84, 1.25).normalize();
+  private readonly direction = new THREE.Vector3(0.32, 0.42, 1).normalize();
   private zoomFrom = 1;
   private zoomTo = 1;
   private started = 0;
@@ -20,26 +20,10 @@ export class IslandCamera {
 
   resize(width: number, height: number): void {
     this.aspect = width / Math.max(1, height);
-    this.direction
-      .set(
-        this.aspect < 0.8 ? 0.55 : 0.85,
-        this.aspect < 0.8 ? 1.08 : 0.84,
-        1.25,
-      )
-      .normalize();
-    // The fitting is calculated in camera space, so portrait retains all four objects.
+    this.direction.set(this.aspect < 0.8 ? 0.28 : 0.32, 0.42, 1).normalize();
     this.place();
-    const inverse = this.camera.matrixWorldInverse;
-    const bounds = new THREE.Box3();
-    for (const x of [-7.4, 7.4])
-      for (const y of [-1.8, 4.1])
-        for (const z of [-4.7, 4.7]) {
-          bounds.expandByPoint(
-            new THREE.Vector3(x, y, z).applyMatrix4(inverse),
-          );
-        }
-    const size = bounds.getSize(new THREE.Vector3());
-    const halfHeight = Math.max(size.y * 0.57, (size.x * 0.55) / this.aspect);
+    // Fit the architectural silhouette, not the empty corners of a 3D box.
+    const halfHeight = Math.max(5.8, 9.8 / this.aspect);
     this.camera.left = -halfHeight * this.aspect;
     this.camera.right = halfHeight * this.aspect;
     this.camera.top = halfHeight;
@@ -55,12 +39,12 @@ export class IslandCamera {
   ): void {
     this.from.copy(this.target);
     this.zoomFrom = this.camera.zoom;
-    this.to.set(0, 1.1, 0);
+    this.to.set(-0.35, 3.65, 0.7);
     if (destination !== "home") {
       const anchor = this.anchors[destination];
       this.to.x = anchor.x * 0.17;
       this.to.z = anchor.z * 0.17;
-      this.to.y = 1.15;
+      this.to.y = 3.65;
     }
     this.zoomTo = destination === "home" ? 1 : 1.06;
     this.started = now;

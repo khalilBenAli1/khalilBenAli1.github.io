@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import type {
   Destination,
   IslandSceneHandle,
@@ -8,6 +9,7 @@ import type {
   SceneStatus,
   WorldDestination,
 } from "../../../lib/island/types";
+import { createRendering } from "./rendering";
 import { IslandCamera } from "./camera";
 import { SceneResources } from "./resources";
 import { createWorld, type IslandWorld } from "./world";
@@ -63,18 +65,33 @@ export async function createIslandScene(
   }
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 0.95;
   renderer.setClearColor(0xf0e9dc, 0);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.shadowMap.autoUpdate = false;
 
   const scene = new THREE.Scene();
-  scene.add(new THREE.HemisphereLight(0xf6f3ec, 0x75746d, 2.6));
-  const key = new THREE.DirectionalLight(0xfff1d8, 4.2);
-  key.position.set(-5, 12, 8);
+  try {
+    const environment = resources.own(new RoomEnvironment());
+    const pmrem = resources.own(new THREE.PMREMGenerator(renderer));
+    const reflection = resources.own(pmrem.fromScene(environment, 0.04));
+    scene.environment = reflection.texture;
+    scene.environmentIntensity = 0.23;
+    resources.release(environment);
+    resources.release(pmrem);
+  } catch {
+    resources.dispose();
+    renderer.dispose();
+    renderer.forceContextLoss();
+    report("unsupported");
+    return null;
+  }
+  scene.add(new THREE.HemisphereLight(0xfff7e9, 0x827666, 0.72));
+  const key = new THREE.DirectionalLight(0xffedd4, 4.1);
+  key.position.set(-8, 16, 10);
   key.castShadow = true;
-  const shadowSize = options.quality === "high" ? 1024 : 512;
+  const shadowSize = options.quality === "high" ? 2048 : 1024;
   key.shadow.mapSize.set(shadowSize, shadowSize);
   Object.assign(key.shadow.camera, {
     left: -11,
@@ -82,13 +99,14 @@ export async function createIslandScene(
     top: 10,
     bottom: -10,
     near: 0.5,
-    far: 35,
+    far: 45,
   });
   key.shadow.bias = -0.0006;
-  key.shadow.normalBias = 0.035;
+  key.shadow.normalBias = 0.018;
+  key.shadow.radius = 3;
   key.target.position.set(0, 0, 0);
   scene.add(key, key.target);
-  const rim = new THREE.DirectionalLight(0xa6b9ff, 1.1);
+  const rim = new THREE.DirectionalLight(0xdce7ff, 0.65);
   rim.position.set(7, 5, -7);
   scene.add(rim);
 
@@ -138,7 +156,25 @@ export async function createIslandScene(
   }
   scene.add(world.root);
   const camera = new IslandCamera(world.anchors);
+  let rendering: ReturnType<typeof createRendering>;
+  try {
+    rendering = createRendering(
+      renderer,
+      scene,
+      camera.camera,
+      resources,
+      options.quality === "high",
+    );
+  } catch {
+    resources.dispose();
+    renderer.dispose();
+    renderer.forceContextLoss();
+    canvas.style.touchAction = originalTouchAction;
+    report("unsupported");
+    return null;
+  }
   const raycaster = new THREE.Raycaster();
+  const pickables = [...world.pickables];
   const pointer = new THREE.Vector2();
   const projected = new THREE.Vector3();
 
@@ -192,7 +228,7 @@ export async function createIslandScene(
     camera.update(now);
     if (motion) world.update(seconds);
     const before = performance.now();
-    renderer.render(scene, camera.camera);
+    rendering.render();
     renderCpuMs = performance.now() - before;
     frames++;
     lastRender = now;
@@ -229,6 +265,7 @@ export async function createIslandScene(
     renderer.setPixelRatio(pixelRatio);
     renderer.setSize(width, height, false);
     camera.resize(width, height);
+    rendering.resize(width, height, pixelRatio);
     renderer.shadowMap.needsUpdate = true;
     invalidate();
   }
@@ -242,7 +279,7 @@ export async function createIslandScene(
     );
     raycaster.setFromCamera(pointer, camera.camera);
     // Include the landform as an occluder, so a hidden exhibit cannot be picked.
-    const hit = raycaster.intersectObject(world.root, true)[0];
+    const hit = raycaster.intersectObjects(pickables, false)[0];
     return (
       (hit?.object.userData.destination as WorldDestination | undefined) ?? null
     );

@@ -1,0 +1,49 @@
+{
+  "renderer": {
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+    "vendor": "Google Inc. (Google)"
+  },
+  "initial": {
+    "status": "ready",
+    "frames": 4,
+    "schedulerStarts": 1,
+    "loopActive": true,
+    "drawCalls": 121,
+    "triangles": 712917,
+    "textures": 23,
+    "geometries": 60,
+    "pixelRatio": 1,
+    "width": 850,
+    "height": 570,
+    "quality": "high",
+    "startupMs": 11039.200000047684,
+    "renderCpuMs": 34.299999952316284
+  },
+  "cadence": {
+    "submissions": 2,
+    "elapsedMs": 2002.2000000476837,
+    "submissionsPerSecond": 0.998901208646673
+  },
+  "note": "Software rendering. renderCpuMs measures CPU submission, and cadence counts scene submissions; neither is a hardware GPU FPS claim.",
+  "verification": {
+    "testsPassed": 3,
+    "build": "Astro static build logged 18:26:41 on 2026-11-03",
+    "viewportCssPixels": [
+      850,
+      900
+    ],
+    "checks": [
+      "Real WebGL2 render and scene metrics",
+      "Motion off leaves frame count stable",
+      "Visibility event pauses and resumes exactly one scheduler",
+      "Actual offscreen scroll pauses rendering; returning resumes",
+      "Two light-view/3D cycles lose old contexts and detach old canvases",
+      "GPU context loss exposes fallback; explicit retry creates a working scene"
+    ],
+    "limitations": [
+      "Software ANGLE SwiftShader; not hardware FPS or real-device mobile benchmarking",
+      "Visibility event contract tested deterministically; browser OS background throttling is not claimed",
+      "Cadence counts completed scene render submissions, not display presentation timestamps"
+    ]
+  }
+}

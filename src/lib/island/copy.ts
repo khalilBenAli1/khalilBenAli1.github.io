@@ -28,6 +28,12 @@ export interface IslandCopy {
     eyebrow: string;
     titleLineOne: string;
     titleLineTwo: string;
+    titleLineThree: string;
+    aboutMe: string;
+    talk: string;
+    discover: string;
+    projectsLabel: string;
+    studioLabel: string;
     intro: string;
     worldLabel: string;
     hint: string;
@@ -68,7 +74,7 @@ const copy: Record<Locale, IslandCopy> = {
       back: "Back",
       close: "Close",
       backToGallery: "Back to gallery",
-      viewWork: t("en").hero.viewWork,
+      viewWork: "Explore my work",
       downloadCv: t("en").hero.downloadCv,
       resume: t("en").nav.resume,
       motionOn: "Motion on",
@@ -84,11 +90,16 @@ const copy: Record<Locale, IslandCopy> = {
       resetFilters: "Reset filters",
     },
     hero: {
-      eyebrow: "A developer’s creative island",
-      titleLineOne: "Code. Craft.",
-      titleLineTwo: "A world to explore.",
-      intro:
-        "Explore my work, from expressive websites to the systems behind them.",
+      eyebrow: "KHALIL BEN ALI",
+      titleLineOne: "WELCOME",
+      titleLineTwo: "TO MY",
+      titleLineThree: "WORLD.",
+      aboutMe: "About me",
+      talk: "Let’s talk",
+      discover: "Scroll to discover",
+      projectsLabel: "Projects",
+      studioLabel: "Studio",
+      intro: "Digital experiences, built to explore.",
       worldLabel: "Khalil Ben Ali’s creative island",
       hint: "Choose a place on the island, or use the navigation.",
     },
@@ -134,7 +145,7 @@ const copy: Record<Locale, IslandCopy> = {
       back: "Retour",
       close: "Fermer",
       backToGallery: "Retour à la galerie",
-      viewWork: t("fr").hero.viewWork,
+      viewWork: "Voir mes projets",
       downloadCv: t("fr").hero.downloadCv,
       resume: t("fr").nav.resume,
       motionOn: "Animations activées",
@@ -150,11 +161,16 @@ const copy: Record<Locale, IslandCopy> = {
       resetFilters: "Réinitialiser les filtres",
     },
     hero: {
-      eyebrow: "L’île créative d’un développeur",
-      titleLineOne: "Du code. Du sens.",
-      titleLineTwo: "Un monde à explorer.",
-      intro:
-        "Découvrez mon travail, des sites expressifs aux systèmes qui les font vivre.",
+      eyebrow: "KHALIL BEN ALI",
+      titleLineOne: "BIENVENUE",
+      titleLineTwo: "DANS MON",
+      titleLineThree: "UNIVERS.",
+      aboutMe: "À propos",
+      talk: "Discutons",
+      discover: "Défiler pour découvrir",
+      projectsLabel: "Projets",
+      studioLabel: "Studio",
+      intro: "Des expériences numériques à explorer.",
       worldLabel: "L’île créative de Khalil Ben Ali",
       hint: "Choisissez un lieu sur l’île ou utilisez la navigation.",
     },
@@ -200,7 +216,7 @@ const copy: Record<Locale, IslandCopy> = {
       back: "Indietro",
       close: "Chiudi",
       backToGallery: "Torna alla galleria",
-      viewWork: t("it").hero.viewWork,
+      viewWork: "Esplora i progetti",
       downloadCv: t("it").hero.downloadCv,
       resume: t("it").nav.resume,
       motionOn: "Animazioni attive",
@@ -216,11 +232,16 @@ const copy: Record<Locale, IslandCopy> = {
       resetFilters: "Reimposta i filtri",
     },
     hero: {
-      eyebrow: "L’isola creativa di uno sviluppatore",
-      titleLineOne: "Codice. Cura.",
-      titleLineTwo: "Un mondo da esplorare.",
-      intro:
-        "Esplora il mio lavoro, dai siti espressivi ai sistemi che li fanno vivere.",
+      eyebrow: "KHALIL BEN ALI",
+      titleLineOne: "BENVENUTI",
+      titleLineTwo: "NEL MIO",
+      titleLineThree: "MONDO.",
+      aboutMe: "Chi sono",
+      talk: "Parliamone",
+      discover: "Scorri per scoprire",
+      projectsLabel: "Progetti",
+      studioLabel: "Studio",
+      intro: "Esperienze digitali, tutte da esplorare.",
       worldLabel: "L’isola creativa di Khalil Ben Ali",
       hint: "Scegli un luogo sull’isola oppure usa la navigazione.",
     },

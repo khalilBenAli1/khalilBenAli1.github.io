@@ -25,11 +25,8 @@ function boot(): void {
   const events = new AbortController();
   const { signal } = events;
   const panels = [...root.querySelectorAll<HTMLElement>("[data-island-panel]")];
-  const projectIds = [
-    ...root.querySelectorAll<HTMLElement>(
-      '[data-island-project],[id^="project-"]',
-    ),
-  ].map((el) => el.dataset.islandProject ?? el.id.replace(/^project-/, ""));
+  const cards = [...root.querySelectorAll<HTMLElement>("[data-island-card]")];
+  const projectIds = cards.map((el) => el.dataset.islandCard!);
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const coarse = matchMedia("(pointer: coarse)");
   const motionButton = root.querySelector<HTMLButtonElement>(
@@ -60,6 +57,7 @@ function boot(): void {
   let clockTimer = 0;
   let previousHref = "";
   let returnFocus: HTMLElement | null = null;
+  let projectReturnFocus: HTMLElement | null = null;
   const metrics = () => {
     root.dataset.islandMetrics = JSON.stringify(
       scene?.getMetrics() ?? {
@@ -205,6 +203,9 @@ function boot(): void {
         onStatus: (value) => {
           if (disposed || abort.signal.aborted || token !== generation) return;
           if (value === "lost" || value === "unsupported") {
+            // A lost GPU handle has disposed itself; an explicit retry needs a new one.
+            scene = null;
+            activeQuality = null;
             runtimeFailed = true;
             canvas!.style.visibility = "hidden";
             root.dataset.view = "lite";
@@ -362,12 +363,74 @@ function boot(): void {
       if (box.top < 100 || box.bottom > innerHeight - 24)
         target.scrollIntoView({ block: "start", behavior: "instant" });
     }
-    if (old.projectId && !route.projectId)
-      root
-        .querySelector<HTMLElement>(
-          `[href="#project-${CSS.escape(old.projectId)}"]`,
+    if (old.projectId && !route.projectId && route.destination === "work") {
+      const trigger = projectReturnFocus?.isConnected
+        ? projectReturnFocus
+        : root.querySelector<HTMLElement>(
+            `[href="#project-${CSS.escape(old.projectId)}"]`,
+          );
+      if (trigger?.getClientRects().length) {
+        trigger.focus({ preventScroll: true });
+        trigger.scrollIntoView({ block: "nearest", behavior: "instant" });
+      }
+      projectReturnFocus = null;
+    }
+  }
+  function syncGallery(): void {
+    let visible = 0;
+    for (const card of cards) {
+      const selected = card.dataset.islandCard === route.projectId;
+      card.hidden = route.projectId
+        ? !selected
+        : route.sector !== "all" && card.dataset.sector !== route.sector;
+      if (!card.hidden) visible++;
+      card.classList.toggle("is-selected", selected);
+      card
+        .querySelectorAll<HTMLElement>(
+          "[data-island-project-extra],[data-island-project-navigation]",
         )
-        ?.focus({ preventScroll: true });
+        .forEach((element) => {
+          element.hidden = !selected;
+        });
+    }
+    root
+      .querySelectorAll<HTMLElement>("[data-island-collection]")
+      .forEach((collection) => {
+        collection.hidden = ![
+          ...collection.querySelectorAll<HTMLElement>("[data-island-card]"),
+        ].some((card) => !card.hidden);
+      });
+    root
+      .querySelectorAll<HTMLElement>("[data-island-collection-header]")
+      .forEach((header) => {
+        header.hidden = route.projectId !== null;
+      });
+    root
+      .querySelectorAll<HTMLElement>("[data-island-gallery-grid]")
+      .forEach((grid) => {
+        grid.dataset.selected = String(route.projectId !== null);
+      });
+    const count = root.querySelector<HTMLElement>(
+      "[data-island-gallery-count]",
+    );
+    if (count) count.textContent = String(visible);
+    const empty = root.querySelector<HTMLElement>(
+      "[data-island-gallery-empty]",
+    );
+    if (empty) empty.hidden = visible !== 0;
+    root
+      .querySelectorAll<HTMLAnchorElement>("a[data-island-filter]")
+      .forEach((anchor) => {
+        if (anchor.dataset.islandFilter === route.sector)
+          anchor.setAttribute("aria-current", "true");
+        else anchor.removeAttribute("aria-current");
+        const url = new URL(location.href);
+        const sector = anchor.dataset.islandFilter;
+        if (!sector || sector === "all") url.searchParams.delete("sector");
+        else url.searchParams.set("sector", sector);
+        url.hash = "work";
+        anchor.href = url.pathname + url.search + url.hash;
+      });
   }
   function syncRoute(initial = false): void {
     if (disposed) return;
@@ -381,6 +444,7 @@ function boot(): void {
     root.dataset.sector = route.sector;
     for (const panel of panels)
       panel.hidden = panel.dataset.islandPanel !== route.destination;
+    syncGallery();
     root
       .querySelectorAll<HTMLAnchorElement>("[data-island-nav]")
       .forEach((el) => {
@@ -406,12 +470,10 @@ function boot(): void {
   }
   function navigate(url: URL, trigger?: HTMLElement): void {
     const next = parseIslandUrl(url, projectIds);
-    if (
-      trigger &&
-      next.destination !== "home" &&
-      (route.destination === "home" || (!route.projectId && next.projectId))
-    )
+    if (trigger && next.destination !== "home" && route.destination === "home")
       returnFocus = trigger;
+    if (trigger && next.projectId && !route.projectId)
+      projectReturnFocus = trigger;
     if (url.href !== location.href)
       history.pushState(null, "", url.pathname + url.search + url.hash);
     syncRoute();
@@ -493,6 +555,15 @@ function boot(): void {
     "keydown",
     (event) => {
       if (event.key !== "Escape" || route.destination === "home") return;
+      if (
+        event.defaultPrevented ||
+        event.isComposing ||
+        (event.target instanceof Element &&
+          event.target.closest(
+            "select,input,textarea,[contenteditable=true],[role=combobox]",
+          ))
+      )
+        return;
       event.preventDefault();
       navigateHash(route.projectId ? "work" : "home");
     },
@@ -529,6 +600,7 @@ function boot(): void {
       url.searchParams.delete("view");
       history.replaceState(null, "", url);
       persist();
+      syncRoute();
       updatePresentation();
     },
     { signal },
@@ -556,6 +628,22 @@ function boot(): void {
     root.classList.remove("island-enhanced");
     document.documentElement.classList.remove("island-enhanced");
     for (const panel of panels) panel.hidden = false;
+    for (const card of cards) {
+      card.hidden = false;
+      card.classList.remove("is-selected");
+    }
+    root
+      .querySelectorAll<HTMLElement>(
+        "[data-island-project-extra],[data-island-project-navigation],[data-island-collection],[data-island-collection-header]",
+      )
+      .forEach((element) => {
+        element.hidden = false;
+      });
+    root
+      .querySelectorAll<HTMLElement>("[data-island-gallery-grid]")
+      .forEach((grid) => {
+        delete grid.dataset.selected;
+      });
     metrics();
   }
   window.addEventListener(
@@ -568,6 +656,12 @@ function boot(): void {
   document.addEventListener("astro:before-swap", dispose, { signal });
   root.addEventListener("island:dispose", dispose, { signal });
   canvas.style.visibility = "hidden";
+  // Architecture diagrams are static exhibits here; the island owns motion.
+  root
+    .querySelectorAll<SVGSVGElement>(".island-project__diagram svg.diagram")
+    .forEach((diagram) => {
+      diagram.pauseAnimations?.();
+    });
   root.classList.add("island-enhanced");
   document.documentElement.classList.add("island-enhanced");
   syncRoute(true);

@@ -29,6 +29,7 @@ const frontend: readonly IslandProject[] = frontendProjects.map((project) => {
     ...placement,
     name: project.name,
     kind: "frontend",
+    sectorLabel: project.sector,
     year: project.year,
     description: project.description,
     technologies: project.technology,

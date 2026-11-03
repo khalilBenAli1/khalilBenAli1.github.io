@@ -31,8 +31,12 @@ for (const { locale, path } of locales) {
           const root = page.locator('[data-island-root]');
           await expect(root).toHaveAttribute('data-bound', 'true');
           const nav = page.getByRole('navigation', { name: 'Primary', exact: true });
-          // Navigation is now permanently visible on desktop and touch layouts.
-          for (const destination of ['home', 'work', 'about', 'experience', 'contact']) {
+          // The compact reference header uses the KB brand as its always-visible Home link.
+          const home = page.locator('.island-brand[data-island-nav="home"]');
+          await expect(home).toHaveAttribute('href', '#home');
+          await expect(home).toBeVisible();
+          await expect(home).toBeInViewport({ ratio: 1 });
+          for (const destination of ['work', 'about', 'experience', 'contact']) {
             const link = nav.locator(`[data-island-nav="${destination}"]`);
             await expect(link).toHaveAttribute('href', `#${destination}`);
             await expect(link).toBeVisible();

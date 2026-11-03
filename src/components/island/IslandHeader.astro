@@ -1,5 +1,5 @@
 ---
-import { cvFile, homePath, locales, resumePath, type Locale } from "../../lib/i18n";
+import { homePath, locales, type Locale } from "../../lib/i18n";
 import { getIslandCopy } from "../../lib/island/copy";
 import { destinations } from "../../lib/island/types";
 interface Props { locale: Locale }
@@ -9,14 +9,11 @@ const copy = getIslandCopy(locale);
 <header class="island-header">
   <a class="island-brand" href="#home" data-island-nav="home" aria-label="Khalil Ben Ali — Home">
     <span class="island-brand__mark">KB<span>.</span></span>
-    <span class="island-brand__name">Khalil Ben Ali<br /><small>Portfolio · 2026</small></span>
   </a>
   <nav class="island-nav" aria-label="Primary">
-    {destinations.map((destination) => <a href={destination === 'home' ? '#home' : '#' + destination} data-island-nav={destination}>{copy.destinations[destination]}</a>)}
+    {destinations.map((destination) => <a href={destination === 'home' ? '#home' : '#' + destination} data-island-nav={destination} aria-label={copy.destinations[destination]}>{destination === 'contact' ? copy.hero.talk : copy.destinations[destination]}{destination === 'contact' && <span aria-hidden="true">↗</span>}</a>)}
   </nav>
   <div class="island-header__utilities">
-    <a class="island-resume" href={resumePath(locale)}>{copy.controls.resume}<span aria-hidden="true">↗</span></a>
-    <a class="island-cv" href={cvFile(locale)} download aria-label={copy.controls.downloadCv}>CV<span aria-hidden="true">↓</span></a>
     <nav class="island-languages" aria-label="Language">
       {locales.map((language) => <a href={homePath(language)} data-island-language={language} lang={language} aria-current={language === locale ? 'page' : undefined}>{language.toUpperCase()}</a>)}
     </nav>

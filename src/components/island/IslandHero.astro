@@ -1,51 +1,49 @@
 ---
 import { islandPosters } from "../../lib/island/posters";
-import { cvFile, t, type Locale } from "../../lib/i18n";
+import { cvFile, resumePath, t, type Locale } from "../../lib/i18n";
 import { getIslandCopy } from "../../lib/island/copy";
 const { locale } = Astro.props as { locale: Locale };
 const copy = getIslandCopy(locale);
 const dict = t(locale);
 
 const places = ['work', 'about', 'experience', 'contact'] as const;
+const placeLabels = { work: copy.hero.projectsLabel, about: copy.hero.studioLabel, experience: copy.destinations.experience, contact: copy.destinations.contact };
 ---
 <section class="island-hero" id="home" data-island-home aria-labelledby="island-title">
   <span id="top" class="island-anchor" aria-hidden="true"></span>
-  <div class="island-hero__meta">
-    <p class="island-eyebrow"><span aria-hidden="true">✳</span>{copy.hero.eyebrow}</p>
-    <p class="island-availability"><span aria-hidden="true"></span>{dict.hero.status}</p>
-  </div>
   <div class="island-hero__composition">
     <div class="island-hero__copy">
-      <h1 id="island-title"><span>{copy.hero.titleLineOne}</span><span>{copy.hero.titleLineTwo}</span></h1>
+      <p class="island-eyebrow">{copy.hero.eyebrow}</p>
+      <h1 id="island-title"><span>{copy.hero.titleLineOne}</span><span>{copy.hero.titleLineTwo}</span><span>{copy.hero.titleLineThree}</span></h1>
       <div class="island-hero__support">
       <p class="island-hero__intro">{copy.hero.intro}</p>
       <div class="island-hero__actions">
         <a class="island-button island-button--primary" href="#work">{copy.controls.viewWork}<span aria-hidden="true">↗</span></a>
-        <a class="island-text-link" href={cvFile(locale)} download>{copy.controls.downloadCv}<span aria-hidden="true">↓</span></a>
+        <a class="island-text-link" href="#about">{copy.hero.aboutMe}</a>
       </div>
-      <p class="island-hero__coordinates"><span aria-hidden="true">↳</span>FAENZA, ITALIA <span>{dict.hero.status}</span></p>
       </div>
     </div>
     <div class="island-world">
-      <div class="island-world__toolbar" aria-label="View preferences">
-        <button type="button" data-island-motion data-label-on={copy.controls.motionOn} data-label-off={copy.controls.motionOff} data-label-reduced={copy.controls.motionReduced} disabled><span class="island-control-dot" aria-hidden="true"></span><span data-island-control-label>{copy.controls.motionOn}</span></button>
-        <button type="button" data-island-view data-label-lite={copy.controls.lightView} data-label-3d={copy.controls.threeDView} disabled><span aria-hidden="true">◈</span><span data-island-control-label>{copy.controls.threeDView}</span></button>
-      </div>
       <div class="island-stage" data-island-stage data-island-scene role="group" aria-label={copy.hero.worldLabel}>
-        <div class="island-stage__datum" aria-hidden="true"><span>KB / WORLD 01</span><span>EST. 2026</span></div>
         <div class="island-poster" data-island-poster aria-hidden="true">
           {islandPosters.desktop && <picture>{islandPosters.mobile && <source media="(max-width: 600px)" srcset={islandPosters.mobile} />}<img src={islandPosters.desktop} alt="" width="1440" height="1080" fetchpriority="high" /></picture>}
-          <div class="island-stage__ground"></div>
         </div>
         <canvas class="island-canvas" data-island-canvas aria-hidden="true"></canvas>
         <div class="island-hotspots">
-          {places.map((place, index) => <a class={'island-hotspot island-hotspot--' + place} href={'#' + place} data-island-hotspot={place}><span class="island-hotspot__number" aria-hidden="true">{'0' + (index + 1)}</span><span>{copy.destinations[place]}</span><span class="island-hotspot__arrow" aria-hidden="true">↗</span></a>)}
+          {places.map((place, index) => <a class={'island-hotspot island-hotspot--' + place} href={'#' + place} data-island-hotspot={place} aria-label={copy.destinations[place]}>{place !== 'contact' && <span class="island-hotspot__number" aria-hidden="true">{'0' + (index + 1)} /</span>}<span>{placeLabels[place]}</span></a>)}
         </div>
-        <span class="island-stage__axis" aria-hidden="true">N<span>↑</span></span>
       </div>
-      <div class="island-world__caption"><span class="island-world__caption-mark" aria-hidden="true">↖</span><p>{copy.hero.hint}</p><span class="island-world__caption-index" aria-hidden="true">01—04</span></div>
+      <p class="sr-only">{copy.hero.hint}</p>
       <p class="island-status sr-only" data-island-status data-status-loading={copy.status.loading} data-status-lite={copy.status.lite} data-status-unsupported={copy.status.unsupported} role="status">{copy.status.loading}</p>
     </div>
   </div>
-  <div class="island-hero__footer"><span>KHALIL BEN ALI — PORTFOLIO</span><a href="#contact">{copy.destinations.contact}<span aria-hidden="true">↗</span></a><span>DESIGN + ENGINEERING</span></div>
+  <div class="island-hero__footer">
+    <p class="island-availability"><span aria-hidden="true"></span>{dict.hero.status}</p>
+    <a class="island-discover" href="#work">{copy.hero.discover}<span aria-hidden="true">↓</span></a>
+    <div class="island-world__toolbar" aria-label="View preferences">
+      <button type="button" data-island-view data-label-lite={copy.controls.lightView} data-label-3d={copy.controls.threeDView} disabled><span data-island-control-label>{copy.controls.threeDView}</span></button>
+      <button type="button" data-island-motion data-label-on={copy.controls.motionOn} data-label-off={copy.controls.motionOff} data-label-reduced={copy.controls.motionReduced} disabled><span data-island-control-label>{copy.controls.motionOn}</span><span class="island-control-dot" aria-hidden="true"></span></button>
+    </div>
+  </div>
+  <div class="island-hero__resources"><a href={resumePath(locale)}>{copy.controls.resume}</a><a href={cvFile(locale)} download>{copy.controls.downloadCv}<span aria-hidden="true"> ↓</span></a></div>
 </section>

@@ -1,0 +1,56 @@
+[
+  {
+    "name": "desktop",
+    "viewport": [
+      1584,
+      992
+    ],
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+    "metrics": {
+      "status": "ready",
+      "frames": 6,
+      "schedulerStarts": 1,
+      "loopActive": true,
+      "drawCalls": 139,
+      "triangles": 710153,
+      "textures": 23,
+      "geometries": 69,
+      "pixelRatio": 1,
+      "width": 1243.734375,
+      "height": 864,
+      "quality": "high",
+      "startupMs": 20738,
+      "renderCpuMs": 40.200000047683716
+    },
+    "errors": [],
+    "poster": "public/island/island-desktop.webp",
+    "sourceSha256": "fadf93d8642402ff1ded427362c6b341591841ae894d151fee0ba1c54894a4e4"
+  },
+  {
+    "name": "mobile",
+    "viewport": [
+      390,
+      844
+    ],
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+    "metrics": {
+      "status": "ready",
+      "frames": 5,
+      "schedulerStarts": 1,
+      "loopActive": true,
+      "drawCalls": 72,
+      "triangles": 272223,
+      "textures": 15,
+      "geometries": 68,
+      "pixelRatio": 1,
+      "width": 390,
+      "height": 350,
+      "quality": "low",
+      "startupMs": 6245.5,
+      "renderCpuMs": 1.2999999523162842
+    },
+    "errors": [],
+    "poster": "public/island/island-mobile.webp",
+    "sourceSha256": "c20a5f9e9141daac841ba2e8400b97630e23e3953333568ff96f8bcc166af08c"
+  }
+]
