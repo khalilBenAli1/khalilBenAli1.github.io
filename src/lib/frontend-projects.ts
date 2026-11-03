@@ -80,6 +80,24 @@ export const frontendProjects: FrontendProject[] = [
     source: "https://github.com/khalilBenAli1/erdenvaux-bags-next",
   },
   {
+    name: "Veyli Colour",
+    year: "2026",
+    sector: {
+      en: "Beauty & makeup",
+      fr: "Beauté & maquillage",
+      it: "Bellezza e make-up",
+    },
+    description: {
+      en: "An expressive beauty shop with named shade choices, an editable colour story and a complete simulated checkout.",
+      fr: "Une boutique beauté expressive, des teintes nommées, un look personnalisable et un parcours d’achat entièrement simulé.",
+      it: "Una boutique beauty espressiva, tonalità riconoscibili, un look personalizzabile e un acquisto completamente simulato.",
+    },
+    image: "/projects/veyli-colour.jpg",
+    technology: ["Nuxt", "Vue", "Pinia"],
+    demo: "https://khalilbenali1.github.io/veyli-colour-nuxt/",
+    source: "https://github.com/khalilBenAli1/veyli-colour-nuxt",
+  },
+  {
     name: "Forma",
     year: "2026",
     sector: {
