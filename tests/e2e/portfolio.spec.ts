@@ -22,42 +22,39 @@ for (const { locale, path } of locales) {
         test('Work navigation is pointer-reachable and Escape restores focus', async ({ page }) => {
           const errors: string[] = [];
           page.on('pageerror', (error) => errors.push(error.message));
-          await page.goto(path);
+          await page.goto(`${path}?view=lite`);
           await expect(page.locator('html')).toHaveAttribute('lang', locale);
           await expect(page.locator('h1')).toBeVisible();
           await page.evaluate(() => document.fonts.ready);
           await expect(page.locator('[data-preloader]')).toHaveCount(0);
           await expect(page.locator('.frontend-demo')).toHaveCount(frontendProjects.length);
-
-          const burger = page.locator('[data-nav-burger]');
-          if (width < 1440) {
-            const overlay = page.locator('[data-nav-overlay]');
-            const work = page.locator('[data-nav-overlay-link][href="#work"]');
-            await burger.click();
-            await expect(burger).toHaveAttribute('aria-expanded', 'true');
-            await expect(overlay).toBeVisible();
-            // The original filtered-header bug made this 67px rather than the viewport height.
-            await expect
-              .poll(() => overlay.evaluate((el) => el.getBoundingClientRect().height))
-              .toBe(height);
-            await expect(work).toBeInViewport({ ratio: 1 });
-            await expect(page.locator('[data-nav-close]')).toBeFocused();
-            await page.keyboard.press('Escape');
-            await expect(overlay).toBeHidden();
-            await expect(burger).toHaveAttribute('aria-expanded', 'false');
-            await expect(burger).toBeFocused();
-
-            await burger.click();
-            await expect(work).toBeInViewport({ ratio: 1 });
-            await work.click();
-            await expect(overlay).toBeHidden();
-            await expect(burger).toHaveAttribute('aria-expanded', 'false');
-          } else {
-            await expect(burger).toBeHidden();
-            await page.locator('[data-nav-link="work"]').click();
+          const root = page.locator('[data-island-root]');
+          await expect(root).toHaveAttribute('data-bound', 'true');
+          const nav = page.getByRole('navigation', { name: 'Primary', exact: true });
+          // Navigation is now permanently visible on desktop and touch layouts.
+          for (const destination of ['home', 'work', 'about', 'experience', 'contact']) {
+            const link = nav.locator(`[data-island-nav="${destination}"]`);
+            await expect(link).toHaveAttribute('href', `#${destination}`);
+            await expect(link).toBeVisible();
+            await expect(link).toBeInViewport({ ratio: 1 });
           }
-
+          const work = nav.locator('[data-island-nav="work"]');
+          if (width < 1440) await work.tap();
+          else await work.click();
           await expect(page).toHaveURL(/#work$/);
+          const panel = page.locator('[data-island-panel="work"]');
+          await expect(panel).toBeVisible();
+          await expect(panel.locator('[data-island-heading]')).toBeFocused();
+          await page.keyboard.press('Escape');
+          await expect(page).toHaveURL(/#home$/);
+          await expect(root).toHaveAttribute('data-destination', 'home');
+          await expect(panel).toBeHidden();
+          await expect(work).toBeFocused();
+          await expect(work).toBeInViewport({ ratio: 1 });
+          if (width < 1440) await work.tap();
+          else await work.click();
+          await expect(page).toHaveURL(/#work$/);
+          await expect(panel.locator('[data-island-heading]')).toBeFocused();
           const dimensions = await page.evaluate(() => ({
             client: document.documentElement.clientWidth,
             scroll: document.documentElement.scrollWidth,
@@ -80,7 +77,11 @@ test.describe('typed frontend catalogue', () => {
 
   for (const { locale, path } of locales) {
     test(`${locale} renders every project with its image and demo/source links`, async ({ page }) => {
-      await page.goto(path);
+      const errors: string[] = [];
+      page.on('pageerror', (error) => errors.push(error.message));
+      await page.goto(`${path}?view=lite#work`);
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      await expect(page.locator('[data-island-root]')).toHaveAttribute('data-bound', 'true');
       const cards = page.locator('.frontend-demo');
       await expect(cards).toHaveCount(frontendProjects.length);
       for (const [index, project] of frontendProjects.entries()) {
@@ -110,6 +111,7 @@ test.describe('typed frontend catalogue', () => {
           )
           .toBe(true);
       }
+      expect(errors).toEqual([]);
     });
   }
 });

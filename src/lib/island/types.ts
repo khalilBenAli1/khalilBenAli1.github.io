@@ -1,16 +1,31 @@
-import type { Locale } from '../i18n';
+import type { Locale } from "../i18n";
 
-export const destinations = ['home', 'work', 'about', 'experience', 'contact'] as const;
+export const destinations = [
+  "home",
+  "work",
+  "about",
+  "experience",
+  "contact",
+] as const;
 export type Destination = (typeof destinations)[number];
-export type WorldDestination = Exclude<Destination, 'home'>;
-export const sectors = ['all', 'hospitality', 'luxury', 'beauty', 'business', 'architecture', 'travel', 'systems'] as const;
+export type WorldDestination = Exclude<Destination, "home">;
+export const sectors = [
+  "all",
+  "hospitality",
+  "luxury",
+  "beauty",
+  "business",
+  "architecture",
+  "travel",
+  "systems",
+] as const;
 export type Sector = (typeof sectors)[number];
 
 export interface IslandProject {
   readonly id: string;
   readonly name: string;
-  readonly kind: 'frontend' | 'professional';
-  readonly sector: Exclude<Sector, 'all'>;
+  readonly kind: "frontend" | "professional";
+  readonly sector: Exclude<Sector, "all">;
   readonly year: string | null;
   readonly description: Readonly<Record<Locale, string>>;
   readonly technologies: readonly string[];
@@ -20,17 +35,17 @@ export interface IslandProject {
   readonly source?: string;
   readonly client?: string;
   readonly production?: boolean;
-  readonly diagram?: 'cuddy' | 'lor' | 'meeting' | 'scanner' | 'audio';
+  readonly diagram?: "cuddy" | "lor" | "meeting" | "scanner" | "audio";
 }
 
 export interface IslandRoute {
   readonly destination: Destination;
   readonly sector: Sector;
   readonly projectId: string | null;
-  readonly aboutSection: 'ai' | 'skills' | null;
+  readonly aboutSection: "ai" | "skills" | null;
 }
-export type ViewPreference = 'auto' | '3d' | 'lite';
-export type MotionPreference = 'system' | 'off';
+export type ViewPreference = "auto" | "3d" | "lite";
+export type MotionPreference = "system" | "off";
 export interface IslandPreferences {
   readonly version: 1;
   readonly view: ViewPreference;
@@ -40,7 +55,7 @@ export interface IslandPreferences {
 export interface ScreenAsset {
   readonly src: string;
   readonly label: string;
-  readonly sector: Exclude<Sector, 'all'>;
+  readonly sector: Exclude<Sector, "all">;
 }
 export interface ProjectedHotspot {
   readonly destination: WorldDestination;
@@ -48,8 +63,9 @@ export interface ProjectedHotspot {
   readonly y: number;
   readonly visible: boolean;
 }
-export type SceneQuality = 'low' | 'high';
-export type SceneStatus = 'loading' | 'ready' | 'unsupported' | 'lost' | 'disposed';
+export type SceneQuality = "low" | "high";
+export type SceneStatus =
+  "loading" | "ready" | "unsupported" | "lost" | "disposed";
 export interface SceneMetrics {
   readonly status: SceneStatus;
   readonly frames: number;

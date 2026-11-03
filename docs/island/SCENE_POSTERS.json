@@ -1,0 +1,35 @@
+{
+  "renderer": "Chromium software SwiftShader, actual implemented geometry/screens",
+  "posters": [
+    {
+      "name": "desktop",
+      "size": [
+        1399,
+        1020
+      ],
+      "sourceAlphaRange": [
+        0,
+        255
+      ],
+      "delivery": "public/island/island-desktop.webp",
+      "bytes": 40842,
+      "sha256": "c84806b0417c319ce5fac8fed61eac135a7bb733bdb049630e66552cebbeb5e4",
+      "method": "Actual WebGL framebuffer; transparent pixels composited on exact UI #eeeae1; HTML labels remain separate."
+    },
+    {
+      "name": "mobile",
+      "size": [
+        487,
+        475
+      ],
+      "sourceAlphaRange": [
+        0,
+        255
+      ],
+      "delivery": "public/island/island-mobile.webp",
+      "bytes": 12418,
+      "sha256": "9a5d53801c0eeb066ce35a340b1890a259023c31baae2bdc05aa7effd641e077",
+      "method": "Actual WebGL framebuffer; transparent pixels composited on exact UI #eeeae1; HTML labels remain separate."
+    }
+  ]
+}

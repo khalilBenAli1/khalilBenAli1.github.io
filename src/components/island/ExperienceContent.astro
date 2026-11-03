@@ -1,0 +1,32 @@
+---
+import { t, type Locale } from "../../lib/i18n";
+const { locale } = Astro.props as { locale: Locale };
+const dict = t(locale);
+---
+<p class="island-panel__intro">{dict.experience.title.replace(/\*/g, '')}</p>
+    <ol class="timeline">
+      {
+        dict.experience.entries.map((e) => (
+          <li class="timeline__entry" data-reveal="fade">
+            <span class="timeline__node" aria-hidden="true" />
+            <div class="timeline__row">
+              {/*
+                The explicit {" "} are load-bearing. Astro collapses the
+                whitespace around an expression, and the em dash is aria-hidden —
+                with nothing between them the accessible name came out as
+                "…AI EngineernBold". CSS padding cannot fix a name.
+              */}
+              <h3 class="timeline__role">
+                {e.role}
+                {" "}
+                <span class="timeline__sep" aria-hidden="true">—</span>
+                {" "}
+                <span class="timeline__company">{e.company}</span>
+              </h3>
+              <p class="timeline__period">{e.period}</p>
+            </div>
+            <p class="timeline__note" data-reveal="lines">{e.note}</p>
+          </li>
+        ))
+      }
+    </ol>

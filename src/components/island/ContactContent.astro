@@ -1,0 +1,15 @@
+---
+import { t, type Locale } from "../../lib/i18n";
+import { ui } from "../../lib/icons";
+const { locale } = Astro.props as { locale: Locale };
+const dict = t(locale);
+---
+<div class="island-contact">
+  <p class="island-contact__original-title">{dict.contact.title.replace(/\*/g, '')}</p>
+  <p class="island-contact__line">{dict.contact.line}</p>
+  <p class="island-availability"><span aria-hidden="true"></span>{dict.hero.status}</p>
+  <a class="island-contact__email" href="mailto:khalil.benali16121@gmail.com">{dict.contact.email}<span aria-hidden="true">↗</span></a>
+  <div class="island-contact__socials"><a href="https://github.com/khalilBenAli1"><span set:html={ui.github} />GitHub<span aria-hidden="true">↗</span></a><a href="https://linkedin.com/in/khalil-ben-ali"><span set:html={ui.linkedin} />LinkedIn<span aria-hidden="true">↗</span></a></div>
+  <p class="island-contact__ghost" aria-hidden="true">{dict.contact.ghost}</p>
+</div>
+<footer class="island-footer"><p>{dict.contact.footerLeft}</p><p class="island-clock"><span>{dict.contact.localTime}</span><strong>FAENZA · <span data-local-time>--:--</span></strong></p><div><p>{dict.contact.footerRight}</p><a href="#top" aria-label={dict.contact.backToTop}>↑</a></div></footer>
