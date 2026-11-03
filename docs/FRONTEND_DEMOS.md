@@ -5,6 +5,8 @@ The frontend gallery uses real screenshots of original applications built in Nov
 | Project | Sector | Live demo | Source screenshot |
 | --- | --- | --- | --- |
 | Maison Sol | Hospitality | https://khalilbenali1.github.io/maison-sol-react/ | `maison-sol-react/docs/screenshots/home-desktop.jpg` |
+| Sora | Dining | https://khalilbenali1.github.io/sora-angular/ | `sora-angular/docs/screenshots/home-desktop.jpg` |
+| Atelier No.8 | Fashion / retail | https://khalilbenali1.github.io/atelier-no8-nuxt/ | `atelier-no8-nuxt/docs/screenshots/home-desktop.jpg` |
 | Forma | Architecture / interiors | https://khalilbenali1.github.io/forma-astro/ | `forma-astro/docs/screenshots/home-desktop.png` |
 | Roam | Travel / planning | https://khalilbenali1.github.io/roam-sveltekit/ | `roam-sveltekit/docs/screenshots/planner-desktop.png` |
 | Prism | Design systems | https://khalilbenali1.github.io/prism-web-components/ | `prism-web-components/docs/screenshots/workbench-desktop.png` |
