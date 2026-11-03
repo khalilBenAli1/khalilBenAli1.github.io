@@ -114,9 +114,9 @@ function initNavActive(): void {
    The overlay is a modal, so nothing behind it may be reachable. Two mechanisms,
    because either alone leaks: `inert` takes the rest of the page out of the tab
    order *and* out of the accessible tree (screen-reader swipe included), and the
-   Tab wrap keeps a cycle inside the overlay. Note that the overlay is a sibling
-   of the nav bar inside <header>, so the bar container is inerted, never the
-   header itself. */
+   Tab wrap keeps a cycle inside the overlay. The overlay sits outside the filtered
+   header so its fixed positioning resolves against the viewport. The bar container
+   is inerted with the rest of the page while the overlay stays interactive. */
 function initNavMenu(): void {
   const burger = document.querySelector<HTMLButtonElement>("[data-nav-burger]");
   const overlay = document.querySelector<HTMLElement>("[data-nav-overlay]");
