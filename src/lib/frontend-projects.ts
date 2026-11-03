@@ -98,6 +98,24 @@ export const frontendProjects: FrontendProject[] = [
     source: "https://github.com/khalilBenAli1/veyli-colour-nuxt",
   },
   {
+    name: "Elnuara",
+    year: "2026",
+    sector: {
+      en: "Body care & rituals",
+      fr: "Soins du corps",
+      it: "Cura del corpo",
+    },
+    description: {
+      en: "A tactile body care shop with size choices, an editable daily ritual and a complete simulated checkout.",
+      fr: "Une boutique de soins du corps, des formats au choix, un rituel personnalisable et un achat entièrement simulé.",
+      it: "Una boutique per la cura del corpo, con formati diversi, rituali personalizzabili e un acquisto completamente simulato.",
+    },
+    image: "/projects/elnuara.jpg",
+    technology: ["SvelteKit", "TypeScript", "CSS"],
+    demo: "https://khalilbenali1.github.io/elnuara-body-sveltekit/",
+    source: "https://github.com/khalilBenAli1/elnuara-body-sveltekit",
+  },
+  {
     name: "Forma",
     year: "2026",
     sector: {
