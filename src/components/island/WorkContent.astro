@@ -89,11 +89,13 @@ const collections = [
                   {project.highlights[locale].length > 0 && <ul class="island-project__highlights">{project.highlights[locale].map((highlight) => <li>{highlight}</li>)}</ul>}
                   {project.kind === "frontend" && <p class="island-project__demo-note">{copy.gallery.demoNote}</p>}
                 </div>
-                <div class:list={["island-project__links", { "frontend-demo__links": project.kind === "frontend" }]}>
-                  {project.demo && <a href={project.demo}>{copy.controls.visit}<span aria-hidden="true" set:html={arrowUpRight} /></a>}
-                  {project.source && <a href={project.source}>{copy.controls.source}<span aria-hidden="true" set:html={ui.github} /></a>}
+                <div class="island-project__actions">
+                  <div class:list={["island-project__links", { "frontend-demo__links": project.kind === "frontend" }]}>
+                    {project.demo && <a href={project.demo}>{copy.controls.visit}<span aria-hidden="true" set:html={arrowUpRight} /></a>}
+                    {project.source && <a href={project.source}>{copy.controls.source}<span aria-hidden="true" set:html={ui.github} /></a>}
+                  </div>
+                  <a class="island-project__details-link" href={'#project-' + project.id}>{copy.controls.projectDetails}<span aria-hidden="true" set:html={plus} /></a>
                 </div>
-                <a class="island-project__details-link" href={'#project-' + project.id}>{copy.controls.projectDetails}<span aria-hidden="true" set:html={plus} /></a>
               </div>
             </article>
           );

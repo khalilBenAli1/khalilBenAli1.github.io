@@ -2,12 +2,13 @@
 import type { WorldDestination } from "../../lib/island/types";
 import type { Locale } from "../../lib/i18n";
 import { getIslandCopy } from "../../lib/island/copy";
+import "../../styles/island-sections.css";
 interface Props { destination: WorldDestination; index: string; title: string; eyebrow: string; locale: Locale }
 const { destination, index, title, eyebrow, locale } = Astro.props;
 const copy = getIslandCopy(locale);
 ---
-<section class={'island-panel island-panel--' + destination} id={destination} data-island-panel={destination} aria-labelledby={destination + '-title'}>
+<section class={'island-panel island-section island-panel--' + destination} id={destination} data-island-panel={destination} aria-labelledby={destination + '-title'}>
   <div class="island-panel__navigation"><a href="#home"><span aria-hidden="true">↖</span>{copy.controls.home}</a><a href="#home" aria-label={copy.controls.close + ' — ' + copy.destinations[destination]}>{copy.controls.close}<span aria-hidden="true">×</span></a></div>
-  <header class="island-panel__header"><p class="island-eyebrow"><span>{index}</span>{eyebrow}</p><h2 id={destination + '-title'} data-island-heading tabindex="-1">{title}</h2></header>
+  <header class="island-panel__header"><p class="island-eyebrow"><span>{index}</span><span>{eyebrow}</span></p><h2 id={destination + '-title'} data-island-heading tabindex="-1">{title}</h2></header>
   <div class="island-panel__content"><slot /></div>
 </section>

@@ -3,14 +3,29 @@ import AiSection from "../AiSection.astro";
 import SkillsSection from "../SkillsSection.astro";
 import TechMarquee from "../TechMarquee.astro";
 import { accent } from "../../lib/accent";
-import { t, type Locale } from "../../lib/i18n";
+import { cvFile, t, type Locale } from "../../lib/i18n";
 const { locale } = Astro.props as { locale: Locale };
 const dict = t(locale);
 ---
-<div class="island-identity">
-  <img src="/khalil.jpg" alt={dict.resume.photoAlt} width="640" height="640" loading="lazy" decoding="async" />
-  <div><p class="island-eyebrow">{dict.hero.eyebrow}</p><h3>Khalil Ben Ali</h3><p class="island-identity__lead" set:html={accent(dict.hero.lead)} /><p class="island-availability"><span aria-hidden="true"></span>{dict.hero.status}</p><a class="island-text-link" href="#work">{dict.hero.scroll}<span aria-hidden="true">↗</span></a></div>
+<div class="island-about">
+  <div class="island-identity">
+    <figure class="island-identity__portrait">
+      <img src="/khalil.jpg" alt={dict.resume.photoAlt} width="640" height="640" loading="lazy" decoding="async" />
+    </figure>
+    <div class="island-identity__copy">
+      <p class="island-eyebrow">{dict.hero.eyebrow}</p>
+      <h3>Khalil Ben Ali</h3>
+      <p class="island-identity__lead" set:html={accent(dict.hero.lead)} />
+      <p class="island-section-availability"><span aria-hidden="true"></span>{dict.hero.status}</p>
+      <div class="island-identity__links">
+        <a class="island-text-link" href="#work">{dict.hero.viewWork}<span aria-hidden="true">↗</span></a>
+        <a class="island-text-link" href={cvFile(locale)} download>{dict.hero.downloadCv}<span aria-hidden="true">↓</span></a>
+      </div>
+    </div>
+  </div>
+  <div class="island-about__tools"><TechMarquee /></div>
+  <div class="island-about__practice">
+    <AiSection locale={locale} />
+    <SkillsSection locale={locale} />
+  </div>
 </div>
-<TechMarquee />
-<AiSection locale={locale} />
-<SkillsSection locale={locale} />
