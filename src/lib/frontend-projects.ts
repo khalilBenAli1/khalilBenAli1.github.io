@@ -26,6 +26,42 @@ export const frontendProjects: FrontendProject[] = [
     source: "https://github.com/khalilBenAli1/maison-sol-react",
   },
   {
+    name: "Sora",
+    year: "2026",
+    sector: {
+      en: "Dining",
+      fr: "Restauration",
+      it: "Ristorazione",
+    },
+    description: {
+      en: "An atmospheric dining experience with a seasonal menu, table reservations and a working reservation desk.",
+      fr: "Une expérience gastronomique immersive, avec menu de saison, réservation de table et gestion des réservations.",
+      it: "Un’esperienza gastronomica immersiva con menu stagionale, prenotazioni e gestione dei tavoli.",
+    },
+    image: "/projects/sora.jpg",
+    technology: ["Angular", "TypeScript", "CSS"],
+    demo: "https://khalilbenali1.github.io/sora-angular/",
+    source: "https://github.com/khalilBenAli1/sora-angular",
+  },
+  {
+    name: "Atelier No.8",
+    year: "2026",
+    sector: {
+      en: "Fashion & retail",
+      fr: "Mode & commerce",
+      it: "Moda e commercio",
+    },
+    description: {
+      en: "A considered boutique with tactile product imagery, a beautifully detailed shopping bag and a complete simulated checkout.",
+      fr: "Une boutique soignée, des matières à découvrir, un panier détaillé et un parcours d’achat entièrement simulé.",
+      it: "Una boutique curata, materiali da scoprire, un carrello dettagliato e un acquisto completamente simulato.",
+    },
+    image: "/projects/atelier.jpg",
+    technology: ["Nuxt", "Vue", "Pinia"],
+    demo: "https://khalilbenali1.github.io/atelier-no8-nuxt/",
+    source: "https://github.com/khalilBenAli1/atelier-no8-nuxt",
+  },
+  {
     name: "Forma",
     year: "2026",
     sector: {
