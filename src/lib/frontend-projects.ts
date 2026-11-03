@@ -62,6 +62,24 @@ export const frontendProjects: FrontendProject[] = [
     source: "https://github.com/khalilBenAli1/atelier-no8-nuxt",
   },
   {
+    name: "Erden Vaux",
+    year: "2026",
+    sector: {
+      en: "Luxury leather goods",
+      fr: "Maroquinerie",
+      it: "Pelletteria di lusso",
+    },
+    description: {
+      en: "An editorial leather-goods shop with material choices, a scaled silhouette comparison and a complete demo checkout.",
+      fr: "Une boutique de maroquinerie éditoriale, avec choix de matières, comparaison des silhouettes à l’échelle et achat simulé.",
+      it: "Una boutique editoriale di pelletteria, con materiali, confronto delle proporzioni e un acquisto simulato completo.",
+    },
+    image: "/projects/erdenvaux.jpg",
+    technology: ["Next.js", "React", "Zustand"],
+    demo: "https://khalilbenali1.github.io/erdenvaux-bags-next/",
+    source: "https://github.com/khalilBenAli1/erdenvaux-bags-next",
+  },
+  {
     name: "Forma",
     year: "2026",
     sector: {
