@@ -4,6 +4,7 @@ import Nav from "./Nav.astro";
 import Hero from "./Hero.astro";
 import TechMarquee from "./TechMarquee.astro";
 import ProjectCard from "./ProjectCard.astro";
+import FrontendShowcase from "./FrontendShowcase.astro";
 import SectionHeading from "./SectionHeading.astro";
 import Diagram from "./Diagram.astro";
 import AiSection from "./AiSection.astro";
@@ -159,6 +160,8 @@ const alternates = Object.fromEntries(locales.map((l) => [l, homePath(l)]));
         >
           <Diagram {...audioDiagram} />
         </ProjectCard>
+
+        <FrontendShowcase locale={locale} />
 
         <div class="more-work card-v3" data-reveal="fade">
           <div class="more-work__biat">
