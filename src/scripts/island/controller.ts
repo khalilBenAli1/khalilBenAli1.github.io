@@ -1,4 +1,6 @@
+import { islandPosters, destinationPosters } from "../../lib/island/posters";
 import { isIslandHash, parseIslandUrl } from "../../lib/island/navigation";
+import { createIslandTransitions } from "./transitions";
 import {
   defaultPreferences,
   parsePreferences,
@@ -7,6 +9,7 @@ import {
 } from "../../lib/island/preferences";
 import {
   sectors,
+  type IslandExhibitSelection,
   type IslandPreferences,
   type IslandRoute,
   type IslandSceneHandle,
@@ -21,12 +24,21 @@ function boot(): void {
   const stage = root.querySelector<HTMLElement>("[data-island-stage]");
   let canvas = root.querySelector<HTMLCanvasElement>("[data-island-canvas]");
   if (!stage || !canvas) return;
+  const transitions = createIslandTransitions(root, stage);
   root.dataset.bound = "true";
   const events = new AbortController();
   const { signal } = events;
   const panels = [...root.querySelectorAll<HTMLElement>("[data-island-panel]")];
   const cards = [...root.querySelectorAll<HTMLElement>("[data-island-card]")];
   const projectIds = cards.map((el) => el.dataset.islandCard!);
+  const exhibitCache = new Map<string, IslandExhibitSelection>();
+  const milestoneButtons = [
+    ...root.querySelectorAll<HTMLButtonElement>("[data-island-milestone]"),
+  ].filter((button) => /^[0-3]$/.test(button.dataset.islandMilestone ?? ""));
+  const milestoneEntries = [
+    ...root.querySelectorAll<HTMLElement>("[data-island-milestone-entry]"),
+  ];
+  let selectedMilestone: number | null = null;
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const coarse = matchMedia("(pointer: coarse)");
   const motionButton = root.querySelector<HTMLButtonElement>(
@@ -74,11 +86,37 @@ function boot(): void {
       /* No persistent preference is required to navigate. */
     }
   }
+  function syncPoster(): void {
+    if (root.dataset.view === "3d" && root.dataset.sceneStatus === "ready")
+      return;
+    const pose =
+      route.destination === "home"
+        ? islandPosters
+        : (destinationPosters[route.destination] ?? islandPosters);
+    const image = root.querySelector<HTMLImageElement>(
+      "[data-island-poster] img",
+    );
+    const source = root.querySelector<HTMLSourceElement>(
+      "[data-island-poster] source",
+    );
+    if (image && pose.desktop && image.getAttribute("src") !== pose.desktop)
+      image.src = pose.desktop;
+    if (source && pose.mobile) {
+      source.media =
+        route.destination === "home"
+          ? "(max-width: 600px)"
+          : "(max-width: 900px)";
+      if (source.getAttribute("srcset") !== pose.mobile)
+        source.srcset = pose.mobile;
+    }
+  }
   function setStatus(
     value: "loading" | "ready" | "lite" | "unsupported" | "lost",
   ): void {
     root.dataset.sceneStatus = value;
     stage!.dataset.sceneStatus = value;
+    syncPoster();
+    syncMilestoneControls();
     if (status)
       status.textContent =
         value === "loading"
@@ -100,7 +138,7 @@ function boot(): void {
   }
   function device() {
     return {
-      width: document.documentElement.clientWidth,
+      width: window.innerWidth || document.documentElement.clientWidth,
       coarse: coarse.matches,
       saveData:
         (navigator as Navigator & { connection?: { saveData?: boolean } })
@@ -130,6 +168,7 @@ function boot(): void {
       el.style.removeProperty("left");
       el.style.removeProperty("top");
       el.hidden = false;
+      el.removeAttribute("data-scene-hover");
     }
   }
   function screens(): readonly ScreenAsset[] {
@@ -149,6 +188,198 @@ function boot(): void {
       );
     } catch {
       return [];
+    }
+  }
+  function diagramSource(source: SVGSVGElement): string {
+    const clone = source.cloneNode(true) as SVGSVGElement;
+    const originals = [source, ...source.querySelectorAll<SVGElement>("*")];
+    const copies = [clone, ...clone.querySelectorAll<SVGElement>("*")];
+    const ids = new Set(originals.map((element) => element.id).filter(Boolean));
+    const localReference = (value: string): string | null => {
+      const id = value.match(/#([^#]+)$/)?.[1];
+      return id && ids.has(id) ? `#${id}` : null;
+    };
+    const localUrls = (value: string): string =>
+      value.replace(
+        /url\(\s*(["']?)(.*?)\1\s*\)/g,
+        (_match, _quote, url: string) => {
+          const reference = localReference(url);
+          return reference ? `url(${reference})` : "none";
+        },
+      );
+    const properties = [
+      "color",
+      "fill",
+      "fill-opacity",
+      "fill-rule",
+      "stroke",
+      "stroke-opacity",
+      "stroke-width",
+      "stroke-linecap",
+      "stroke-linejoin",
+      "stroke-miterlimit",
+      "stroke-dasharray",
+      "stroke-dashoffset",
+      "opacity",
+      "font-family",
+      "font-size",
+      "font-weight",
+      "font-style",
+      "font-variant",
+      "letter-spacing",
+      "text-transform",
+      "text-anchor",
+      "dominant-baseline",
+      "paint-order",
+      "visibility",
+      "display",
+      "stop-color",
+      "stop-opacity",
+      "flood-color",
+      "flood-opacity",
+      "filter",
+    ];
+    originals.forEach((element, index) => {
+      const copy = copies[index];
+      const computed = getComputedStyle(element);
+      copy.removeAttribute("style");
+      for (const property of properties) {
+        const value = computed.getPropertyValue(property);
+        if (value) copy.style.setProperty(property, localUrls(value));
+      }
+      for (const attribute of [...copy.attributes]) {
+        if (/^on/i.test(attribute.name)) copy.removeAttributeNode(attribute);
+        else if (/^(?:href|xlink:href|src)$/i.test(attribute.name)) {
+          const reference = localReference(attribute.value);
+          if (reference) attribute.value = reference;
+          else copy.removeAttributeNode(attribute);
+        } else if (attribute.value.includes("url(")) {
+          attribute.value = localUrls(attribute.value);
+        }
+      }
+    });
+    // The texture is a self-contained snapshot of the actual exhibit diagram.
+    clone
+      .querySelectorAll(
+        "script,style,foreignObject,image,iframe,audio,video,animate,animateMotion,animateTransform,set,mpath",
+      )
+      .forEach((element) => element.remove());
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    const viewBox = source.viewBox.baseVal;
+    const mount = source.closest<HTMLElement>(
+      ".island-project__diagram, .island-project__reference",
+    );
+    if (mount) {
+      const background = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "rect",
+      );
+      background.setAttribute("x", String(viewBox.x));
+      background.setAttribute("y", String(viewBox.y));
+      background.setAttribute("width", String(viewBox.width || 640));
+      background.setAttribute("height", String(viewBox.height || 400));
+      background.setAttribute("fill", getComputedStyle(mount).backgroundColor);
+      clone.insertBefore(background, clone.firstChild);
+    }
+    clone.setAttribute("width", String(Math.max(1, viewBox.width || 640)));
+    clone.setAttribute("height", String(Math.max(1, viewBox.height || 400)));
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(clone))}`;
+  }
+  function exhibitForCard(card: HTMLElement): IslandExhibitSelection | null {
+    const id = card.dataset.islandCard;
+    if (!id || !projectIds.includes(id)) return null;
+    const cached = exhibitCache.get(id);
+    if (cached) return cached;
+    const label = card.querySelector("h4")?.textContent?.trim();
+    if (!label) return null;
+    const image = card.querySelector<HTMLImageElement>(
+      ".island-project__preview img",
+    );
+    let src: string | null = null;
+    if (image) {
+      const actual = image.getAttribute("src");
+      if (actual) {
+        const url = new URL(actual, location.href);
+        if (
+          url.origin === location.origin &&
+          url.pathname.startsWith("/projects/")
+        )
+          src = url.pathname + url.search;
+      }
+    } else {
+      const diagram = card.querySelector<SVGSVGElement>(
+        ".island-project__diagram svg, .island-project__reference svg",
+      );
+      if (diagram) {
+        try {
+          src = diagramSource(diagram);
+        } catch {
+          // The original HTML diagram stays available if snapshotting fails.
+          return null;
+        }
+      }
+    }
+    if (!src) return null;
+    const selection = { id, src, label };
+    exhibitCache.set(id, selection);
+    return selection;
+  }
+  function syncMilestoneControls(): void {
+    for (const button of milestoneButtons) {
+      button.disabled = !scene || root.dataset.view !== "3d";
+      button.setAttribute(
+        "aria-pressed",
+        String(Number(button.dataset.islandMilestone) === selectedMilestone),
+      );
+    }
+    for (const entry of milestoneEntries)
+      entry.toggleAttribute(
+        "data-milestone-selected",
+        Number(entry.dataset.islandMilestoneEntry) === selectedMilestone,
+      );
+  }
+  function syncSceneContent(handle: IslandSceneHandle, instant: boolean): void {
+    const card =
+      route.destination === "work"
+        ? route.projectId
+          ? cards.find((entry) => entry.dataset.islandCard === route.projectId)
+          : route.sector !== "all"
+            ? cards.find((entry) => entry.dataset.sector === route.sector)
+            : null
+        : null;
+    handle.setProject(
+      card ? exhibitForCard(card) : null,
+      instant,
+      route.projectId !== null,
+    );
+    handle.setMilestone(
+      route.destination === "experience" ? selectedMilestone : null,
+      route.destination === "experience" && selectedMilestone !== null,
+    );
+  }
+  function activateDestination(destination: WorldDestination): void {
+    if (destination !== route.destination) {
+      navigateHash(destination);
+      return;
+    }
+    const panel = panels.find(
+      (entry) => entry.dataset.islandPanel === destination,
+    );
+    const card = cards.find(
+      (entry) => entry.dataset.islandCard === route.projectId,
+    );
+    const target =
+      card?.querySelector<HTMLElement>(".island-project__links a") ??
+      card?.querySelector<HTMLElement>("h4") ??
+      (destination === "contact"
+        ? panel?.querySelector<HTMLElement>('a[href^="mailto:"]')
+        : null) ??
+      panel?.querySelector<HTMLElement>("[data-island-heading]");
+    if (target) {
+      if (!target.matches("a,button,[tabindex]"))
+        target.setAttribute("tabindex", "-1");
+      target.focus({ preventScroll: true });
+      scrollWithinPanel(target, "nearest");
     }
   }
   async function startScene(
@@ -176,14 +407,33 @@ function boot(): void {
         quality,
         motion,
         signal: abort.signal,
-        onActivate: (destination) => navigateHash(destination),
+        onActivate: (destination) => {
+          if (disposed || abort.signal.aborted || token !== generation) return;
+          activateDestination(destination);
+        },
+        onHover: (destination) => {
+          if (disposed || abort.signal.aborted || token !== generation) return;
+          for (const hotspot of hotspots)
+            hotspot.toggleAttribute(
+              "data-scene-hover",
+              hotspot.dataset.islandHotspot === destination,
+            );
+        },
         onHotspots: (points) => {
           if (disposed || abort.signal.aborted) return;
+          const returningHome =
+            route.destination === "home" && scene?.getMetrics().cameraMoving;
           for (const point of points) {
             const el = hotspots.find(
               (node) => node.dataset.islandHotspot === point.destination,
             );
             if (!el) continue;
+            if (returningHome) {
+              el.hidden = false;
+              el.style.removeProperty("left");
+              el.style.removeProperty("top");
+              continue;
+            }
             el.hidden = !point.visible;
             const half = el.offsetWidth / 2 + 8;
             const x = Math.max(
@@ -208,6 +458,8 @@ function boot(): void {
             activeQuality = null;
             runtimeFailed = true;
             canvas!.style.visibility = "hidden";
+            for (const hotspot of hotspots)
+              hotspot.removeAttribute("data-scene-hover");
             root.dataset.view = "lite";
             setStatus(value);
             updateControlLabels();
@@ -232,8 +484,13 @@ function boot(): void {
         device(),
         new URL(location.href).searchParams.get("view"),
       );
+      // Loading can finish after another route has committed. Reveal that final
+      // state immediately rather than replaying navigation from startup time.
+      handle.setMotion(false);
+      handle.setDestination(route.destination, true);
+      syncSceneContent(handle, true);
       handle.setMotion(latest.motion);
-      handle.setDestination(route.destination, !latest.motion);
+      handle.renderFrame?.();
       canvas.style.visibility = "visible";
       setStatus("ready");
       metrics();
@@ -272,6 +529,7 @@ function boot(): void {
       );
     }
     root.dataset.motion = motionAllowed ? "on" : "off";
+    if (!motionAllowed) transitions.cancel();
   }
   function updatePresentation(): void {
     if (disposed) return;
@@ -330,8 +588,49 @@ function boot(): void {
       .forEach((el) => (el.textContent = value));
     clockTimer = window.setTimeout(clock, 60000);
   }
+  function scrollWithinPanel(
+    target: HTMLElement,
+    block: "start" | "nearest",
+  ): void {
+    const panel = target.closest<HTMLElement>("[data-island-panel]");
+    if (!panel) return;
+    const style = getComputedStyle(panel);
+    if (!/auto|scroll/.test(style.overflowY)) {
+      target.scrollIntoView({ block, behavior: "instant" });
+      return;
+    }
+    const bounds = panel.getBoundingClientRect();
+    const box = target.getBoundingClientRect();
+    const inset = Number.parseFloat(style.scrollPaddingTop) || 0;
+    const top = bounds.top + panel.clientTop + inset;
+    const bottom = bounds.top + panel.clientTop + panel.clientHeight - 16;
+    let delta = 0;
+    if (block === "start" || box.top < top || box.height > bottom - top)
+      delta = box.top - top;
+    else if (box.bottom > bottom) delta = box.bottom - bottom;
+    if (delta)
+      panel.scrollTo({
+        top: Math.max(0, panel.scrollTop + delta),
+        behavior: "instant",
+      });
+  }
   function focusForRoute(isInitial: boolean, old: IslandRoute): void {
-    if (isInitial) return;
+    const panel = panels.find(
+      (el) => el.dataset.islandPanel === route.destination,
+    );
+    if (isInitial || old.destination !== route.destination) {
+      if (panel) panel.scrollTop = 0;
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+    if (isInitial) {
+      const directTarget = route.projectId
+        ? document.getElementById(`project-${route.projectId}`)
+        : route.aboutSection
+          ? document.getElementById(route.aboutSection)
+          : null;
+      if (directTarget) scrollWithinPanel(directTarget, "start");
+      return;
+    }
     if (
       old.destination === route.destination &&
       old.projectId === route.projectId &&
@@ -343,14 +642,11 @@ function boot(): void {
       const target =
         returnFocus?.isConnected && returnFocus.getClientRects().length
           ? returnFocus
-          : root.querySelector<HTMLElement>('[data-island-nav="home"]');
+          : root.querySelector<HTMLElement>('.island-brand[href="#home"]');
       target?.focus({ preventScroll: true });
       returnFocus = null;
       return;
     }
-    const panel = panels.find(
-      (el) => el.dataset.islandPanel === route.destination,
-    );
     const target = route.projectId
       ? document.getElementById(`project-${route.projectId}`)
       : route.aboutSection
@@ -359,9 +655,10 @@ function boot(): void {
     if (target instanceof HTMLElement) {
       target.setAttribute("tabindex", "-1");
       target.focus({ preventScroll: true });
-      const box = target.getBoundingClientRect();
-      if (box.top < 100 || box.bottom > innerHeight - 24)
-        target.scrollIntoView({ block: "start", behavior: "instant" });
+      scrollWithinPanel(
+        target,
+        route.projectId || route.aboutSection ? "start" : "nearest",
+      );
     }
     if (old.projectId && !route.projectId && route.destination === "work") {
       const trigger = projectReturnFocus?.isConnected
@@ -371,7 +668,7 @@ function boot(): void {
           );
       if (trigger?.getClientRects().length) {
         trigger.focus({ preventScroll: true });
-        trigger.scrollIntoView({ block: "nearest", behavior: "instant" });
+        scrollWithinPanel(trigger, "nearest");
       }
       projectReturnFocus = null;
     }
@@ -438,35 +735,75 @@ function boot(): void {
     const old = route;
     route = parseIslandUrl(location.href, projectIds);
     previousHref = location.href;
-    root.dataset.destination = route.destination;
-    document.documentElement.dataset.destination = route.destination;
-    root.dataset.selectedProject = route.projectId ?? "";
-    root.dataset.sector = route.sector;
-    for (const panel of panels)
-      panel.hidden = panel.dataset.islandPanel !== route.destination;
-    syncGallery();
-    root
-      .querySelectorAll<HTMLAnchorElement>("[data-island-nav]")
-      .forEach((el) => {
-        if (el.dataset.islandNav === route.destination)
-          el.setAttribute("aria-current", "page");
-        else el.removeAttribute("aria-current");
-      });
-    root
-      .querySelectorAll<HTMLAnchorElement>("[data-island-language]")
-      .forEach((el) => {
-        const target = new URL(el.getAttribute("href") ?? "/", location.origin);
-        target.search = location.search;
-        target.hash = location.hash;
-        el.href = target.pathname + target.search + target.hash;
-      });
-    root.dispatchEvent(new CustomEvent("island:route", { detail: route }));
-    scene?.setDestination(
-      route.destination,
-      reduced.matches || preferences.motion === "off",
+    const next = route;
+    const update = () => {
+      if (route !== next || disposed) return;
+      root.dataset.destination = route.destination;
+      document.documentElement.dataset.destination = route.destination;
+      if (route.destination === "home") {
+        // Navigation targets stay available while the room camera pulls back.
+        for (const hotspot of hotspots) {
+          hotspot.hidden = false;
+          hotspot.style.removeProperty("left");
+          hotspot.style.removeProperty("top");
+        }
+      }
+      syncPoster();
+      root.dataset.selectedProject = route.projectId ?? "";
+      root.dataset.sector = route.sector;
+      for (const panel of panels)
+        panel.hidden = panel.dataset.islandPanel !== route.destination;
+      syncGallery();
+      if (route.destination !== "experience") {
+        selectedMilestone = null;
+        syncMilestoneControls();
+      }
+      root
+        .querySelectorAll<HTMLAnchorElement>("[data-island-nav]")
+        .forEach((el) => {
+          if (el.dataset.islandNav === route.destination)
+            el.setAttribute("aria-current", "page");
+          else el.removeAttribute("aria-current");
+        });
+      root
+        .querySelectorAll<HTMLAnchorElement>("[data-island-language]")
+        .forEach((el) => {
+          const target = new URL(
+            el.getAttribute("href") ?? "/",
+            location.origin,
+          );
+          target.search = location.search;
+          target.hash = location.hash;
+          el.href = target.pathname + target.search + target.hash;
+        });
+      root.dispatchEvent(new CustomEvent("island:route", { detail: route }));
+      // Retarget before fitting the new room viewport, preserving the current
+      // animated zoom instead of snapping the previous room to the new layout.
+      scene?.setDestination(
+        route.destination,
+        reduced.matches || preferences.motion === "off",
+      );
+      scene?.resize();
+      if (scene)
+        syncSceneContent(
+          scene,
+          reduced.matches || preferences.motion === "off",
+        );
+      focusForRoute(initial, old);
+      scene?.renderFrame?.();
+      metrics();
+    };
+    const changed =
+      old.destination !== next.destination ||
+      old.projectId !== next.projectId ||
+      old.sector !== next.sector ||
+      old.aboutSection !== next.aboutSection;
+    transitions.run(
+      old,
+      next,
+      !initial && changed && !reduced.matches && preferences.motion !== "off",
+      update,
     );
-    focusForRoute(initial, old);
-    metrics();
   }
   function navigate(url: URL, trigger?: HTMLElement): void {
     const next = parseIslandUrl(url, projectIds);
@@ -576,6 +913,51 @@ function boot(): void {
     });
     el.addEventListener("blur", () => scene?.setFocus(null), { signal });
   }
+  function previewMilestone(index: number | null): void {
+    if (route.destination !== "experience") return;
+    scene?.setMilestone(index, false);
+    metrics();
+  }
+  for (const button of milestoneButtons) {
+    const index = Number(button.dataset.islandMilestone);
+    const entry = milestoneEntries.find(
+      (element) => Number(element.dataset.islandMilestoneEntry) === index,
+    );
+    button.addEventListener("focus", () => previewMilestone(index), { signal });
+    button.addEventListener("blur", () => previewMilestone(selectedMilestone), {
+      signal,
+    });
+    entry?.addEventListener(
+      "pointerenter",
+      (event) => {
+        if (event.pointerType !== "touch") previewMilestone(index);
+      },
+      { signal },
+    );
+    entry?.addEventListener(
+      "pointerleave",
+      () => {
+        const focused = milestoneButtons.find(
+          (milestone) => milestone === document.activeElement,
+        );
+        previewMilestone(
+          focused ? Number(focused.dataset.islandMilestone) : selectedMilestone,
+        );
+      },
+      { signal },
+    );
+    button.addEventListener(
+      "click",
+      () => {
+        if (route.destination !== "experience") return;
+        selectedMilestone = selectedMilestone === index ? null : index;
+        syncMilestoneControls();
+        scene?.setMilestone(selectedMilestone, true);
+        metrics();
+      },
+      { signal },
+    );
+  }
   motionButton?.addEventListener(
     "click",
     () => {
@@ -620,10 +1002,14 @@ function boot(): void {
   function dispose(): void {
     if (disposed) return;
     disposed = true;
+    transitions.dispose();
     stopScene();
     clearTimeout(resizeTimer);
     clearTimeout(clockTimer);
     events.abort();
+    exhibitCache.clear();
+    selectedMilestone = null;
+    syncMilestoneControls();
     root.dataset.bound = "false";
     root.classList.remove("island-enhanced");
     document.documentElement.classList.remove("island-enhanced");

@@ -3,6 +3,7 @@ import type { WorldDestination } from "../../lib/island/types";
 import type { Locale } from "../../lib/i18n";
 import { getIslandCopy } from "../../lib/island/copy";
 import "../../styles/island-sections.css";
+import "../../styles/island-spatial.css";
 interface Props { destination: WorldDestination; index: string; title: string; eyebrow: string; locale: Locale }
 const { destination, index, title, eyebrow, locale } = Astro.props;
 const copy = getIslandCopy(locale);

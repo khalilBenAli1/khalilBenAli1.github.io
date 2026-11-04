@@ -5,45 +5,60 @@
   },
   "initial": {
     "status": "ready",
-    "frames": 4,
+    "frames": 7,
     "schedulerStarts": 1,
     "loopActive": true,
-    "drawCalls": 121,
-    "triangles": 712917,
-    "textures": 23,
-    "geometries": 60,
+    "drawCalls": 209,
+    "triangles": 1350697,
+    "textures": 27,
+    "geometries": 63,
     "pixelRatio": 1,
     "width": 850,
     "height": 570,
     "quality": "high",
-    "startupMs": 11039.200000047684,
-    "renderCpuMs": 34.299999952316284
+    "bakedArchitecture": true,
+    "startupMs": 8454.100000143051,
+    "enhancedReadyMs": 20566.400000095367,
+    "renderCpuMs": 1.9000000953674316
   },
   "cadence": {
-    "submissions": 2,
-    "elapsedMs": 2002.2000000476837,
-    "submissionsPerSecond": 0.998901208646673
+    "submissions": 1,
+    "elapsedMs": 2000.7000000476837,
+    "submissionsPerSecond": 0.49982506121665743
   },
-  "note": "Software rendering. renderCpuMs measures CPU submission, and cadence counts scene submissions; neither is a hardware GPU FPS claim.",
+  "note": "Software rendering; logical-core hint fixed at 8 to exercise high quality on CI. renderCpuMs measures CPU submission, and cadence counts scene submissions; neither is a hardware GPU FPS claim. startupMs covers the first procedural frame; baked-asset readiness is verified separately.",
   "verification": {
     "testsPassed": 3,
-    "build": "Astro static build logged 18:26:41 on 2026-11-03",
+    "durationMs": 156892.883,
+    "build": "Frozen Astro build logged 23:28:07 on 2026-11-03",
+    "architectureAsset": {
+      "path": "public/island/baked/architecture-baked.glb",
+      "bytes": 4395132,
+      "sha256": "9153acbcdd80b2814c07dde6061b998b82c3a3c88e9d5a901aa1486b2518572f"
+    },
     "viewportCssPixels": [
       850,
       900
     ],
     "checks": [
-      "Real WebGL2 render and scene metrics",
+      "Real WebGL2 rendering with final Draco architecture and physical reflection enhancement",
       "Motion off leaves frame count stable",
       "Visibility event pauses and resumes exactly one scheduler",
+      "Live 3D Work navigation commits semantic content without a native GPU snapshot",
       "Actual offscreen scroll pauses rendering; returning resumes",
-      "Two light-view/3D cycles lose old contexts and detach old canvases",
+      "Two light-view/3D cycles lose old contexts, detach old canvases and retain bounded resources",
       "GPU context loss exposes fallback; explicit retry creates a working scene"
     ],
+    "testStability": [
+      "Lifecycle cases run sequentially within this file while unrelated suite files may remain parallel",
+      "Asset readiness waits for Draco replacement and a completed final-scene paint before idle/resource assertions",
+      "Logical-core capability hint is fixed at 8 for high-quality branch coverage on small CI runners; reduced-motion preference is explicitly no-preference"
+    ],
     "limitations": [
-      "Software ANGLE SwiftShader; not hardware FPS or real-device mobile benchmarking",
-      "Visibility event contract tested deterministically; browser OS background throttling is not claimed",
-      "Cadence counts completed scene render submissions, not display presentation timestamps"
+      "ANGLE SwiftShader software rendering; not hardware FPS or real-device mobile benchmarking",
+      "Visibility event contract is tested deterministically; operating-system background throttling is not claimed",
+      "Cadence counts scene render submissions rather than display presentation timestamps",
+      "startupMs covers the first procedural frame; enhancedReadyMs covers the first complete baked-architecture render including its reflection setup"
     ]
   }
 }

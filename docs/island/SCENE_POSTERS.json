@@ -1,35 +1,62 @@
 {
-  "renderer": "Chromium software SwiftShader, actual implemented geometry/screens",
   "posters": [
     {
       "name": "desktop",
-      "size": [
-        1399,
-        1020
-      ],
-      "sourceAlphaRange": [
-        0,
-        255
-      ],
       "delivery": "public/island/island-desktop.webp",
-      "bytes": 40842,
-      "sha256": "c84806b0417c319ce5fac8fed61eac135a7bb733bdb049630e66552cebbeb5e4",
-      "method": "Actual WebGL framebuffer; transparent pixels composited on exact UI #eeeae1; HTML labels remain separate."
+      "size": [
+        1243,
+        864
+      ],
+      "bytes": 263984,
+      "sha256": "fa4ab6fc0c06e5dba733ce96e267730b3204e3c5838f4a8dfbe85701d559d25c",
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+      "method": "Actual implemented WebGL framebuffer with baked architecture; transparent background; HTML labels remain separate.",
+      "metrics": {
+        "status": "ready",
+        "frames": 7,
+        "schedulerStarts": 1,
+        "loopActive": true,
+        "drawCalls": 205,
+        "triangles": 1169985,
+        "textures": 23,
+        "geometries": 61,
+        "pixelRatio": 1,
+        "width": 1243.734375,
+        "height": 864,
+        "quality": "high",
+        "bakedArchitecture": true,
+        "startupMs": 10413.100000143051,
+        "renderCpuMs": 1.7000000476837158
+      }
     },
     {
       "name": "mobile",
-      "size": [
-        487,
-        475
-      ],
-      "sourceAlphaRange": [
-        0,
-        255
-      ],
       "delivery": "public/island/island-mobile.webp",
-      "bytes": 12418,
-      "sha256": "9a5d53801c0eeb066ce35a340b1890a259023c31baae2bdc05aa7effd641e077",
-      "method": "Actual WebGL framebuffer; transparent pixels composited on exact UI #eeeae1; HTML labels remain separate."
+      "size": [
+        390,
+        350
+      ],
+      "bytes": 35764,
+      "sha256": "ebb8746c407a94c8c179b9ab13c19e1cf332593e67daf7265a0732acf6124233",
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+      "method": "Actual implemented WebGL framebuffer with baked architecture; transparent background; HTML labels remain separate.",
+      "metrics": {
+        "status": "ready",
+        "frames": 7,
+        "schedulerStarts": 1,
+        "loopActive": true,
+        "drawCalls": 63,
+        "triangles": 285957,
+        "textures": 15,
+        "geometries": 60,
+        "pixelRatio": 1,
+        "width": 390,
+        "height": 350,
+        "quality": "low",
+        "bakedArchitecture": true,
+        "startupMs": 7748,
+        "renderCpuMs": 1.2000000476837158
+      }
     }
   ]
 }

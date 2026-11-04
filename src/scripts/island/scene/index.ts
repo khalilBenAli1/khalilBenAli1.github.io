@@ -3,6 +3,7 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import type {
   Destination,
   IslandSceneHandle,
+  IslandExhibitSelection,
   IslandSceneOptions,
   ProjectedHotspot,
   SceneMetrics,
@@ -155,6 +156,7 @@ export async function createIslandScene(
     return null;
   }
   scene.add(world.root);
+  world.setDestination(options.initialDestination);
   const camera = new IslandCamera(world.anchors);
   let rendering: ReturnType<typeof createRendering>;
   try {
@@ -174,9 +176,15 @@ export async function createIslandScene(
     return null;
   }
   const raycaster = new THREE.Raycaster();
-  const pickables = [...world.pickables];
+  raycaster.layers.enable(2);
+  raycaster.layers.enable(3);
+  const pickables = world.pickables;
   const pointer = new THREE.Vector2();
   const projected = new THREE.Vector3();
+  let reflectionMaterials = new WeakSet<THREE.Material>();
+  let reflectionEnvironment = scene.environment;
+  let reflectionCaptured = false;
+  let enhancedReadyMs = 0;
 
   function canRender(): boolean {
     return ready && !disposed && !lost && visible && intersects;
@@ -227,8 +235,80 @@ export async function createIslandScene(
   function render(now: number): void {
     camera.update(now);
     if (motion) world.update(seconds);
+    if (!enhancedReadyMs && world.root.userData.bakedArchitecture)
+      renderer.shadowMap.needsUpdate = true;
+    if (
+      !reflectionCaptured &&
+      options.quality === "high" &&
+      world.root.userData.bakedArchitecture
+    ) {
+      reflectionCaptured = true;
+      const probeTarget = resources.own(
+        new THREE.WebGLCubeRenderTarget(128, { type: THREE.HalfFloatType }),
+      );
+      const probe = new THREE.CubeCamera(0.1, 40, probeTarget);
+      probe.layers.enableAll();
+      probe.children.forEach((camera) => camera.layers.enableAll());
+      probe.position.set(-2.7, 3.85, 1.2);
+      const hidden: THREE.Mesh[] = [];
+      scene.traverse((object) => {
+        if (
+          object instanceof THREE.Mesh &&
+          !Array.isArray(object.material) &&
+          object.material instanceof THREE.MeshStandardMaterial &&
+          object.material.metalness > 0.9 &&
+          object.visible
+        ) {
+          hidden.push(object);
+          object.visible = false;
+        }
+      });
+      const filter = resources.own(new THREE.PMREMGenerator(renderer));
+      try {
+        probe.update(renderer, scene);
+        reflectionEnvironment = resources.own(
+          filter.fromCubemap(probeTarget.texture),
+        ).texture;
+        reflectionMaterials = new WeakSet<THREE.Material>();
+      } catch {
+        // Optional reflection enhancement leaves the existing environment usable.
+      } finally {
+        hidden.forEach((object) => {
+          object.visible = true;
+        });
+        resources.release(filter);
+        resources.release(probeTarget);
+      }
+    }
+    // Explicit environment bindings retain visible floor, glass and metal reflections.
+    // Scene.environmentIntensity alone intentionally stays subdued for diffuse stone.
+    if (reflectionEnvironment)
+      scene.traverse((object) => {
+        if (!(object instanceof THREE.Mesh)) return;
+        const materials = Array.isArray(object.material)
+          ? object.material
+          : [object.material];
+        for (const material of materials) {
+          if (reflectionMaterials.has(material)) continue;
+          reflectionMaterials.add(material);
+          if (!(material instanceof THREE.MeshStandardMaterial)) continue;
+          const polished =
+            material instanceof THREE.MeshPhysicalMaterial &&
+            material.clearcoat > 0.2;
+          const glass = material.transparent && material.metalness > 0.1;
+          if (material.metalness >= 0.6 || polished || glass) {
+            material.envMap = reflectionEnvironment;
+            material.envMapIntensity =
+              material.metalness > 0.9 ? 2.4 : glass ? 0.9 : 1.25;
+            material.needsUpdate = true;
+          }
+        }
+      });
     const before = performance.now();
     rendering.render();
+    world.releaseReplacedResources();
+    if (!enhancedReadyMs && world.root.userData.bakedArchitecture)
+      enhancedReadyMs = performance.now() - started;
     renderCpuMs = performance.now() - before;
     frames++;
     lastRender = now;
@@ -254,9 +334,11 @@ export async function createIslandScene(
 
   function resize(): void {
     if (disposed || lost) return;
-    const rect = canvas.getBoundingClientRect();
-    width = Math.max(1, rect.width || canvas.clientWidth || 1);
-    height = Math.max(1, rect.height || canvas.clientHeight || 1);
+    // FLIP transforms animate the stage visually; renderer dimensions must use
+    // its untransformed layout or the returning world and labels stay stretched.
+    const layout = getComputedStyle(canvas);
+    width = Math.max(1, parseFloat(layout.width) || canvas.clientWidth || 1);
+    height = Math.max(1, parseFloat(layout.height) || canvas.clientHeight || 1);
     pixelRatio = Math.min(
       window.devicePixelRatio || 1,
       options.quality === "high" ? 1.5 : 1.25,
@@ -264,7 +346,7 @@ export async function createIslandScene(
     );
     renderer.setPixelRatio(pixelRatio);
     renderer.setSize(width, height, false);
-    camera.resize(width, height);
+    camera.resize(width, height, window.innerWidth > 900);
     rendering.resize(width, height, pixelRatio);
     renderer.shadowMap.needsUpdate = true;
     invalidate();
@@ -316,6 +398,7 @@ export async function createIslandScene(
     const next = pick(event.clientX, event.clientY);
     if (hovered !== next) {
       hovered = next;
+      options.onHover?.(hovered);
       updateFocus();
     }
   }
@@ -338,6 +421,7 @@ export async function createIslandScene(
     press = null;
     if (hovered) {
       hovered = null;
+      options.onHover?.(null);
       updateFocus();
     }
   }
@@ -455,7 +539,28 @@ export async function createIslandScene(
   return {
     setDestination(destination: Destination, instant = false): void {
       if (disposed) return;
+      world.setDestination(destination);
       camera.setDestination(destination, instant || !motion, performance.now());
+      invalidate();
+    },
+    setProject(
+      selection: IslandExhibitSelection | null,
+      instant = false,
+      focus = true,
+    ): void {
+      if (disposed) return;
+      world.setProject(selection);
+      camera.setProject(
+        Boolean(selection) && focus,
+        instant || !motion,
+        performance.now(),
+      );
+      invalidate();
+    },
+    setMilestone(index: number | null, focus = false): void {
+      if (disposed) return;
+      world.setMilestone(index);
+      if (focus) camera.setMilestone(index, !motion, performance.now());
       invalidate();
     },
     setMotion(enabled): void {
@@ -473,6 +578,11 @@ export async function createIslandScene(
       updateFocus();
     },
     resize,
+    renderFrame(): void {
+      // Native view-transition snapshots need one paint before observers/RAF resume.
+      if (ready && !disposed && !lost && !document.hidden)
+        render(performance.now());
+    },
     getMetrics(): SceneMetrics {
       return {
         status,
@@ -487,8 +597,20 @@ export async function createIslandScene(
         width,
         height,
         quality: options.quality,
+        bakedArchitecture: Boolean(world.root.userData.bakedArchitecture),
         startupMs,
+        enhancedReadyMs,
         renderCpuMs,
+        cameraZoom: camera.camera.zoom,
+        cameraMoving: camera.active,
+        studioPortraitReady: Boolean(world.root.userData.studioPortraitReady),
+        exhibitId:
+          typeof world.root.userData.exhibitId === "string"
+            ? world.root.userData.exhibitId
+            : null,
+        activeMilestone: Number.isInteger(world.root.userData.activeMilestone)
+          ? world.root.userData.activeMilestone
+          : null,
       };
     },
     dispose,

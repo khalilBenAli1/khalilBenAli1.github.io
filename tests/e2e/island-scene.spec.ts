@@ -5,10 +5,14 @@ import type { SceneMetrics } from '../../src/lib/island/types';
 // rendering through software ANGLE, while the ordinary suite covers WebKit HTML.
 test.use({
   viewport: { width: 850, height: 900 },
+  contextOptions: { reducedMotion: 'no-preference' },
   launchOptions: { args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] },
 });
 
 test.describe('real WebGL scene lifecycle (software Chromium)', () => {
+  // These independent cases share one software GPU lane even when the main
+  // suite runs files in parallel; competing SwiftShader contexts skew lifecycle timing.
+  test.describe.configure({ mode: 'default' });
   test.skip(({ browserName }) => browserName !== 'chromium', 'Software ANGLE is Chromium-specific.');
   test.setTimeout(120_000);
 
@@ -23,7 +27,16 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
     await expect(page.locator('[data-island-root]')).toHaveAttribute('data-scene-status', 'ready', { timeout: 60_000 });
     await expect(page.locator('[data-island-canvas]')).toBeVisible();
     await page.waitForLoadState('networkidle');
-    await expect.poll(async () => (await metrics(page)).frames, { timeout: 20_000 }).toBeGreaterThan(1);
+    // Network idle precedes Draco decoding. Wait for the actual model swap,
+    // then a completed paint, so a valid late asset invalidation is not mistaken
+    // for an idle-loop leak and resource comparisons use the same architecture.
+    await expect.poll(async () => (await metrics(page)).bakedArchitecture, { timeout: 60_000 }).toBe(true);
+    const swapped = await metrics(page);
+    if (await page.locator('[data-island-root]').getAttribute('data-motion') === 'off') {
+      await expect.poll(async () => (await metrics(page)).loopActive, { timeout: 20_000 }).toBe(false);
+    } else {
+      await expect.poll(async () => (await metrics(page)).frames, { timeout: 20_000 }).toBeGreaterThan(swapped.frames);
+    }
   }
 
   async function frozenFrames(page: Page) {
@@ -35,9 +48,15 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
     return before;
   }
 
-  test('renders geometry, freezes for motion/visibility/offscreen, and resumes once', async ({ page }, testInfo) => {
+  test('renders a persistent room, freezes for motion/visibility/observer, and resumes once', async ({ page }, testInfo) => {
+    // Exercise the desktop renderer even on two-core CI runners. This is a
+    // capability hint for branch coverage, not a claim about the test hardware.
+    await page.addInitScript(() => Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, get: () => 8 }));
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
+    page.on('console', message => {
+      if (message.type() === 'error' && /THREE|shader|WebGL/i.test(message.text())) errors.push(message.text());
+    });
     await page.goto('/?view=3d');
     await ready(page);
     const initial = await metrics(page);
@@ -66,7 +85,7 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
     });
     await testInfo.attach('renderer-and-startup.json', {
       body: JSON.stringify({ renderer, initial, cadence,
-        note: 'Software rendering. renderCpuMs measures CPU submission, and cadence counts scene submissions; neither is a hardware GPU FPS claim.',
+        note: 'Software rendering; logical-core hint fixed at 8 to exercise high quality on CI. renderCpuMs measures CPU submission, and cadence counts scene submissions; neither is a hardware GPU FPS claim. startupMs covers the first procedural frame; baked-asset readiness is verified separately.',
       }, null, 2),
       contentType: 'application/json',
     });
@@ -96,23 +115,53 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
     await expect.poll(async () => (await metrics(page)).frames, { timeout: 20_000 }).toBeGreaterThan(hidden.frames);
     expect((await metrics(page)).schedulerStarts).toBe(hidden.schedulerStarts + 1);
 
-    // The wide layout deliberately keeps its island sticky beside the gallery.
-    // The stacked tablet layout can genuinely scroll the scene offscreen.
-    await page.setViewportSize({ width: 850, height: 900 });
     await page.locator('nav[aria-label="Primary"] [data-island-nav="work"]').click();
-    await expect(page.locator('[data-island-panel="work"]')).toBeVisible();
+    const panel = page.locator('[data-island-panel="work"]');
+    const stage = page.locator('[data-island-stage]');
+    const canvas = page.locator('[data-island-canvas]');
+    await expect(panel).toBeVisible();
+    await expect(page.locator('[data-island-root]')).not.toHaveAttribute('data-transition', /.+/);
+    const beforeScroll = await canvas.boundingBox();
     await page.locator('[data-island-card]').last().scrollIntoViewIfNeeded();
-    await expect.poll(async () => page.locator('[data-island-canvas]').evaluate(canvas => canvas.getBoundingClientRect().bottom)).toBeLessThan(-80);
-    const offscreen = await frozenFrames(page);
+    await expect.poll(() => panel.evaluate(element => element.scrollTop)).toBeGreaterThan(100);
+    await expect(canvas).toBeInViewport({ ratio: 0.95 });
+    const afterScroll = await canvas.boundingBox();
+    expect(Math.abs(afterScroll!.y - beforeScroll!.y)).toBeLessThan(1);
+    expect(Math.abs(afterScroll!.height - beforeScroll!.height)).toBeLessThan(1);
+    const reading = await metrics(page);
+    await expect.poll(async () => (await metrics(page)).frames, { timeout: 20_000 }).toBeGreaterThan(reading.frames);
+
+    // The world intentionally stays onscreen while its reading panel scrolls.
+    // Move the stage temporarily to exercise the real IntersectionObserver
+    // contract; this synthetic placement is not presented as a user scroll flow.
+    const originalTransform = await stage.evaluate((element: HTMLElement) => element.style.transform);
+    let observerFrames = 0;
+    try {
+      await stage.evaluate((element: HTMLElement) => { element.style.transform = 'translateY(-300vh)'; });
+      await expect.poll(() => canvas.evaluate(element => element.getBoundingClientRect().bottom)).toBeLessThan(-80);
+      observerFrames = (await frozenFrames(page)).frames;
+    } finally {
+      await stage.evaluate((element: HTMLElement, transform) => { element.style.transform = transform; }, originalTransform);
+    }
+    await expect.poll(async () => (await metrics(page)).frames, { timeout: 20_000 }).toBeGreaterThan(observerFrames);
     await page.locator('.island-brand').click();
     await expect(page).toHaveURL(/#home$/);
-    await expect.poll(async () => (await metrics(page)).frames, { timeout: 20_000 }).toBeGreaterThan(offscreen.frames);
+    await expect(page.locator('[data-island-root]')).toHaveAttribute('data-destination', 'home');
+    await expect(page.locator('[data-island-root]')).not.toHaveAttribute('data-transition', /.+/);
+    await expect.poll(async () => {
+      const current = await metrics(page);
+      const layout = await page.locator('[data-island-canvas]').evaluate((canvas: HTMLCanvasElement) => ({ width:canvas.clientWidth,height:canvas.clientHeight }));
+      return Math.abs(current.width-layout.width)+Math.abs(current.height-layout.height);
+    }).toBeLessThan(2);
     expect(errors).toEqual([]);
   });
 
   test('light-view switches lose old contexts and recreate one bounded scene', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
+    page.on('console', message => {
+      if (message.type() === 'error' && /THREE|shader|WebGL/i.test(message.text())) errors.push(message.text());
+    });
     // A narrow viewport exercises the explicitly opted-in low-power 3D path.
     await page.setViewportSize({ width: 600, height: 900 });
     await page.goto('/?view=3d');
@@ -149,6 +198,9 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
   test('a lost GPU context falls back and can be explicitly retried', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
+    page.on('console', message => {
+      if (message.type() === 'error' && /THREE|shader|WebGL/i.test(message.text())) errors.push(message.text());
+    });
     await page.setViewportSize({ width: 600, height: 900 });
     await page.goto('/?view=3d');
     await ready(page);

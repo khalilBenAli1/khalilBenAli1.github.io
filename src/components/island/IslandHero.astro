@@ -11,6 +11,9 @@ const placeLabels = { work: copy.hero.projectsLabel, about: copy.hero.studioLabe
 ---
 <section class="island-hero" id="home" data-island-home aria-labelledby="island-title">
   <span id="top" class="island-anchor" aria-hidden="true"></span>
+  <div class="island-place" aria-live="polite">
+    {places.map((place, index) => <p data-island-place={place}><span class="island-place__index" aria-hidden="true">{'0' + (index + 1)}</span><span>{placeLabels[place]}</span></p>)}
+  </div>
   <div class="island-hero__composition">
     <div class="island-hero__copy">
       <p class="island-eyebrow">{copy.hero.eyebrow}</p>

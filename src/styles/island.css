@@ -43,10 +43,10 @@ body.island-portfolio {
   --sky: #0923dc;
   --green: #3b6a41;
   --gradient: #0929ff;
-  --font-display: "Inter Variable", Arial, sans-serif;
+  --font-display: "Island Display", "Inter Variable", Arial, sans-serif;
   --font-body: "DM Sans", Arial, sans-serif;
   --font-mono: "DM Sans", Arial, sans-serif;
-  --font-accent: "Inter Variable", Arial, sans-serif;
+  --font-accent: "Island Display", "Inter Variable", Arial, sans-serif;
   --card-surface: #fff8f0;
   --r-card: 8px;
   --r-btn: 0;
@@ -285,8 +285,8 @@ html[lang="it"] .island-hero h1 { font-size: clamp(48px, 4.55vw, 86px); }
 .island-hotspot__number { font-weight: 600; }
 .island-hotspot--work { left: 24%; top: 11%; }
 .island-hotspot--about { left: 74%; top: 12%; }
-.island-hotspot--experience { left: 34%; top: 59%; }
-.island-hotspot--contact { left: 88%; top: 62%; }
+.island-hotspot--experience { left: 34%; top: 57%; }
+.island-hotspot--contact { left: 88%; top: 47%; }
 .island-hotspot--contact { font-size: 15px; }
 .island-hotspot--contact::before,
 .island-hotspot--contact::after { display: none; }
@@ -699,32 +699,8 @@ html[lang="it"] .island-hero h1 { font-size: clamp(48px, 4.55vw, 86px); }
   text-decoration: none;
 }
 
-/* Content destinations retain a smaller, interactive world beside semantic HTML. */
-.island-enhanced[data-destination]:not([data-destination="home"]) main {
-  display: grid;
-  grid-template-columns: minmax(260px, 0.55fr) minmax(0, 1.45fr);
-  align-items: start;
-  gap: 36px;
-}
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-nav [data-island-nav="home"] { display: inline-flex; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero { position: sticky; top: 25px; min-width: 0; padding-top: 30px; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__copy,
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-availability,
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-discover { display: none; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__composition { min-height: 0; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-world { position: relative; inset: auto; width: 100%; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-stage { height: 380px; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__footer { display: block; border: 0; padding: 0; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-world__toolbar { justify-content: center; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__resources { justify-content: center; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-hotspot { gap: 4px; padding: 5px 8px; min-height: 36px; font-size: 11px; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-hotspot::after { height: 20px; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-hotspot::before { top: calc(100% + 17px); left: calc(64% + 3px); width: 9px; height: 9px; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel { padding-top: 26px; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__header h2 { font-size: clamp(40px, 4.2vw, 64px); }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__content .project,
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__content .project--flip { grid-template-columns: 1fr; }
-.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__content .project--flip .project__diagram { order: 0; }
+/* Immersive destination layout lives in island-spatial.css. */
+
 @media (max-width: 1240px) {
   .island-header { gap: 16px; }
   .island-nav { gap: 25px; }
@@ -772,11 +748,7 @@ html[lang="it"] .island-hero h1 { font-size: clamp(48px, 4.55vw, 86px); }
   .island-control-dot { width: 36px; height: 21px; }
   .island-control-dot::after { width: 15px; height: 15px; }
   [data-island-motion][aria-pressed="false"] .island-control-dot::after { right: 18px; }
-  .island-enhanced[data-destination]:not([data-destination="home"]) main { display: block; }
-  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero { position: relative; top: auto; max-width: 480px; margin-inline: auto; padding-top: 10px; }
-  .island-enhanced[data-destination]:not([data-destination="home"]) .island-stage { height: 270px; }
-  .island-enhanced[data-destination]:not([data-destination="home"]) .island-world { margin: 0; }
-  .island-enhanced[data-destination]:not([data-destination="home"]) .island-panel { padding-top: 10px; }
+
   .island-panel__navigation { margin-bottom: 25px; }
 }
 @media (max-width: 600px) {
@@ -841,9 +813,7 @@ html[lang="it"] .island-hero h1 { font-size: clamp(48px, 4.55vw, 86px); }
   .island-contact__email { font-size: 25px; gap: 10px; }
   .island-footer { gap: 20px; margin-top: 35px; }
   .island-footer > div { width: 100%; justify-content: space-between; }
-  .island-enhanced[data-destination]:not([data-destination="home"]) .island-stage { height: 240px; }
-  .island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__header h2 { font-size: 40px; }
-  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hotspot { min-height: 44px; font-size: 10px; }
+
 }
 @media (max-width: 360px) {
   .island-app { padding-inline: 16px; }
@@ -858,4 +828,24 @@ html[lang="it"] .island-hero h1 { font-size: clamp(48px, 4.55vw, 86px); }
   .island-portfolio *,
   .island-portfolio *::before,
   .island-portfolio *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+}
+
+/* Keep touch labels outside the miniature architecture on the home view. */
+@media (max-width: 600px) {
+  .island-enhanced[data-destination="home"] .island-world { margin-bottom: 54px; }
+  .island-enhanced[data-destination="home"] .island-hotspot--experience,
+  .island-enhanced[data-destination="home"] .island-hotspot--contact {
+    top: calc(100% - 6px) !important;
+    transform: translate(-50%, 0) !important;
+  }
+  .island-enhanced[data-destination="home"] .island-hotspot--experience { left: 25% !important; }
+  .island-enhanced[data-destination="home"] .island-hotspot--contact { left: 75% !important; }
+  .island-enhanced[data-destination="home"] .island-hotspot--experience::after,
+  .island-enhanced[data-destination="home"] .island-hotspot--contact::after {
+    display: block; top: auto; bottom: 100%; height: 82px; transform: rotate(24deg); transform-origin: bottom;
+  }
+  .island-enhanced[data-destination="home"] .island-hotspot--experience::before,
+  .island-enhanced[data-destination="home"] .island-hotspot--contact::before {
+    display: block; top: auto; bottom: calc(100% + 70.4px); left: calc(64% + 29.6px);
+  }
 }

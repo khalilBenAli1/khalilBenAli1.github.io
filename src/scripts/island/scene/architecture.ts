@@ -7,9 +7,15 @@ import type { IslandMaterials } from "./materials";
 
 type Point = readonly [number, number, number];
 function footprint(points: readonly (readonly [number, number])[]) {
+  const perimeter = new THREE.CatmullRomCurve3(
+    points.map(([x, z]) => new THREE.Vector3(x, 0, z)),
+    true,
+    "centripetal",
+  );
+  const samples = perimeter.getPoints(points.length * 10);
   const s = new THREE.Shape();
-  s.moveTo(points[0][0], -points[0][1]);
-  for (let i = 1; i < points.length; i++) s.lineTo(points[i][0], -points[i][1]);
+  s.moveTo(samples[0].x, -samples[0].z);
+  for (const point of samples.slice(1)) s.lineTo(point.x, -point.z);
   s.closePath();
   return s;
 }

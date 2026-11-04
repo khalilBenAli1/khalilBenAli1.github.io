@@ -2,6 +2,8 @@
 import { homePath, locales, type Locale } from "../../lib/i18n";
 import { getIslandCopy } from "../../lib/island/copy";
 import { destinations } from "../../lib/island/types";
+import arrowUpRight from "lucide-static/icons/arrow-up-right.svg?raw";
+import "../../styles/island-motion.css";
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const copy = getIslandCopy(locale);
@@ -11,7 +13,7 @@ const copy = getIslandCopy(locale);
     <span class="island-brand__mark">KB<span>.</span></span>
   </a>
   <nav class="island-nav" aria-label="Primary">
-    {destinations.map((destination) => <a href={destination === 'home' ? '#home' : '#' + destination} data-island-nav={destination} aria-label={copy.destinations[destination]}>{destination === 'contact' ? copy.hero.talk : copy.destinations[destination]}{destination === 'contact' && <span aria-hidden="true">↗</span>}</a>)}
+    {destinations.map((destination) => <a href={destination === 'home' ? '#home' : '#' + destination} data-island-nav={destination} aria-label={copy.destinations[destination]}><span>{destination === 'contact' ? copy.hero.talk : copy.destinations[destination]}</span>{destination === 'contact' && <span class="island-talk__icon" aria-hidden="true" set:html={arrowUpRight} />}</a>)}
   </nav>
   <div class="island-header__utilities">
     <nav class="island-languages" aria-label="Language">

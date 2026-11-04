@@ -83,6 +83,8 @@ export function createLandscape(
     new THREE.MeshStandardMaterial({
       color: 0xffffff,
       roughness: 0.83,
+      emissive: 0x5e642b,
+      emissiveIntensity: 0.06,
       side: THREE.DoubleSide,
     }),
   );
@@ -280,7 +282,11 @@ export function createLandscape(
       place(
         leafInstances,
         center.clone().add(offset),
-        new THREE.Vector3(range(0.035, 0.067), range(0.105, 0.2), 0.12),
+        new THREE.Vector3(
+          range(0.035, 0.067) * (count > 200 ? 0.7 : 1),
+          range(0.105, 0.2) * (count > 200 ? 0.65 : 1),
+          0.12,
+        ),
         colorFrom(colors),
         direction,
       );
@@ -374,7 +380,7 @@ export function createLandscape(
             mature ? 0.48 : 0.32,
             mature ? 0.58 : 0.38,
           ).multiplyScalar(scale),
-          mature ? 245 : 66,
+          mature ? 520 : 66,
           oliveColors,
         );
       }
@@ -382,7 +388,7 @@ export function createLandscape(
   }
 
   olive(new THREE.Vector3(2.6, 3.1, -0.6));
-  olive(new THREE.Vector3(-4.23, 1.16, 3.07), 0.54);
+  olive(new THREE.Vector3(-5.12, 1.16, 3.48), 0.54);
 
   // Muted limestone, smoothly shaded but uneven enough to read as eroded rock.
   const rawRock = new THREE.IcosahedronGeometry(1, 3);
@@ -428,12 +434,6 @@ export function createLandscape(
     );
   }
   [
-    [-5.4, 0.12, 4.4, 0.7],
-    [-2.7, 0.1, 5.3, 0.87],
-    [-1.75, 0.05, 5.53, 0.46],
-    [3.05, 0.05, 5.8, 0.6],
-    [3.85, 0.02, 5.7, 0.43],
-    [7.7, 0.3, 3.9, 0.61],
     [7.42, 3.0, -0.1, 0.37],
     [-4.2, 1.18, 3.6, 0.28],
     [-3.8, 1.15, 3.8, 0.21],

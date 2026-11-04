@@ -1,0 +1,79 @@
+{
+  "meshCount": 53,
+  "bakedCount": 26,
+  "reflectiveCount": 4,
+  "accents": {
+    "blue": 2,
+    "citrus": 1
+  },
+  "alphaSignage": 5,
+  "naturalStone": [
+    {
+      "mesh": "Mesh_3",
+      "uv": 0,
+      "repeatY": -1,
+      "offsetY": 1,
+      "bumpScale": 0.16,
+      "roughness": 1,
+      "metalness": 0,
+      "vertexColors": false,
+      "colour": "e4d8c7",
+      "imageSize": [
+        1024,
+        1024
+      ]
+    }
+  ],
+  "cliffs": [
+    {
+      "mesh": "Mesh_0",
+      "uv": 0,
+      "repeatY": -1,
+      "offsetY": 1,
+      "bumpScale": 0.16,
+      "roughness": 1,
+      "metalness": 0,
+      "vertexColors": true,
+      "colour": "e4d8c7",
+      "colourVertices": 15948
+    }
+  ],
+  "routes": {
+    "work": 13,
+    "about": 14,
+    "experience": 7,
+    "contact": 8,
+    "terrain": 11
+  },
+  "invalidations": 1,
+  "loadAndDecodeMs": 196.40000009536743,
+  "bounds": {
+    "min": [
+      -8.879925727844238,
+      -0.8348262906074524,
+      -4.5779194831848145
+    ],
+    "max": [
+      9.364535331726074,
+      9.088000160276891,
+      6.403646945953369
+    ]
+  },
+  "retainedAllocations": 85,
+  "disposed": 85,
+  "fetchCancelled": true,
+  "decodeCancelled": true,
+  "workers": [
+    {
+      "terminated": true
+    },
+    {
+      "terminated": true
+    }
+  ],
+  "images": {
+    "created": 20,
+    "closed": 20
+  },
+  "pageErrors": []
+}

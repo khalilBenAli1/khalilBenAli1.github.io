@@ -28,6 +28,7 @@ try {
     const page = await context.newPage();
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
+    page.on("console", message => { if (message.type() === "error") errors.push(message.text()); });
     await page.goto(`${base}/?view=3d`, { waitUntil: "networkidle" });
     await page.waitForFunction(
       () =>
@@ -37,6 +38,10 @@ try {
       { timeout: 120000 },
     );
     await page.evaluate(() => document.fonts.ready);
+    await page.waitForFunction(() => {
+      const value=document.querySelector('[data-island-root]')?.getAttribute('data-island-metrics');
+      return value && JSON.parse(value).bakedArchitecture === true;
+    }, {}, {timeout:120000});
     const data = await page.evaluate(
       () =>
         new Promise((resolve) => {
@@ -71,7 +76,6 @@ try {
       png,
       delivery,
     ]);
-    await page.locator("[data-island-motion]").click();
     await page.screenshot({
       path: resolve(directory, `${name}-current.png`),
       fullPage: name === "mobile",

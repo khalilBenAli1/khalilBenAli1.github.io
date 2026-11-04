@@ -54,6 +54,12 @@ export interface IslandPreferences {
   readonly motion: MotionPreference;
 }
 
+export interface IslandExhibitSelection {
+  readonly id: string;
+  readonly src: string;
+  readonly label: string;
+}
+
 export interface ScreenAsset {
   readonly src: string;
   readonly label: string;
@@ -81,8 +87,15 @@ export interface SceneMetrics {
   readonly width: number;
   readonly height: number;
   readonly quality: SceneQuality;
+  readonly bakedArchitecture?: boolean;
   readonly startupMs: number;
+  readonly enhancedReadyMs?: number;
   readonly renderCpuMs: number;
+  readonly cameraZoom?: number;
+  readonly cameraMoving?: boolean;
+  readonly exhibitId?: string | null;
+  readonly activeMilestone?: number | null;
+  readonly studioPortraitReady?: boolean;
 }
 export interface IslandSceneOptions {
   readonly canvas: HTMLCanvasElement;
@@ -92,14 +105,22 @@ export interface IslandSceneOptions {
   readonly motion: boolean;
   readonly signal: AbortSignal;
   readonly onActivate: (destination: WorldDestination) => void;
+  readonly onHover?: (destination: WorldDestination | null) => void;
   readonly onHotspots?: (points: readonly ProjectedHotspot[]) => void;
   readonly onStatus?: (status: SceneStatus) => void;
 }
 export interface IslandSceneHandle {
   setDestination(destination: Destination, instant?: boolean): void;
   setMotion(enabled: boolean): void;
+  setProject(
+    selection: IslandExhibitSelection | null,
+    instant?: boolean,
+    focus?: boolean,
+  ): void;
+  setMilestone(index: number | null, focus?: boolean): void;
   setFocus(destination: WorldDestination | null): void;
   resize(): void;
+  renderFrame?(): void;
   getMetrics(): SceneMetrics;
   dispose(): void;
 }

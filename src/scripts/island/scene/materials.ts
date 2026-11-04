@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { SceneResources } from "./resources";
 
-/** Original, deterministic mineral maps. No remote texture or runtime request. */
+/** Original local mineral maps; every texture shares the scene lifetime. */
 export function createMaterials(
   resources: SceneResources,
   invalidate: () => void,
@@ -14,6 +14,17 @@ export function createMaterials(
   stoneMap.colorSpace = THREE.SRGBColorSpace;
   stoneMap.wrapS = stoneMap.wrapT = THREE.RepeatWrapping;
   stoneMap.anisotropy = 8;
+  const rockMap = resources.own(
+    new THREE.TextureLoader().load(
+      "/island/materials/coastal-limestone.webp",
+      () => {
+        if (!resources.disposed) invalidate();
+      },
+    ),
+  );
+  rockMap.colorSpace = THREE.SRGBColorSpace;
+  rockMap.wrapS = rockMap.wrapT = THREE.RepeatWrapping;
+  rockMap.anisotropy = 8;
   const mat = (p: THREE.MeshStandardMaterialParameters) =>
     resources.own(new THREE.MeshStandardMaterial(p));
   const stone = mat({
@@ -24,10 +35,10 @@ export function createMaterials(
     roughness: 0.78,
   });
   const rock = mat({
-    color: 0xd6c5ad,
-    map: stoneMap,
-    bumpMap: stoneMap,
-    bumpScale: 0.2,
+    color: 0xe4d8c7,
+    map: rockMap,
+    bumpMap: rockMap,
+    bumpScale: 0.16,
     roughness: 1,
     vertexColors: true,
   });
