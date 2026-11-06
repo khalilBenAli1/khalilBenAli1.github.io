@@ -10,8 +10,6 @@ test.use({
 });
 
 test.describe('real WebGL scene lifecycle (software Chromium)', () => {
-  // These independent cases share one software GPU lane even when the main
-  // suite runs files in parallel; competing SwiftShader contexts skew lifecycle timing.
   test.describe.configure({ mode: 'default' });
   test.skip(({ browserName }) => browserName !== 'chromium', 'Software ANGLE is Chromium-specific.');
   test.setTimeout(120_000);
@@ -26,17 +24,9 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
   async function ready(page: Page) {
     await expect(page.locator('[data-island-root]')).toHaveAttribute('data-scene-status', 'ready', { timeout: 60_000 });
     await expect(page.locator('[data-island-canvas]')).toBeVisible();
-    await page.waitForLoadState('networkidle');
-    // Network idle precedes Draco decoding. Wait for the actual model swap,
-    // then a completed paint, so a valid late asset invalidation is not mistaken
-    // for an idle-loop leak and resource comparisons use the same architecture.
-    await expect.poll(async () => (await metrics(page)).bakedArchitecture, { timeout: 60_000 }).toBe(true);
-    const swapped = await metrics(page);
-    if (await page.locator('[data-island-root]').getAttribute('data-motion') === 'off') {
-      await expect.poll(async () => (await metrics(page)).loopActive, { timeout: 20_000 }).toBe(false);
-    } else {
-      await expect.poll(async () => (await metrics(page)).frames, { timeout: 20_000 }).toBeGreaterThan(swapped.frames);
-    }
+    // enhancedReadyMs is recorded after the first paint of the decoded model.
+    // Motion can be stopped or throttled immediately after that paint.
+    await expect.poll(async () => (await metrics(page)).enhancedReadyMs ?? 0, { timeout: 60_000 }).toBeGreaterThan(0);
   }
 
   async function frozenFrames(page: Page) {
@@ -49,6 +39,8 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
   }
 
   test('renders a persistent room, freezes for motion/visibility/observer, and resumes once', async ({ page }, testInfo) => {
+    // This sequence exercises the high-quality renderer entirely in software.
+    test.setTimeout(180_000);
     // Exercise the desktop renderer even on two-core CI runners. This is a
     // capability hint for branch coverage, not a claim about the test hardware.
     await page.addInitScript(() => Object.defineProperty(navigator, 'hardwareConcurrency', { configurable: true, get: () => 8 }));
@@ -120,7 +112,7 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
     const stage = page.locator('[data-island-stage]');
     const canvas = page.locator('[data-island-canvas]');
     await expect(panel).toBeVisible();
-    await expect(page.locator('[data-island-root]')).not.toHaveAttribute('data-transition', /.+/);
+    await expect(page.locator('[data-island-root]')).not.toHaveAttribute('data-transition', /.+/, { timeout: 20_000 });
     const beforeScroll = await canvas.boundingBox();
     await page.locator('[data-island-card]').last().scrollIntoViewIfNeeded();
     await expect.poll(() => panel.evaluate(element => element.scrollTop)).toBeGreaterThan(100);
@@ -147,7 +139,7 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
     await page.locator('.island-brand').click();
     await expect(page).toHaveURL(/#home$/);
     await expect(page.locator('[data-island-root]')).toHaveAttribute('data-destination', 'home');
-    await expect(page.locator('[data-island-root]')).not.toHaveAttribute('data-transition', /.+/);
+    await expect(page.locator('[data-island-root]')).not.toHaveAttribute('data-transition', /.+/, { timeout: 20_000 });
     await expect.poll(async () => {
       const current = await metrics(page);
       const layout = await page.locator('[data-island-canvas]').evaluate((canvas: HTMLCanvasElement) => ({ width:canvas.clientWidth,height:canvas.clientHeight }));

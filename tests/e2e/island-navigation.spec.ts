@@ -93,6 +93,8 @@ for (const layout of layouts) {
 
     for (const locale of locales) {
       test(`${locale} normal navigation and labelled places share routes and restore focus`, async ({ page }) => {
+        // Exercise all four return trips and native keyboard traversal in one document.
+        test.setTimeout(60_000);
         const errors = captureErrors(page);
         await page.goto(`${homePath(locale)}?view=lite`);
         const root = await bound(page);

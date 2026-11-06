@@ -435,8 +435,8 @@ export function createLandscape(
   }
   [
     [7.42, 3.0, -0.1, 0.37],
-    [-4.2, 1.18, 3.6, 0.28],
-    [-3.8, 1.15, 3.8, 0.21],
+    [-5.02, 1.18, 3.55, 0.28],
+    [-4.78, 1.15, 3.83, 0.21],
   ].forEach(([x, y, z, scale]) => boulder(x, y, z, scale));
 
   function shrub(
@@ -584,8 +584,9 @@ export function createLandscape(
     [2.9, 3.1, -1.68, 0.35, 0.41],
     [8.05, 3.12, -0.25, 0.45, 0.47],
     [6.45, 3.1, -0.3, 0.3, 0.35],
-    [-4.3, 1.17, 3.75, 0.45, 0.43],
-    [-3.65, 1.16, 4.15, 0.32, 0.38],
+    // Keep the foreground bed to the left of the first timeline inscription.
+    [-5.14, 1.17, 3.34, 0.33, 0.38],
+    [-5.03, 1.16, 3.92, 0.25, 0.3],
     [2.18, 1.2, 2.35, 0.35, 0.38],
     [2.55, 1.2, 2.55, 0.32, 0.5],
     [7.25, 1.2, 4.57, 0.43, 0.4],
@@ -595,7 +596,7 @@ export function createLandscape(
     [3.65, 3.12, -0.15, 0.38, 0.47],
     [2.5, 3.13, 0.55, 0.46, 0.49],
     [6.15, 1.2, 4.7, 0.43, 0.45],
-    [-3.95, 1.19, 3.5, 0.4, 0.53],
+    [-5.22, 1.19, 2.88, 0.28, 0.4],
   ];
   beds.forEach(([x, y, z, radius, height], index) => {
     shrub(x, y, z, radius, height);
@@ -609,12 +610,12 @@ export function createLandscape(
     );
   });
   flowers(2.35, 1.2, 2.05, 0.48, false);
-  flowers(-4.05, 1.18, 3.95, 0.36, false);
+  flowers(-5.15, 1.18, 3.63, 0.28, false);
   flowers(3.45, 3.11, 0.42, 0.28, false);
   shrub(-7.12, 3.69, 0.31, 0.29, 0.92);
   flowers(1.65, 3.16, 0.63, 0.36, true);
   flowers(3.16, 3.2, 0.57, 0.38, true);
-  flowers(-4.65, 1.2, 3.7, 0.32, false);
+  flowers(-5.26, 1.2, 3.14, 0.26, false);
   flowers(2.9, 1.2, 2.15, 0.36, false);
 
   function cascade(
@@ -656,7 +657,7 @@ export function createLandscape(
   cascade(-7.12, 6.75, 0.17, 1.28, 1.85, -0.5);
   cascade(8.36, 3.13, -0.1, 0.55, 1.6);
   cascade(6.6, 1.21, 4.91, 1.55, 1.19);
-  cascade(-4.23, 1.17, 4.23, 0.85, 1.04);
+  cascade(-4.94, 1.17, 4.18, 0.54, 1.04);
 
   if (barkParts.length) {
     const merged = mergeGeometries(barkParts);

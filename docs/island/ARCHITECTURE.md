@@ -57,7 +57,7 @@ The renderer classifies late-loaded objects on every frame:
 
 The high-quality path applies contact occlusion and tone mapping to physical color, then composites literal color with depth preserved. Native multisampling needs a geometry depth prepass: copying one depth sample into an antialiased framebuffer had rejected half the samples on angled screens. Non-antialiased contexts use the cheaper depth copy. Glass and transparent text render together in depth order. The low-quality path renders all four layers directly.
 
-High quality also captures one 128-pixel cube reflection probe from the modeled world after the baked architecture arrives. Polished floors, glass and metal use that environment; the low-quality path retains the existing environment. This is a local reflection approximation, not continuous global illumination.
+High quality captures a 128-pixel cube reflection probe for glass and metal. The polished gallery floor also samples a 512-pixel planar reflection from a mirrored orthographic camera. It blends the reflected furniture and displays into the stone on the upper terrace. The floor reuses its capture during camera travel and refreshes it once on arrival or when the exhibit changes. Low quality uses its environment map.
 
 ## Assets and verification
 
@@ -70,8 +70,8 @@ node scripts/capture-island.mjs http://127.0.0.1:4196
 node scripts/capture-spatial.mjs http://127.0.0.1:4196
 ```
 
-These authoring commands use existing Playwright plus Python/Pillow, wait for the baked architecture, capture the WebGL framebuffer, and encode WebP fallbacks. Run them sequentially against a stable build, without another software-rendered suite competing for the GPU process. Their metrics identify SwiftShader explicitly. CPU submission time and submitted-triangle counts are not hardware GPU frame-rate measurements.
+These authoring commands use Playwright and Pillow. They wait for the baked architecture, capture the WebGL framebuffer and encode WebP fallbacks. They default to SwiftShader. On a supported Mac, pass `metal` after the URL to capture on the GPU. Each result records the renderer reported by WebGL. CPU timing measures submission time.
 
-The spatial command captures each settled room at desktop and mobile sizes, waiting for the studio portrait in About. It writes room posters under `public/island/rooms/`, comparison images under `docs/island/qa/`, and `spatial-capture.json`. Add verified poster paths to `destinationPosters` in `src/lib/island/posters.ts` after reviewing those outputs, then rebuild. Missing room entries deliberately fall back to the same-scene Home poster; the capture command does not populate that mapping or establish visual acceptance by itself.
+The spatial command captures each settled room at desktop and mobile sizes and waits for the studio portrait in About. All eight room views are mapped in `src/lib/island/posters.ts`. Their files live under `public/island/rooms/`. The comparison images and capture hashes live in `docs/island/qa/`. Regenerate both Home and room captures after changing a camera, material or layout and rebuild to include the updated fallbacks.
 
 Repository checks are `npm run astro -- check`, `npm run build` and `npm run test:e2e`. No separate lint command is configured. The immutable preservation fixture must not be regenerated to silence failures. The color-pipeline probe checks literal pixel consistency; real WebGL lifecycle tests use Chromium SwiftShader, while the ordinary suite covers Chromium and WebKit HTML interactions. Current integrated and visual acceptance status belongs in `design-qa.md` and the latest test evidence, not in this architecture description.

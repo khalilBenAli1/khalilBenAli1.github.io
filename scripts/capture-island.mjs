@@ -1,5 +1,5 @@
-import { chromium } from "playwright";
-import { mkdir, writeFile } from "node:fs/promises";
+import { launchCaptureBrowser } from "./capture-browser.mjs";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
@@ -7,15 +7,9 @@ import { execFileSync } from "node:child_process";
 const base = process.argv[2] || "http://127.0.0.1:4196";
 const directory = resolve("docs/island/qa");
 await mkdir(directory, { recursive: true });
-const browser = await chromium.launch({
-  headless: true,
-  args: [
-    "--use-gl=angle",
-    "--use-angle=swiftshader",
-    "--enable-unsafe-swiftshader",
-  ],
-});
+const browser = await launchCaptureBrowser(process.argv[3]);
 const results = [];
+const posters = [];
 try {
   for (const [name, width, height] of [
     ["desktop", 1584, 992],
@@ -80,13 +74,23 @@ try {
       path: resolve(directory, `${name}-current.png`),
       fullPage: name === "mobile",
     });
+    if (errors.length) throw new Error(errors.join("\n"));
+    const poster = `public/island/island-${name}.webp`;
+    const deliveryBytes = await readFile(delivery);
+    posters.push({
+      name, delivery: poster, size: [bytes.readUInt32BE(16), bytes.readUInt32BE(20)],
+      bytes: deliveryBytes.length,
+      sha256: createHash("sha256").update(deliveryBytes).digest("hex"),
+      renderer: data.renderer, metrics: data.metrics,
+      method: "Captured live WebGL framebuffer with transparent background and baked architecture.",
+    });
     results.push({
       name,
       viewport: [width, height],
       renderer: data.renderer,
       metrics: data.metrics,
       errors,
-      poster: `public/island/island-${name}.webp`,
+      poster,
       sourceSha256: createHash("sha256").update(bytes).digest("hex"),
     });
     await context.close();
@@ -95,6 +99,7 @@ try {
     resolve(directory, "capture-metrics.json"),
     JSON.stringify(results, null, 2),
   );
+  await writeFile(resolve("docs/island/SCENE_POSTERS.json"), JSON.stringify({ posters }, null, 2) + "\n");
   console.log(JSON.stringify(results, null, 2));
 } finally {
   await browser.close();

@@ -1,5 +1,5 @@
 /** Capture real room poses for the lightweight experience and visual QA. */
-import { chromium } from "playwright";
+import { launchCaptureBrowser } from "./capture-browser.mjs";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { execFileSync } from "node:child_process";
@@ -10,14 +10,7 @@ const output = resolve("docs/island/qa");
 const rooms = resolve("public/island/rooms");
 await mkdir(output, { recursive: true });
 await mkdir(rooms, { recursive: true });
-const browser = await chromium.launch({
-  headless: true,
-  args: [
-    "--use-gl=angle",
-    "--use-angle=swiftshader",
-    "--enable-unsafe-swiftshader",
-  ],
-});
+const browser = await launchCaptureBrowser(process.argv[3]);
 const evidence = [];
 try {
   for (const [device, width, height] of [
@@ -75,10 +68,12 @@ try {
               () => {
                 const root = document.querySelector("[data-island-root]");
                 root.dispatchEvent(new Event("island:inspect"));
+                const canvas = document.querySelector("[data-island-canvas]");
+                const gl = canvas.getContext("webgl2");
+                const info = gl.getExtension("WEBGL_debug_renderer_info");
                 resolve({
-                  png: document
-                    .querySelector("[data-island-canvas]")
-                    .toDataURL("image/png"),
+                  png: canvas.toDataURL("image/png"),
+                  renderer: gl.getParameter(info?.UNMASKED_RENDERER_WEBGL ?? gl.RENDERER),
                   metrics: JSON.parse(root.getAttribute("data-island-metrics")),
                 });
               },
@@ -86,20 +81,18 @@ try {
             );
           }),
       );
-      const png = resolve(output, `room-${destination}-${device}.png`);
-      await writeFile(png, Buffer.from(frame.png.split(",")[1], "base64"));
       const webp = resolve(rooms, `${destination}-${device}.webp`);
       execFileSync("python3", [
         "-c",
-        "from PIL import Image; import sys; Image.open(sys.argv[1]).save(sys.argv[2],quality=90,method=6)",
-        png,
+        "from PIL import Image; import io,sys; Image.open(io.BytesIO(sys.stdin.buffer.read())).save(sys.argv[1],quality=90,method=6)",
         webp,
-      ]);
+      ], { input: Buffer.from(frame.png.split(",")[1], "base64") });
       const bytes = await readFile(webp);
       await page.screenshot({
         path: resolve(output, `spatial-${destination}-${device}.png`),
         fullPage: false,
       });
+      if (errors.length) throw new Error(errors.join("\n"));
       evidence.push({
         destination,
         device,
@@ -109,8 +102,7 @@ try {
         sha256: createHash("sha256").update(bytes).digest("hex"),
         metrics: frame.metrics,
         errors: [...errors],
-        renderer:
-          "Chromium ANGLE SwiftShader; software-rendered evidence, not hardware FPS",
+        renderer: frame.renderer,
       });
     }
     await context.close();

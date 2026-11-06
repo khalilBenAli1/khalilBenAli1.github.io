@@ -93,6 +93,7 @@ export interface SceneMetrics {
   readonly renderCpuMs: number;
   readonly cameraZoom?: number;
   readonly cameraMoving?: boolean;
+  readonly terraceReflectionCaptures?: number;
   readonly exhibitId?: string | null;
   readonly activeMilestone?: number | null;
   readonly studioPortraitReady?: boolean;

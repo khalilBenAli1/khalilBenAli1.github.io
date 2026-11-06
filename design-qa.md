@@ -1,28 +1,23 @@
-# Reference implementation visual QA
+# Architectural portfolio visual review
 
-Source: `/Users/khalilbenali/.codex/generated_images/01a19f14-aef5-7631-a46a-2a3c7576fec3/exec-dc979881-f5eb-44a1-908e-5139d146973d.png`.
-Desktop evidence: `docs/island/qa/desktop-01.jpg` through `desktop-06.jpg`; current full-page capture in `desktop-current.png`. Mobile evidence: `mobile-current.png`.
-Viewport: desktop1584×992 CSS px, DPR1; mobile390×844 CSS px, DPR1. Original reference1584×992. Desktop captures use equal pixel dimensions and were opened together with the original for comparisons. State: home, explicit3D. Captures marked current are reproducible software-rendered snapshots and may precede the newest geometric iteration.
+The desktop comparison uses a 1584 × 992 production capture, matching the supplied reference. The mobile view uses 390 × 844. All ten comparison views came from Chromium on an Apple M1. The room captures wait for the camera to settle and for the studio portrait to load. The capture logs record the renderer, camera measurements and browser errors.
 
-## Comparison history
+- [Desktop Home](docs/island/qa/desktop-current.png)
+- [Mobile Home](docs/island/qa/mobile-current.png)
+- [Desktop gallery](docs/island/qa/spatial-work-desktop.png)
+- [Mobile studio](docs/island/qa/spatial-about-mobile.png)
+- [Desktop timeline](docs/island/qa/spatial-experience-desktop.png)
+- [Mobile contact pavilion](docs/island/qa/spatial-contact-mobile.png)
+- [Measurements for all eight room views](docs/island/qa/spatial-capture.json)
 
-1. Initial detailed world:56/100. Layout recognizable; thin fallback font, gray poster rectangle, underscaled world, pale striped materials and inadequate canopy.
-2. Generated travertine texture, richer plants, corrected background and larger world:68/100. Rock facets, insufficient depth and typography remained.
-3. Contact occlusion and actual public font delivery corrected. Internal score74; contact elevation, timeline overlap and studio depth remained.
-4. Adjusted contact terrace, warm material tint and interior detail. Internal score80 was subsequently judged too optimistic.
-5. Independent review of `desktop-05.jpg`:68/100, revise. The scene still read as a stylized model. Priority findings: physical light/surface realism, studio elevation and height, repeated rounded rock ring, overly wide canopy, timeline/plant intersections.
-6. `desktop-06.jpg`: studio raised and shortened, tree narrowed/twisted, rock ring replaced largely by continuous fractured faces, timeline text brought forward and contact planting cleared. Internal74/100; lighting and staircase alignment remained. A diagonal stair refinement followed. A portable Blender proof is being tested before further acceptance.
+## Findings
 
-## Required fidelity surfaces
+The independent comparison rated Home 90/100 and the eight desktop and mobile room layouts 92/100. These are visual judgments. The gallery floor now reflects the blue seat, chrome stool and screens in their actual positions. The pendant and warm back wall make the furnished studio legible through its windows. Each destination keeps its own part of the island visible beside or above the reading panel. After the last planting adjustment, the reviewer confirmed that “2019–2022”, “Tynass IT” and “Developer” are visible on desktop and mobile. A small dark patch remains on the tread beneath the first light.
 
-- Fonts/typography: licensed Inter900 now loads correctly from public assets; heavier second/third headline lines better match the source. Companion DM Sans remains readable. French/Italian and mobile wrapping retain their own fit.
-- Spacing/layout: header, left editorial column, dominant world and thin footer now follow the reference. Studio/camera/stair proportions remain under refinement.
-- Colors/tokens: ivory, black, electric blue and concentrated yellow are established. Runtime mineral light is still less natural than the reference.
-- Image quality/assets: real project screenshots and original interactive geometry are used. Source image is not shipped as a background. Surface depth/reflection and geological realism remain acceptance blockers.
-- Copy/content: fictional reference screens and career dates are deliberately replaced with verified existing project/career content. All original translations/downloads remain protected by immutable tests.
+The implemented gallery shows more roof and less shaded soffit than the reference. Rock fractures and olive branches have more regular shapes. Water is brighter and its ripples are more uniform. Real portfolio screenshots and career dates replace the fictional examples in the reference.
 
-Focused review covered architecture, vegetation, stone, timeline lettering and furniture at full screenshot resolution. No page errors occurred in capture tooling. Functional tests are separate: preservation/navigation/gallery cases passed in Chromium and WebKit; all three real WebGL lifecycle cases passed in Chromium SwiftShader. Software timing is recorded explicitly in runtime.json and is not hardware FPS evidence.
+## Iterations and verification
 
-Next: integrate and compare the physical-lighting proof, regenerate final same-scene posters, capture stable desktop/mobile output, repeat independent visual review, and run final checks before publishing.
+The first review scored the composition 56/100. Correcting the typeface, terrace levels, gallery opening, geology, stone texture and sunlight brought the model closer. The 86/100 review isolated the two final material issues in the courtyard and studio. The final review used the production render with the local reflection and interior light applied.
 
-final result: blocked
+The runtime tests exercise room changes, project displays, milestone selection, history, keyboard focus, reduced motion, WebGL failure, offscreen pausing and resource disposal. Software-rendered test timings are recorded separately from the Apple GPU captures. See [integration checks](docs/island/qa/integration-run.json), [Home capture measurements](docs/island/qa/capture-metrics.json) and [poster provenance](docs/island/SCENE_POSTERS.json).

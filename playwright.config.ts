@@ -12,7 +12,9 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    // Lifecycle and spatial tests share the host's software GPU. Keep them in
+    // one Chromium worker while independent WebKit tests can run alongside.
+    { name: 'chromium', workers: 1, use: { ...devices['Desktop Chrome'] } },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
   ],
   webServer: {

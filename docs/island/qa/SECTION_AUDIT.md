@@ -28,6 +28,6 @@ The sticky Home/Close controls, ordinary header links and view/motion controls r
 
 The implementation details above were checked against the current source. `spatial-about-desktop.jpg` and `spatial-gallery-desktop.jpg` are intermediate live-browser evidence, not final acceptance captures.
 
-Fresh settled desktop/mobile room captures, the corresponding lightweight poster mapping, and the integrated spatial/lifecycle test results remain required before integrated visual acceptance. `scripts/capture-spatial.mjs` produces those captures and poster assets, but does not itself approve their appearance. The final comparison and release decision belong in the root `design-qa.md` with the actual test evidence.
+The final desktop and mobile room captures are the eight `spatial-*.png` files. Each room also supplies a lightweight WebP from the same camera. Read capture sizes, hashes and camera measurements in [spatial-capture.json](spatial-capture.json), and the original interaction checks in [integration-run.json](integration-run.json). The design comparison is recorded in [design-qa.md](../../../design-qa.md).
 
 Automated verification must separately cover content preservation, direct URLs, history, keyboard/focus restoration, rapid camera retargeting, motion preferences, selected display/milestone reset, and resource disposal. A visually successful screenshot does not prove those behaviors, and passing them does not establish reference fidelity.

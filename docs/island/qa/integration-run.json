@@ -1,0 +1,146 @@
+{
+  "scope": "Persistent 3D rooms, live content selection and renderer lifecycle",
+  "date": "2026-11-04",
+  "timezone": "Europe/Rome",
+  "runs": [
+    {
+      "buildLocal": "2026-11-04 01:25:10",
+      "command": "npm run test:e2e -- --project=chromium tests/e2e/island-scene.spec.ts tests/e2e/island-spatial.spec.ts --workers=1 --reporter=list,json",
+      "startTimeUtc": "2026-11-04T00:25:19.283Z",
+      "durationMs": 332058.162,
+      "results": [
+        {
+          "name": "renders a persistent room, freezes for motion/visibility/observer, and resumes once",
+          "project": "chromium",
+          "status": "passed",
+          "durationMs": 110435
+        },
+        {
+          "name": "light-view switches lose old contexts and recreate one bounded scene",
+          "project": "chromium",
+          "status": "passed",
+          "durationMs": 59532
+        },
+        {
+          "name": "a lost GPU context falls back and can be explicitly retried",
+          "project": "chromium",
+          "status": "passed",
+          "durationMs": 36270
+        },
+        {
+          "name": "rooms keep one canvas; project details and sector previews drive its exhibit",
+          "project": "chromium",
+          "status": "passed",
+          "durationMs": 45139
+        },
+        {
+          "name": "milestone preview, selection and reset stay aligned with keyboard/ARIA state",
+          "project": "chromium",
+          "status": "passed",
+          "durationMs": 30246
+        },
+        {
+          "name": "direct project refresh and browser history restore the live display and close camera pose",
+          "project": "chromium",
+          "status": "passed",
+          "durationMs": 36160
+        },
+        {
+          "name": "lite rooms retain readable controls and use available captured room posters without WebGL",
+          "project": "chromium",
+          "status": "failed",
+          "durationMs": 10277
+        }
+      ],
+      "interpretation": "All six real-WebGL cases passed. The lite-room case failed only on a test expectation that incorrectly used the email address as the accessible name; the existing localized name is Email me. Its assertion was corrected to the source dictionary."
+    },
+    {
+      "buildLocal": "2026-11-04 01:25:10",
+      "command": "npm run test:e2e -- --project=chromium tests/e2e/island-spatial.spec.ts --workers=1 --grep lite rooms",
+      "passed": 1,
+      "durationSeconds": 7.9,
+      "interpretation": "The corrected lite-room case passed against the same build."
+    },
+    {
+      "buildLocal": "2026-11-04 01:32:56",
+      "command": "npm run test:e2e -- tests/e2e/island-motion.spec.ts --reporter=list",
+      "projects": [
+        "chromium",
+        "webkit"
+      ],
+      "passed": 14,
+      "durationSeconds": 22.7,
+      "interpretation": "Motion preference, native-snapshot watchdog, live-3D snapshot bypass, interruption, URL/history and focus regressions all passed. These are presentation-routing tests using lite mode; the real-WebGL evidence is in the first run."
+    },
+    {
+      "buildLocal": "2026-11-04 01:32:56",
+      "command": "npm run test:e2e -- --project=chromium tests/e2e/island-spatial.spec.ts --workers=1 --grep lite rooms --reporter=list,json",
+      "startTimeUtc": "2026-11-04T00:34:46.967Z",
+      "durationMs": 9248.592,
+      "results": [
+        {
+          "name": "lite rooms retain readable controls and use available captured room posters without WebGL",
+          "project": "chromium",
+          "status": "passed",
+          "durationMs": 6624
+        }
+      ],
+      "interpretation": "Corrected lite-room fallback also passed against the refreshed controller build; no WebGL context was requested."
+    }
+  ],
+  "realWebGLMetrics": {
+    "renderer": {
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+      "vendor": "Google Inc. (Google)"
+    },
+    "initial": {
+      "status": "ready",
+      "frames": 7,
+      "schedulerStarts": 1,
+      "loopActive": true,
+      "drawCalls": 208,
+      "triangles": 1350685,
+      "textures": 28,
+      "geometries": 63,
+      "pixelRatio": 1,
+      "width": 850,
+      "height": 570,
+      "quality": "high",
+      "bakedArchitecture": true,
+      "startupMs": 9386.5,
+      "enhancedReadyMs": 23513,
+      "renderCpuMs": 1.5,
+      "cameraZoom": 1,
+      "cameraMoving": false,
+      "studioPortraitReady": false,
+      "exhibitId": null,
+      "activeMilestone": null
+    },
+    "cadence": {
+      "submissions": 0,
+      "elapsedMs": 2002.7000000476837,
+      "submissionsPerSecond": 0
+    },
+    "note": "Software rendering; logical-core hint fixed at 8 to exercise high quality on CI. renderCpuMs measures CPU submission, and cadence counts scene submissions; neither is a hardware GPU FPS claim. startupMs covers the first procedural frame; baked-asset readiness is verified separately."
+  },
+  "verifiedBehaviors": [
+    "One canvas persists across Work, About, Experience and Contact, with room camera zoom greater than Home.",
+    "Sora project details update the live exhibit and use a closer camera pose; gallery return restores the room pose.",
+    "Beauty-sector preview updates the display without entering a project detail pose; All resets it.",
+    "Career milestone hover, keyboard selection, mouse reset and ARIA selected state remain aligned.",
+    "Direct project refresh and browser history restore both the live display and camera pose.",
+    "Native panel scrolling preserves the visible world; document visibility and a controlled offscreen stage placement pause/resume rendering.",
+    "Light/3D view cycles detach old canvases and lose old contexts with bounded replacement resources; GPU-loss recovery works.",
+    "All lite rooms retain readable content, current-place controls and a loaded poster without WebGL."
+  ],
+  "limitations": [
+    "GPU measurements use ANGLE SwiftShader. CPU submission time and the short submission-cadence sample are not hardware FPS.",
+    "The first-frame and enhanced-frame timings are distinct; enhancedReadyMs includes asynchronous baked architecture and reflection setup.",
+    "Offscreen IntersectionObserver coverage uses an explicitly synthetic stage transform because normal room-panel scrolling intentionally keeps the scene visible.",
+    "Room-specific fallback poster metadata was still empty in these runs; the existing whole-island fallback was validated. The same test will verify room-specific paths when captures populate the pose map."
+  ],
+  "pendingFinalSuite": [
+    "The added mixed keyboard/pointer milestone assertion (focus 3, hover 2, leave and restore preview 3) was added after the worker loaded the initial spatial test body. The corresponding controller fix is in the 01:32 build; final real-WebGL suite must verify this additional assertion.",
+    "Final visual material integration and captured room posters were not part of this functional validation build. Rerun the final suite after their integration."
+  ]
+}

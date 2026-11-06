@@ -11,6 +11,7 @@ import type {
   WorldDestination,
 } from "../../../lib/island/types";
 import { createRendering } from "./rendering";
+import { createTerraceReflection } from "./terrace-reflection";
 import { IslandCamera } from "./camera";
 import { SceneResources } from "./resources";
 import { createWorld, type IslandWorld } from "./world";
@@ -184,6 +185,7 @@ export async function createIslandScene(
   let reflectionMaterials = new WeakSet<THREE.Material>();
   let reflectionEnvironment = scene.environment;
   let reflectionCaptured = false;
+  let terraceReflection: ReturnType<typeof createTerraceReflection> | undefined;
   let enhancedReadyMs = 0;
 
   function canRender(): boolean {
@@ -305,6 +307,14 @@ export async function createIslandScene(
         }
       });
     const before = performance.now();
+    if (options.quality === "high" && world.root.userData.bakedArchitecture) {
+      if (terraceReflection === undefined) {
+        terraceReflection = createTerraceReflection(
+          renderer, scene, camera.camera, world.root, resources,
+        );
+      }
+      terraceReflection?.update(camera.active);
+    }
     rendering.render();
     world.releaseReplacedResources();
     if (!enhancedReadyMs && world.root.userData.bakedArchitecture)
@@ -603,6 +613,7 @@ export async function createIslandScene(
         renderCpuMs,
         cameraZoom: camera.camera.zoom,
         cameraMoving: camera.active,
+        terraceReflectionCaptures: terraceReflection?.captures ?? 0,
         studioPortraitReady: Boolean(world.root.userData.studioPortraitReady),
         exhibitId:
           typeof world.root.userData.exhibitId === "string"

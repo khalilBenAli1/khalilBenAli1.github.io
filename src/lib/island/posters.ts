@@ -9,10 +9,17 @@ export const islandPosters: {
   mobile: "/island/island-mobile.webp",
 };
 
-/** Filled from actual room-camera captures; missing poses safely use the island. */
-export const destinationPosters: Partial<
-  Record<
-    WorldDestination,
-    { readonly desktop: string; readonly mobile: string }
-  >
-> = {};
+/** Each pair is captured from the same room camera as the live scene. */
+function roomPosters(room: WorldDestination) {
+  return {
+    desktop: `/island/rooms/${room}-desktop.webp`,
+    mobile: `/island/rooms/${room}-mobile.webp`,
+  };
+}
+
+export const destinationPosters = {
+  work: roomPosters("work"),
+  about: roomPosters("about"),
+  experience: roomPosters("experience"),
+  contact: roomPosters("contact"),
+} satisfies Record<WorldDestination, ReturnType<typeof roomPosters>>;
