@@ -1,0 +1,128 @@
+{
+  "bytes": 1286900,
+  "sha256": "0308d8ddd9eb3a17eb342a97e301ee07909e99422b2bf065075862ef3347e6fe",
+  "bounds": {
+    "min": [
+      -8.024999856948853,
+      3.0749999042600393,
+      -2.0170000140666957
+    ],
+    "max": [
+      1.624999761581421,
+      6.7749998569488525,
+      1.0343999367713934
+    ]
+  },
+  "meshes": 13,
+  "images": 4,
+  "materials": [
+    {
+      "name": "Gallery baked diffuse \u2014 no runtime double lighting",
+      "emissiveFactor": [
+        1,
+        1,
+        1
+      ],
+      "emissiveTexture": {
+        "index": 0,
+        "texCoord": 1
+      },
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "Material_12",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.020288562402129173,
+          0.020288562402129173,
+          0.01599629409611225,
+          1
+        ],
+        "metallicFactor": 0.6499999761581421,
+        "roughnessFactor": 0.30000001192092896
+      }
+    },
+    {
+      "name": "Material_15",
+      "extensions": {
+        "KHR_materials_emissive_strength": {
+          "emissiveStrength": 2
+        }
+      },
+      "emissiveFactor": [
+        1,
+        0.7083757519721985,
+        0.2746773064136505
+      ],
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          0.8796223998069763,
+          0.5711248517036438,
+          1
+        ],
+        "metallicFactor": 0,
+        "roughnessFactor": 0.4000000059604645
+      }
+    },
+    {
+      "name": "Material_6",
+      "extensions": {
+        "KHR_materials_unlit": {}
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.9
+      }
+    },
+    {
+      "name": "Material_7",
+      "extensions": {
+        "KHR_materials_unlit": {}
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 2
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.9
+      }
+    },
+    {
+      "name": "Material_8",
+      "extensions": {
+        "KHR_materials_unlit": {}
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 3
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.9
+      }
+    },
+    {
+      "name": "Material_9",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.7835378050804138,
+          0.7304607629776001,
+          0.6172065734863281,
+          1
+        ],
+        "metallicFactor": 0.9399999976158142,
+        "roughnessFactor": 0.1899999976158142
+      }
+    }
+  ]
+}

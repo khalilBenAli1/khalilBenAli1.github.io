@@ -1,0 +1,108 @@
+---
+import Diagram from "../Diagram.astro";
+import { ui } from "../../lib/icons";
+import arrowLeft from "lucide-static/icons/arrow-left.svg?raw";
+import arrowUpRight from "lucide-static/icons/arrow-up-right.svg?raw";
+import plus from "lucide-static/icons/plus.svg?raw";
+import { t, type Locale } from "../../lib/i18n";
+import { islandProjects } from "../../lib/island/content";
+import { getIslandCopy } from "../../lib/island/copy";
+import { sectors } from "../../lib/island/types";
+import { audioDiagram, cuddyDiagram, lorDiagram, meetingDiagram, scannerDiagram } from "../../lib/diagrams-data";
+import "../../styles/island-gallery.css";
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const dict = t(locale);
+const copy = getIslandCopy(locale);
+const exhibition = {
+  en: { frontend: "Finished websites", professional: "Professional projects", shown: "Projects shown", frontendIntro: "Nine original experiences, ready to explore.", professionalIntro: "Selected systems, integrations and research. Private work is labelled below." },
+  fr: { frontend: "Sites à découvrir", professional: "Projets professionnels", shown: "Projets affichés", frontendIntro: "Neuf expériences originales, prêtes à explorer.", professionalIntro: "Systèmes, intégrations et recherche. Les projets privés sont indiqués ci-dessous." },
+  it: { frontend: "Siti da esplorare", professional: "Progetti professionali", shown: "Progetti visualizzati", frontendIntro: "Nove esperienze originali, pronte da esplorare.", professionalIntro: "Sistemi, integrazioni e ricerca. I progetti privati sono indicati qui sotto." },
+}[locale];
+const diagrams = { cuddy: cuddyDiagram, lor: lorDiagram, meeting: meetingDiagram, scanner: scannerDiagram, audio: audioDiagram };
+const collections = [
+  { kind: "frontend", title: exhibition.frontend, intro: exhibition.frontendIntro },
+  { kind: "professional", title: exhibition.professional, intro: exhibition.professionalIntro },
+] as const;
+---
+
+<div class="island-gallery" id="frontend">
+  <div class="island-gallery__introduction">
+    <p>{copy.gallery.intro}</p>
+    <p class="island-gallery__count" role="status" aria-live="polite" aria-atomic="true">{exhibition.shown}<span data-island-gallery-count>{islandProjects.length}</span></p>
+  </div>
+  <nav class="island-gallery__filters" aria-label={copy.controls.allProjects}>
+    {sectors.map((sector) => (
+      <a href={'?sector=' + sector + '#work'} data-island-filter={sector} aria-current={sector === "all" ? "true" : undefined}>
+        <span>{copy.sectors[sector]}</span>
+        <small aria-hidden="true">{sector === "all" ? islandProjects.length : islandProjects.filter((project) => project.sector === sector).length}</small>
+      </a>
+    ))}
+  </nav>
+  <div class="island-gallery__empty" data-island-gallery-empty hidden>
+    <p>{copy.gallery.empty}</p>
+    <a href="?sector=all#work" data-island-filter="all">{copy.controls.resetFilters}</a>
+  </div>
+
+  {collections.map((collection) => (
+    <section class="island-gallery__collection" data-island-collection={collection.kind} aria-labelledby={'collection-' + collection.kind}>
+      <header class="island-gallery__collection-header" data-island-collection-header>
+        <h3 id={'collection-' + collection.kind}>{collection.title}</h3>
+        <p>{collection.intro}</p>
+      </header>
+      <div class="island-gallery__grid" data-island-gallery-grid>
+        {islandProjects.filter((project) => project.kind === collection.kind).map((project, index) => {
+          const sectorLabel = project.sectorLabel?.[locale] ?? copy.sectors[project.sector];
+          const diagram = project.diagram ? diagrams[project.diagram] : undefined;
+          return (
+            <article id={'project-' + project.id} class:list={["island-project", { "frontend-demo": project.kind === "frontend", "island-project--professional": project.kind === "professional" }]} data-island-project={project.id} data-island-card={project.id} data-sector={project.sector} aria-labelledby={'project-' + project.id + '-title'} tabindex="-1">
+              <nav class="island-project__navigation" data-island-project-navigation aria-label={project.name}>
+                <a href="#work"><span aria-hidden="true" set:html={arrowLeft} />{copy.controls.backToGallery}</a>
+                <a href="#work" aria-label={copy.controls.close + ' — ' + project.name}>{copy.controls.close}<span aria-hidden="true" set:html={ui.x} /></a>
+              </nav>
+              <div class="island-project__visual">
+                <div class="island-project__exhibit" aria-hidden="true"><span>{String(index + 1).padStart(2, "0")}</span><span>{copy.sectors[project.sector]}</span></div>
+                {project.image && project.demo ? (
+                  <a class="island-project__preview frontend-demo__preview" href={project.demo} aria-label={copy.controls.visit + ' — ' + project.name}>
+                    <img src={project.image} alt={project.name + ' — ' + sectorLabel} width="1440" height="1000" loading="lazy" decoding="async" />
+                  </a>
+                ) : diagram ? (
+                  <div class="island-project__diagram"><Diagram {...diagram} /></div>
+                ) : (
+                  <div class="island-project__reference" aria-hidden="true"><span set:html={ui.database} /><span>Assurances BIAT KB</span></div>
+                )}
+              </div>
+              <div class="island-project__body">
+                <p class="island-project__sector"><span>{sectorLabel}</span>{project.year && <span>{project.year}</span>}</p>
+                <h4 id={'project-' + project.id + '-title'}><a href={'#project-' + project.id}>{project.name}<span aria-hidden="true" set:html={arrowUpRight} /></a></h4>
+                <p class:list={["island-project__description", { "frontend-demo__description": project.kind === "frontend" }]}>{project.description[locale]}</p>
+                {(project.client || project.production || !project.source) && (
+                  <div class="island-project__metadata">
+                    {project.client && <span>{project.client}</span>}
+                    {project.production && <span class="island-project__production">{dict.work.production}</span>}
+                    {!project.source && <span class="island-project__private"><span aria-hidden="true" set:html={ui.lock} />{dict.work.privateRepo}</span>}
+                  </div>
+                )}
+                <ul class="island-project__technology">{project.technologies.map((technology) => <li>{technology}</li>)}</ul>
+                <div class="island-project__details" data-island-project-extra>
+                  {project.highlights[locale].length > 0 && <ul class="island-project__highlights">{project.highlights[locale].map((highlight) => <li>{highlight}</li>)}</ul>}
+                  {project.kind === "frontend" && <p class="island-project__demo-note">{copy.gallery.demoNote}</p>}
+                </div>
+                <div class="island-project__actions">
+                  <div class:list={["island-project__links", { "frontend-demo__links": project.kind === "frontend" }]}>
+                    {project.demo && <a href={project.demo}>{copy.controls.visit}<span aria-hidden="true" set:html={arrowUpRight} /></a>}
+                    {project.source && <a href={project.source}>{copy.controls.source}<span aria-hidden="true" set:html={ui.github} /></a>}
+                  </div>
+                  <a class="island-project__details-link" href={'#project-' + project.id}>{copy.controls.projectDetails}<span aria-hidden="true" set:html={plus} /></a>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+      {collection.kind === "frontend" && <p class="island-gallery__note" data-island-collection-header>{copy.gallery.demoNote}</p>}
+    </section>
+  ))}
+  <footer class="island-gallery__footer"><p>{dict.work.moreLine}</p><a href="https://github.com/khalilBenAli1"><span aria-hidden="true" set:html={ui.github} />github.com/khalilBenAli1</a></footer>
+</div>

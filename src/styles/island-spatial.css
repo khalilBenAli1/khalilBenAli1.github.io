@@ -1,0 +1,333 @@
+/* Routing enhances the document into rooms. Without JavaScript, every section
+   remains in normal document flow and the ordinary links still reach it. */
+.island-place { display: none; }
+
+html:has(.island-enhanced[data-destination]:not([data-destination="home"])),
+body:has(.island-enhanced[data-destination]:not([data-destination="home"])) {
+  height: 100%;
+  overflow: hidden;
+}
+.island-app.island-enhanced[data-destination]:not([data-destination="home"]) {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100svh;
+  height: 100dvh;
+  overflow: hidden;
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-header {
+  flex: none;
+  z-index: 30;
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-nav [data-island-nav="home"] { display: inline-flex; }
+.island-enhanced[data-destination]:not([data-destination="home"]) main {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 46%);
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
+  min-width: 0;
+  min-height: 0;
+  gap: 0;
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero {
+  position: absolute;
+  inset: 0 auto 0 -2vw;
+  width: 64%;
+  max-width: none;
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  isolation: isolate;
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__copy,
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__footer > .island-availability,
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-discover { display: none; }
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__composition {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-world {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-stage {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-place {
+  position: absolute;
+  z-index: 6;
+  top: 24px;
+  left: max(26px, 3vw);
+  display: block;
+  pointer-events: none;
+}
+.island-place > p {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 10px 15px 10px 10px;
+  border: 1px solid rgba(67, 51, 33, 0.18);
+  border-radius: 6px;
+  background: rgba(251, 239, 228, 0.92);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.island-place__index {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--violet);
+  border-radius: 50%;
+  color: var(--violet);
+  font-size: 10px;
+  font-weight: 600;
+}
+.island-enhanced[data-destination="work"] [data-island-place="work"],
+.island-enhanced[data-destination="about"] [data-island-place="about"],
+.island-enhanced[data-destination="experience"] [data-island-place="experience"],
+.island-enhanced[data-destination="contact"] [data-island-place="contact"] { display: flex; }
+
+/* The room itself is the current location. Labels for distant rooms would
+   obscure close views; every destination remains in the ordinary header. */
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-hotspots { display: none; }
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__footer {
+  position: absolute;
+  z-index: 6;
+  left: max(26px, 3vw);
+  bottom: 48px;
+  display: flex;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 14px;
+  border: 1px solid rgba(67, 51, 33, 0.12);
+  border-radius: 6px;
+  background: rgba(251, 239, 228, 0.94);
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-world__toolbar {
+  justify-content: flex-start;
+  gap: 22px;
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-world__toolbar button { font-size: 12px; }
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-world__toolbar [data-island-view] { font-size: 11px; }
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__resources {
+  position: absolute;
+  z-index: 6;
+  left: max(28px, 3vw);
+  bottom: 10px;
+  justify-content: flex-start;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  font-size: 11px;
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__resources a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+}
+
+/* The reading surface overlaps the room, rather than displacing it into a
+   sidebar. This is an ordinary scroll container, with no wheel interception. */
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-panels {
+  position: relative;
+  z-index: 10;
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  max-width: 720px;
+  height: calc(100% - 30px);
+  margin: 14px 0 16px;
+}
+body.island-portfolio .island-app.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel.island-section {
+  container: island-reading / inline-size;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0 clamp(22px, 2.1vw, 34px) 30px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(94, 88, 79, 0.45) transparent;
+  scroll-padding-top: 68px;
+  scroll-margin: 0;
+  border: 1px solid rgba(111, 86, 55, 0.19);
+  border-radius: 24px 24px 9px 9px;
+  background: #fff7ed;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: -10px 14px 45px rgba(92, 66, 34, 0.09);
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__navigation {
+  position: sticky;
+  z-index: 12;
+  top: 0;
+  min-height: 56px;
+  margin: 0 calc(-1 * clamp(22px, 2.1vw, 34px)) 14px;
+  padding: 7px clamp(22px, 2.1vw, 34px);
+  border-bottom: 1px solid rgba(111, 86, 55, 0.12);
+  background: #fff7ed;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__navigation a { min-height: 40px; }
+body.island-portfolio .island-app.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__header h2 {
+  font-size: clamp(31px, 2.65vw, 42px);
+  line-height: 1.08;
+  scroll-margin-top: 70px;
+}
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__content [id] { scroll-margin-top: 76px; }
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__content .project,
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__content .project--flip { grid-template-columns: 1fr; }
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__content .project--flip .project__diagram { order: 0; }
+
+@container island-reading (max-width: 600px) {
+  .island-section .island-gallery__grid { grid-template-columns: 1fr; }
+  .island-section .island-identity { grid-template-columns: 140px minmax(0, 1fr); gap: 23px; }
+  .island-section .island-identity h3 { font-size: 28px; }
+  .island-section .island-identity__lead { font-size: 14px; }
+  .island-section .island-identity__copy > .island-eyebrow { font-size: 9px; }
+  .island-section .island-identity__links { gap: 4px 16px; }
+  .island-section .island-identity__links .island-text-link { font-size: 12px; }
+  .island-section .island-about__practice .ai-section__grid { grid-template-columns: 1fr; }
+  .island-section .island-about__practice .skills__grid { grid-template-columns: 1fr; }
+  .island-section .island-about__practice .skills__card:last-child { grid-column: auto; }
+  .island-section .island-career .timeline__entry { grid-template-columns: 104px minmax(0, 1fr); gap: 16px; padding-left: 28px; }
+  .island-section .island-career .timeline__role { font-size: 21px; }
+  .island-section .island-career .timeline__period { font-size: 12px; }
+  .island-section .island-career .timeline__note { font-size: 13px; }
+  .island-section .island-contact { padding: 26px 22px; }
+  .island-section .island-contact__line { font-size: 21px; }
+  .island-section .island-contact__email { font-size: 38px; }
+  .island-section .island-contact__email-arrow { width: 50px; height: 50px; font-size: 30px; }
+  .island-section .island-contact__email-address { font-size: 11px; }
+  .island-section .island-contact__socials { grid-template-columns: 1fr; gap: 10px; }
+  .island-section .island-contact__socials a { min-height: 58px; }
+  .island-section .island-footer { grid-template-columns: 1fr auto; }
+  .island-section .island-footer > div { grid-column: 1 / -1; justify-content: space-between; }
+}
+@container island-reading (max-width: 400px) {
+  .island-section .island-identity { grid-template-columns: 1fr; }
+  .island-section .island-identity__portrait { width: 160px; justify-self: center; }
+  .island-section .island-career .timeline__entry { grid-template-columns: 1fr; gap: 13px; }
+  .island-section .timeline__date { display: flex; align-items: center; }
+  .island-section .island-contact__email { font-size: 32px; gap: 8px 12px; }
+}
+
+@media (max-width: 900px) {
+  .island-enhanced[data-destination]:not([data-destination="home"]) main {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(190px, 32svh) minmax(0, 1fr);
+  }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero {
+    position: relative;
+    inset: auto;
+    grid-column: 1;
+    grid-row: 1;
+    width: calc(100% + 48px);
+    height: 100%;
+    margin: 0 -24px;
+  }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-place { top: 8px; left: 24px; }
+  .island-place > p { gap: 8px; padding: 5px 10px 5px 6px; font-size: 12px; }
+  .island-place__index { width: 23px; height: 23px; font-size: 9px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__footer {
+    left: 24px;
+    bottom: 12px;
+    min-height: 40px;
+    padding: 0 11px;
+  }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-world__toolbar { gap: 18px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-world__toolbar button { min-height: 44px; font-size: 11px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__resources {
+    top: 7px;
+    right: 24px;
+    bottom: auto;
+    left: auto;
+    gap: 14px;
+    padding: 0 7px;
+    border-radius: 4px;
+    background: rgba(251, 239, 228, 0.9);
+    font-size: 10px;
+  }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__resources a { min-height: 44px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-panels {
+    grid-column: 1;
+    grid-row: 2;
+    width: calc(100% + 48px);
+    max-width: none;
+    height: 100%;
+    margin: 0 -24px;
+  }
+  body.island-portfolio .island-app.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel.island-section {
+    padding-inline: 25px;
+    padding-bottom: max(28px, env(safe-area-inset-bottom));
+    border-bottom: 0;
+    border-radius: 23px 23px 0 0;
+    box-shadow: 0 -8px 30px rgba(92, 66, 34, 0.08);
+    scroll-padding-top: 64px;
+  }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__navigation { margin-inline: -25px; padding-inline: 25px; min-height: 52px; margin-bottom: 13px; }
+  body.island-portfolio .island-app.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__header h2 { font-size: 34px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__header { margin-bottom: 21px; }
+}
+@media (max-width: 600px) {
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero { width: calc(100% + 40px); margin-inline: -20px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-place { left: 20px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__footer { left: 20px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__resources { right: 20px; gap: 10px; font-size: 9px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-panels { width: calc(100% + 40px); margin-inline: -20px; }
+  body.island-portfolio .island-app.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel.island-section { padding-inline: 20px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__navigation { margin-inline: -20px; padding-inline: 20px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__navigation a { min-height: 44px; }
+  body.island-portfolio .island-app.island-enhanced[data-destination]:not([data-destination="home"]) .island-panel__header h2 { font-size: 31px; }
+}
+@media (max-width: 360px) {
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero { width: calc(100% + 32px); margin-inline: -16px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-panels { width: calc(100% + 32px); margin-inline: -16px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-place { left: 16px; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__resources { right: 16px; gap: 8px; font-size: 8px; }
+}
+@media (max-height: 650px) and (max-width: 900px) and (orientation: landscape) {
+  .island-enhanced[data-destination]:not([data-destination="home"]) main { grid-template-columns: minmax(0, 0.46fr) minmax(0, 0.54fr); grid-template-rows: minmax(0, 1fr); }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero { width: 100%; margin: 0; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-panels { grid-column: 2; grid-row: 1; width: 100%; margin: 0; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-place { top: 5px; left: 0; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__resources { top: auto; right: auto; bottom: 0; left: 0; }
+  .island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__footer { left: 0; bottom: 40px; }
+}
+
+/* In a live gallery, the physical display carries the large preview; the
+   reading panel keeps a compact reference and the real project actions. */
+.island-enhanced[data-view="3d"][data-destination="work"] .island-project.is-selected { display: block; }
+.island-enhanced[data-view="3d"][data-destination="work"] .island-project.is-selected .island-project__visual { border-right: 0; border-bottom: 1px solid var(--border); }
+.island-enhanced[data-view="3d"][data-destination="work"] .island-project.is-selected .island-project__preview img { width:100%;height:170px;aspect-ratio:auto;object-fit:contain; }
+.island-enhanced[data-view="3d"][data-destination="work"] .island-project.is-selected .island-project__diagram { max-height:190px;aspect-ratio:auto;overflow:hidden; }
+.island-enhanced[data-view="3d"][data-destination="work"] .island-project.is-selected .island-project__reference { min-height:150px; }
+
+/* Intermediate mobile widths can keep two identity columns; the portrait must
+   never exceed its grid track when narrower media rules supply a fixed width. */
+.island-section .island-identity__portrait { max-width: 100%; }
+
+.island-enhanced[data-destination]:not([data-destination="home"]) .island-hero__resources {
+  padding-inline: 9px;
+  border: 1px solid rgba(67, 51, 33, 0.12);
+  border-radius: 6px;
+  background: rgba(251, 239, 228, 0.94);
+}

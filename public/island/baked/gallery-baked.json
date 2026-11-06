@@ -1,0 +1,40 @@
+{
+  "source": "/private/tmp/portfolio-blender-proof/source-world.glb",
+  "renderer": "Blender Cycles",
+  "samples": 48,
+  "device": "GPU",
+  "dimensions": [
+    1280,
+    900
+  ],
+  "meshes": 70,
+  "lighting": "Nishita sky, warm sun and reflected fill",
+  "not_integrated": true,
+  "limitations": [
+    "Browser water shader reconstructed as physical material.",
+    "Current authored geometry is a snapshot and must be re-exported after geometry edits.",
+    "Transparent text/BasicMaterial rendering must be visually compared."
+  ],
+  "bake": {
+    "objects": [
+      "Mesh_5",
+      "Mesh_10",
+      "Mesh_11",
+      "Mesh_12",
+      "Mesh_14",
+      "Mesh_15",
+      "Mesh_17"
+    ],
+    "galleryObjects": 13,
+    "faces": 7006,
+    "map": "gallery-baked-diffuse.png",
+    "size": 2048,
+    "asset": "gallery-baked.glb",
+    "bytes": 1286900,
+    "coordinates": "glTF Y-up; world placement retained, no additional runtime transform",
+    "samples": 32
+  },
+  "asset_role": "Optional progressive real-geometry gallery diffuse-lighting enhancement",
+  "source_snapshot": "Gallery authored at position[-3.2,3.1,-0.25], z scale0.76; wider scene study is not final",
+  "sha256": "0308d8ddd9eb3a17eb342a97e301ee07909e99422b2bf065075862ef3347e6fe"
+}

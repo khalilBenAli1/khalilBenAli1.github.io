@@ -19,6 +19,8 @@ interface Props {
   bodyClass?: string;
   /** page renders the fixed Three.js background (home only) */
   space?: boolean;
+  /** Uses the island homepage without legacy motion or decorative layers. */
+  island?: boolean;
   lang?: string;
   skipLinkLabel?: string;
   /** locale → path, rendered as hreflang alternates */
@@ -30,6 +32,7 @@ const {
   description = "Khalil Ben Ali, full-stack and AI engineer in Faenza, Italy. Microsoft Teams platforms, in-browser vision models and production AI systems.",
   bodyClass = "",
   space = false,
+  island = false,
   lang = "en",
   skipLinkLabel = "Skip to content",
   alternates,
@@ -45,7 +48,7 @@ const socialImage = new URL("/og.png", Astro.site);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#06070C" />
+    <meta name="theme-color" content={island ? "#eeeae1" : "#06070C"} />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {
@@ -76,7 +79,7 @@ const socialImage = new URL("/og.png", Astro.site);
       Preloader skip decision, made BEFORE first paint so a repeat visit never
       flashes a curtain. Must stay inline (no bundling, no defer).
     */}
-    <script is:inline>
+    {!island && <script is:inline>
       (function () {
         var root = document.documentElement;
         try {
@@ -110,19 +113,19 @@ const socialImage = new URL("/og.png", Astro.site);
           }, 5000);
         }
       })();
-    </script>
+    </script>}
   </head>
-  <body class={bodyClass}>
+  <body class:list={[bodyClass, { "island-portfolio": island }]}>
     <a class="skip-link" href="#main-content">{skipLinkLabel}</a>
 
     {/*
       Curtain. Content below stays in the DOM and painted underneath, so the
       hero remains the LCP element. motion/preloader.ts removes this node.
     */}
-    <div class="preloader" data-preloader aria-hidden="true">
+    {!island && <div class="preloader" data-preloader aria-hidden="true">
       <span class="preloader__mark">KB<span class="gradient-text">.</span></span>
       <span class="preloader__count" data-preloader-count>00</span>
-    </div>
+    </div>}
 
     {/*
       The orbs are gone: the canvas is later in the DOM at the same z-index, so
@@ -130,20 +133,20 @@ const socialImage = new URL("/og.png", Astro.site);
       Their glow is now the aurora wash inside the canvas, which is also what
       lets the GL context run with alpha:false. See scripts/space.ts.
     */}
-    {space && <canvas id="space-canvas" aria-hidden="true" />}
+    {space && !island && <canvas id="space-canvas" aria-hidden="true" />}
     <slot />
 
     {/* Film grain — static noise tile, soft-light, above content, below nav. */}
-    <div class="grain" aria-hidden="true"></div>
+    {!island && <div class="grain" aria-hidden="true"></div>}
 
     {/*
       Cursor augment. CSS keeps it display:none unless the pointer is fine, and
       the native cursor is never hidden. Add data-lenis-prevent to any inner
       scroll container if one is ever introduced.
     */}
-    <div class="cursor" data-cursor-root aria-hidden="true">
+    {!island && <div class="cursor" data-cursor-root aria-hidden="true">
       <span class="cursor__ring"></span>
       <span class="cursor__dot"></span>
-    </div>
+    </div>}
   </body>
 </html>

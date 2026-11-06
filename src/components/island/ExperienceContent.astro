@@ -1,0 +1,47 @@
+---
+import arrowUpRight from "lucide-static/icons/arrow-up-right.svg?raw";
+import { t, type Locale } from "../../lib/i18n";
+const { locale } = Astro.props as { locale: Locale };
+const dict = t(locale);
+---
+<p class="island-panel__intro">{dict.experience.title.replace(/\*/g, '')}</p>
+    <ol class="timeline island-career">
+      {
+        dict.experience.entries.map((e, index) => (
+          <li class="timeline__entry" data-reveal="fade" data-island-milestone-entry={dict.experience.entries.length - 1 - index}>
+            <div class="timeline__date">
+              <button type="button" class="timeline__period island-career__visit" disabled data-island-milestone={dict.experience.entries.length - 1 - index} aria-pressed="false" aria-label={e.company + " — " + e.period}>{e.period}<span aria-hidden="true" set:html={arrowUpRight} /></button>
+            </div>
+            <div class="timeline__body">
+              {/*
+                The explicit {" "} are load-bearing. Astro collapses the
+                whitespace around an expression, and the em dash is aria-hidden —
+                with nothing between them the accessible name came out as
+                "…AI EngineernBold". CSS padding cannot fix a name.
+              */}
+              <h3 class="timeline__role">
+                <span class="timeline__role-label">{e.role}</span>
+                {" "}
+                <span class="timeline__sep" aria-hidden="true">—</span>
+                {" "}
+                <span class="timeline__company">{e.company}</span>
+              </h3>
+              <p class="timeline__note" data-reveal="lines">{e.note}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+<style>
+  .island-career__visit { display:inline-flex;align-items:center;gap:10px;min-height:44px;margin:0;padding:8px 10px;border:1px solid transparent;border-radius:8px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:background 180ms,border-color 180ms,color 180ms; }
+  .island-career__visit:hover, .island-career__visit[aria-pressed="true"] { color:var(--violet);border-color:var(--border-accent);background:rgba(9,41,255,.05); }
+  .island-career__visit span { display:inline-flex;transition:transform 180ms; }
+  .island-career__visit span :global(svg) { width:14px;height:14px; }
+  .island-career__visit:hover span { transform:translate(2px,-2px); }
+  .island-career__visit:disabled { cursor:default; }
+  .island-career__visit:disabled span { visibility:hidden; }
+  :global(.island-enhanced[data-motion="off"]) .island-career__visit, :global(.island-enhanced[data-motion="off"]) .island-career__visit span { transition:none; }
+  :global(.island-enhanced[data-motion="off"]) .island-career__visit:hover span { transform:none; }
+  @media(prefers-reduced-motion:reduce) { .island-career__visit,.island-career__visit span { transition:none; } .island-career__visit:hover span { transform:none; } }
+</style>

@@ -1,0 +1,264 @@
+/* The world stays one shared place as its surrounding content changes. */
+.island-portfolio .island-header {
+  view-transition-name: island-header;
+}
+.island-portfolio .island-stage {
+  view-transition-name: island-world;
+}
+.island-portfolio .island-hero__copy {
+  view-transition-name: island-introduction;
+}
+.island-portfolio .island-panel:not([hidden]) {
+  view-transition-name: island-content;
+}
+
+::view-transition,
+::view-transition-group(*),
+::view-transition-image-pair(*) {
+  pointer-events: none;
+}
+::view-transition-group(island-header) {
+  animation-duration: 1ms;
+}
+::view-transition-old(island-header) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(island-header) {
+  animation: none;
+  opacity: 1;
+}
+::view-transition-group(island-world) {
+  animation-duration: 900ms;
+  animation-timing-function: cubic-bezier(0.22, 0.7, 0.18, 1);
+  z-index: 5;
+}
+::view-transition-old(island-world),
+::view-transition-new(island-world) {
+  animation-duration: 180ms;
+  mix-blend-mode: normal;
+  object-fit: contain;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  opacity: 0;
+}
+::view-transition-old(island-content),
+::view-transition-old(island-introduction) {
+  animation: island-content-out 240ms ease both;
+}
+::view-transition-new(island-content),
+::view-transition-new(island-introduction) {
+  animation: island-content-in 650ms cubic-bezier(0.2, 0.75, 0.2, 1) 120ms both;
+}
+@keyframes island-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes island-content-out {
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+.island-portfolio .island-nav > a:not([data-island-nav="contact"]) {
+  position: relative;
+  text-decoration: none;
+}
+.island-portfolio .island-nav > a:not([data-island-nav="contact"])::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 7px;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 260ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+.island-portfolio .island-nav > a[aria-current="page"]::after,
+.island-portfolio .island-nav > a:focus-visible::after {
+  transform: scaleX(1);
+}
+.island-portfolio .island-nav > a[data-island-nav="contact"] {
+  border-radius: 8px;
+  padding: 8px 10px 8px 21px;
+  gap: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: 0 3px 0 rgba(12, 25, 129, 0.12);
+}
+.island-talk__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 31px;
+  height: 31px;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  border-radius: 50%;
+  transition:
+    background 250ms ease,
+    color 250ms ease,
+    transform 350ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+.island-talk__icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+.island-portfolio .island-button,
+.island-portfolio .island-nav > a[data-island-nav="contact"] {
+  transition:
+    transform 260ms cubic-bezier(0.2, 0.75, 0.2, 1),
+    box-shadow 260ms ease,
+    background 260ms ease;
+}
+.island-portfolio .island-button > span,
+.island-portfolio .island-text-link > span,
+.island-portfolio .island-panel__navigation a > span {
+  display: inline-block;
+  transition: transform 300ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+.island-portfolio .island-hotspot {
+  transition:
+    translate 260ms cubic-bezier(0.2, 0.75, 0.2, 1),
+    box-shadow 260ms ease,
+    background 220ms ease,
+    color 220ms ease;
+}
+.island-portfolio .island-hotspot[data-scene-hover] {
+  color: white;
+  background: var(--violet);
+  border-color: var(--violet);
+  translate: 0 -4px;
+  box-shadow: 0 5px 0 rgba(9, 41, 255, 0.12);
+}
+.island-portfolio .island-brand__mark {
+  transition: transform 300ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+.island-portfolio .island-button:active,
+.island-portfolio .island-nav > a[data-island-nav="contact"]:active {
+  transform: translateY(1px) scale(0.98);
+}
+@media (hover: hover) {
+  .island-portfolio .island-nav > a:hover::after {
+    transform: scaleX(1);
+  }
+  .island-portfolio .island-nav > a[data-island-nav="contact"]:hover,
+  .island-portfolio .island-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 9px 22px rgba(9, 41, 255, 0.16);
+  }
+  .island-portfolio
+    .island-nav
+    > a[data-island-nav="contact"]:hover
+    .island-talk__icon {
+    background: white;
+    color: #0929ff;
+    transform: rotate(7deg);
+  }
+  .island-portfolio .island-button:hover > span,
+  .island-portfolio .island-text-link:hover > span {
+    transform: translate(3px, -3px);
+  }
+  .island-portfolio .island-panel__navigation a:hover > span {
+    transform: translateX(-4px);
+  }
+  .island-portfolio .island-hotspot:hover {
+    translate: 0 -4px;
+    box-shadow: 0 5px 0 rgba(9, 41, 255, 0.12);
+  }
+  .island-portfolio .island-brand:hover .island-brand__mark {
+    transform: rotate(-4deg);
+  }
+}
+@media (max-width: 600px) {
+  .island-portfolio .island-header__utilities {
+    padding-right: 138px;
+  }
+  .island-portfolio .island-nav > a[data-island-nav="contact"] {
+    padding: 7px 8px 7px 12px;
+    gap: 8px;
+  }
+  .island-talk__icon {
+    width: 27px;
+    height: 27px;
+  }
+  .island-talk__icon svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.island-enhanced[data-motion="off"] .island-nav a,
+.island-enhanced[data-motion="off"] .island-nav a::after,
+.island-enhanced[data-motion="off"] .island-talk__icon,
+.island-enhanced[data-motion="off"] .island-button,
+.island-enhanced[data-motion="off"] .island-button > span,
+.island-enhanced[data-motion="off"] .island-text-link > span,
+.island-enhanced[data-motion="off"] .island-panel__navigation a > span,
+.island-enhanced[data-motion="off"] .island-hotspot,
+.island-enhanced[data-motion="off"] .island-brand__mark {
+  transition: none !important;
+}
+.island-enhanced[data-motion="off"] .island-button,
+.island-enhanced[data-motion="off"] .island-nav > a[data-island-nav="contact"],
+.island-enhanced[data-motion="off"] .island-talk__icon,
+.island-enhanced[data-motion="off"] .island-button > span,
+.island-enhanced[data-motion="off"] .island-text-link > span,
+.island-enhanced[data-motion="off"] .island-panel__navigation a > span,
+.island-enhanced[data-motion="off"] .island-brand__mark {
+  transform: none !important;
+}
+.island-enhanced[data-motion="off"] .island-hotspot {
+  translate: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  .island-portfolio .island-nav a,
+  .island-portfolio .island-nav a::after,
+  .island-portfolio .island-talk__icon,
+  .island-portfolio .island-button,
+  .island-portfolio .island-button > span,
+  .island-portfolio .island-text-link > span,
+  .island-portfolio .island-panel__navigation a > span,
+  .island-portfolio .island-hotspot,
+  .island-portfolio .island-brand__mark {
+    transition: none !important;
+  }
+  .island-portfolio .island-button,
+  .island-portfolio .island-nav > a[data-island-nav="contact"],
+  .island-portfolio .island-talk__icon,
+  .island-portfolio .island-button > span,
+  .island-portfolio .island-text-link > span,
+  .island-portfolio .island-panel__navigation a > span,
+  .island-portfolio .island-brand__mark {
+    transform: none !important;
+  }
+  .island-portfolio .island-hotspot {
+    translate: none !important;
+  }
+}
+
+/* The live world moves as one object; labels return after it lands. */
+.island-portfolio .island-hotspots { transition: opacity 160ms ease; }
+.island-enhanced[data-view="3d"][data-transition="world"] .island-hotspots { opacity: 0; }
+.island-enhanced[data-view="3d"][data-transition="world"] .island-hotspots:focus-within { opacity: 1; }
+.island-enhanced[data-motion="off"] .island-hotspots { transition: none; }
+@media (prefers-reduced-motion: reduce) { .island-portfolio .island-hotspots { transition: none; } }

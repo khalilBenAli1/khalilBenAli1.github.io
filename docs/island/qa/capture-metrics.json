@@ -1,0 +1,72 @@
+[
+  {
+    "name": "desktop",
+    "viewport": [
+      1584,
+      992
+    ],
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)",
+    "metrics": {
+      "status": "ready",
+      "frames": 12,
+      "schedulerStarts": 1,
+      "loopActive": true,
+      "drawCalls": 215,
+      "triangles": 1352517,
+      "textures": 29,
+      "geometries": 65,
+      "pixelRatio": 1,
+      "width": 1243.73,
+      "height": 864,
+      "quality": "high",
+      "bakedArchitecture": true,
+      "startupMs": 638.7999999523163,
+      "enhancedReadyMs": 1329.8999998569489,
+      "renderCpuMs": 1.3999998569488525,
+      "cameraZoom": 1,
+      "cameraMoving": false,
+      "terraceReflectionCaptures": 1,
+      "studioPortraitReady": false,
+      "exhibitId": null,
+      "activeMilestone": null
+    },
+    "errors": [],
+    "poster": "public/island/island-desktop.webp",
+    "sourceSha256": "6e79666de161d24cc82e327410faf01b294e1080bf824dc142c69f30a362d497"
+  },
+  {
+    "name": "mobile",
+    "viewport": [
+      390,
+      844
+    ],
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)",
+    "metrics": {
+      "status": "ready",
+      "frames": 6,
+      "schedulerStarts": 1,
+      "loopActive": true,
+      "drawCalls": 67,
+      "triangles": 328577,
+      "textures": 19,
+      "geometries": 64,
+      "pixelRatio": 1,
+      "width": 390,
+      "height": 350,
+      "quality": "low",
+      "bakedArchitecture": true,
+      "startupMs": 429.19999980926514,
+      "enhancedReadyMs": 817.6999998092651,
+      "renderCpuMs": 1,
+      "cameraZoom": 1,
+      "cameraMoving": false,
+      "terraceReflectionCaptures": 0,
+      "studioPortraitReady": false,
+      "exhibitId": null,
+      "activeMilestone": null
+    },
+    "errors": [],
+    "poster": "public/island/island-mobile.webp",
+    "sourceSha256": "226b02fdb931257cb9b1fa5d5c460c57227be72edce800ce2974879be9a217a9"
+  }
+]

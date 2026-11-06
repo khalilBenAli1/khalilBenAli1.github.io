@@ -1,0 +1,262 @@
+{
+  "source": "/private/tmp/portfolio-blender-proof/final-architecture-source.glb",
+  "renderer": "Blender Cycles",
+  "samples": 64,
+  "device": "GPU",
+  "dimensions": [
+    1248,
+    864
+  ],
+  "meshes": 61,
+  "lighting": "Nishita sky, warm sun and reflected fill",
+  "limitations": [
+    "Browser water shader reconstructed as physical material.",
+    "Current authored geometry is a snapshot and must be re-exported after geometry edits.",
+    "Transparent text/BasicMaterial rendering must be visually compared."
+  ],
+  "bake": {
+    "scope": "architecture",
+    "objects": [
+      "Mesh_1",
+      "Mesh_2",
+      "Mesh_4",
+      "Mesh_5",
+      "Mesh_11",
+      "Mesh_12",
+      "Mesh_14",
+      "Mesh_15",
+      "Mesh_17",
+      "Mesh_18",
+      "Mesh_19",
+      "Mesh_22",
+      "Mesh_25",
+      "Mesh_26",
+      "Mesh_27",
+      "Mesh_30",
+      "Mesh_31",
+      "Mesh_34",
+      "Mesh_35",
+      "Mesh_37",
+      "Mesh_42",
+      "Mesh_43",
+      "Mesh_45",
+      "Mesh_46",
+      "Mesh_47",
+      "Mesh_48"
+    ],
+    "meshObjects": 53,
+    "faces": 94884,
+    "map": "architecture-baked-diffuse.png",
+    "samples": 64,
+    "size": 4096,
+    "asset": "architecture-baked.glb",
+    "bytes": 4395132,
+    "coordinates": "glTF Y-up; world placement retained, no additional runtime transform",
+    "draco": true,
+    "destinations": {
+      "work": 13,
+      "about": 14,
+      "experience": 7,
+      "contact": 8
+    },
+    "terrainOccluders": 11,
+    "images": 10,
+    "materials": 18,
+    "colorContract": "8-bit LDR sRGB baked appearance; toneMapped=false for both flat diffuse and glossy emissive+reflection materials. Reflection highlights may clip.",
+    "originalAtlasSurfaceCount": 31,
+    "runtimeBakedSurfaceCount": 26,
+    "imageFormats": {
+      "jpegAtlas": 1,
+      "exactSourcePng": 8,
+      "embeddedOriginalWebP": 1
+    }
+  },
+  "sourceHashes": {
+    "src/scripts/island/scene/world.ts": "da90429ab084846e533a6353f91ed2e65b458b2e3b26a27e4bee2fa6f24fb409",
+    "src/scripts/island/scene/architecture.ts": "96f0f809c24b432aeea32a0b672cad9de00473ba6932a69de19a2405d9ca4994",
+    "src/scripts/island/scene/construction.ts": "97a925a53429f622f808d22bcdd0d9ca53f6671dba2d8831f9c3db5f0776a215",
+    "src/scripts/island/scene/landscape.ts": "4410f64fe0ad88bab60a85c00233566ee2539deab2a879a3a79d4bdf01868d19",
+    "src/scripts/island/scene/materials.ts": "4681526e9a1ece6f0fe06c5af182a0807bf1e4a6d4a7dea6866d32a53bea9b92",
+    "src/scripts/island/scene/camera.ts": "06d1be0606e6991b15bc9036d583dd0745d0f9563834ae88b8b763ac081c4469"
+  },
+  "camera": {
+    "position": [
+      7.573310872149861,
+      14.049345519696692,
+      25.460346475468313
+    ],
+    "target": [
+      -0.3500000000000023,
+      3.6500000000000004,
+      0.6999999999999957
+    ],
+    "orthographicWidth": 19.6,
+    "viewport": [
+      1248,
+      864
+    ]
+  },
+  "sha256": "9153acbcdd80b2814c07dde6061b998b82c3a3c88e9d5a901aa1486b2518572f",
+  "renderStudyViewTransform": {
+    "transform": "AgX",
+    "look": "AgX - Medium High Contrast",
+    "exposure": 0.35
+  },
+  "decoder": {
+    "source": "Installed three/examples/jsm/libs/draco/gltf",
+    "bytes": 250876,
+    "license": "Apache-2.0",
+    "files": {
+      "draco_decoder.wasm": "a680d927bed9cb864ddbd63521868891af2bfbe755092761b4837487618df8ac",
+      "draco_wasm_wrapper.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6",
+      "LICENSE": "d3709b0fb4b8a94bbb1d02b8a2e484f258b0d9c5c5a01f940391f3fe662cd1a4"
+    }
+  },
+  "materialPreservation": {
+    "bytes": 4395132,
+    "sha256": "9153acbcdd80b2814c07dde6061b998b82c3a3c88e9d5a901aa1486b2518572f",
+    "literalImages": [
+      {
+        "image": 1,
+        "mimeType": "image/png",
+        "bytes": 42572,
+        "sha256": "6bed8fc13821e10b166daf5a49f2c89cd377c094f6ee2d3d101f845fc958d5e2"
+      },
+      {
+        "image": 2,
+        "mimeType": "image/png",
+        "bytes": 37928,
+        "sha256": "84cd1f32bd7e9d9104cd522c713e5966613df232fab46157e753a481b109a273"
+      },
+      {
+        "image": 3,
+        "mimeType": "image/png",
+        "bytes": 41036,
+        "sha256": "9af109e78eb330e47cb59e30a930077e25629ae78911ff45c3cf56077fd13885"
+      },
+      {
+        "image": 4,
+        "mimeType": "image/png",
+        "bytes": 43516,
+        "sha256": "4604b2b52a41e0701c93f557835bcb96b5ff203a247be01de39ed480b1ad9cb0"
+      },
+      {
+        "image": 5,
+        "mimeType": "image/png",
+        "bytes": 33432,
+        "sha256": "453e139d1ac5ecd8b79af2304156a2949711b1671c5711bd3dcf79d2894a80d8"
+      },
+      {
+        "image": 6,
+        "mimeType": "image/png",
+        "bytes": 463556,
+        "sha256": "04376b2ebfcf9bbc354003c1894981a5f65b0dc3b5d3585d05b01a8eb674b154"
+      },
+      {
+        "image": 7,
+        "mimeType": "image/png",
+        "bytes": 307256,
+        "sha256": "88ffa7d0c65dde830d0140149f6ecd4fbd19fa1a8e758979af45eb03c512fa02"
+      },
+      {
+        "image": 8,
+        "mimeType": "image/png",
+        "bytes": 442800,
+        "sha256": "6e32d4f6f5fef502ade4fdc78d4ffc6fc987ae167b26db5e9cdec32bf6a3f843"
+      }
+    ],
+    "runtimeAccentMeshes": [
+      {
+        "mesh": "Mesh_23",
+        "accent": "blue"
+      },
+      {
+        "mesh": "Mesh_51",
+        "accent": "citrus"
+      },
+      {
+        "mesh": "Mesh_10",
+        "accent": "blue"
+      }
+    ],
+    "runtimeNaturalStoneMeshes": [
+      {
+        "mesh": "Mesh_3",
+        "sourceMaterial": 3,
+        "bounds": {
+          "min": [
+            -8.596783638000488,
+            -0.8348262906074524,
+            -4.5779194831848145
+          ],
+          "max": [
+            8.91275405883789,
+            2.87296724319458,
+            6.4037089347839355
+          ]
+        },
+        "uv": 0,
+        "vertexColours": false,
+        "texture": "embedded coastal-limestone.webp"
+      }
+    ],
+    "runtimeCliffMeshes": [
+      {
+        "mesh": "Mesh_0",
+        "sourceMaterial": 0,
+        "bounds": {
+          "min": [
+            -8.879925727844238,
+            -0.5299950838088989,
+            -4.556071758270264
+          ],
+          "max": [
+            9.364534378051758,
+            5.329999923706055,
+            5.96714448928833
+          ]
+        },
+        "uv": 0,
+        "vertexColours": true,
+        "texture": "embedded coastal-limestone.webp"
+      }
+    ],
+    "naturalStoneEvidence": {
+      "sourceMesh": 3,
+      "sourceMaterial": 3,
+      "sourceAttributes": [
+        "POSITION",
+        "NORMAL",
+        "TEXCOORD_0"
+      ],
+      "sourceCliffMesh": 0,
+      "cliffHasVertexColours": true,
+      "cliffMaxY": 5.329999923706055,
+      "embeddedWebPBytes": 471546,
+      "embeddedWebPSha256": "a2fa42d71e530934c15dbef9c78c53ece6747357616024b4eb8636b7e27f22ae",
+      "publicWebPMatchesEmbedded": true,
+      "sourcePngEqualsVerticallyFlippedWebP": true,
+      "textureTransform": {
+        "offset": [
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          -1
+        ]
+      },
+      "repairIdempotent": true
+    },
+    "cliffEvidence": {
+      "sourceMesh": 0,
+      "sourceMaterial": 0,
+      "sourceHasColour0": true,
+      "deliveryRetainsColour0": true,
+      "all53DracoPayloadsUnchanged": true,
+      "allTexturesEmbedded": true,
+      "repairIdempotent": true
+    }
+  },
+  "integration": "Optional runtime architecture enhancement; visual acceptance is tracked separately in design-qa.md"
+}
