@@ -5,6 +5,8 @@ import type { SceneMetrics } from '../../src/lib/island/types';
 // rendering through software ANGLE, while the ordinary suite covers WebKit HTML.
 test.use({
   viewport: { width: 850, height: 900 },
+  // Keep the desktop CSS viewport and shader path while reducing software raster work.
+  deviceScaleFactor: 0.5,
   contextOptions: { reducedMotion: 'no-preference' },
   launchOptions: { args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] },
 });
@@ -23,10 +25,44 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
 
   async function ready(page: Page) {
     await expect(page.locator('[data-island-root]')).toHaveAttribute('data-scene-status', 'ready', { timeout: 60_000 });
-    await expect(page.locator('[data-island-canvas]')).toBeVisible();
-    // enhancedReadyMs is recorded after the first paint of the decoded model.
-    // Motion can be stopped or throttled immediately after that paint.
-    await expect.poll(async () => (await metrics(page)).enhancedReadyMs ?? 0, { timeout: 60_000 }).toBeGreaterThan(0);
+    const canvas = page.locator('[data-island-canvas]');
+    await expect(canvas).toBeVisible();
+    // Offscreen scenes intentionally suspend painting while assets finish decoding.
+    await canvas.scrollIntoViewIfNeeded();
+    await expect(canvas).toBeInViewport();
+    try {
+      // The renderer records this after submitting its first decoded-model frame.
+      await expect.poll(async () => (await metrics(page)).enhancedReadyMs ?? 0, { timeout: 60_000 }).toBeGreaterThan(0);
+    } catch (error) {
+      const diagnostics = await enhancementDiagnostics(page).catch(String);
+      console.error('Baked-scene readiness:', JSON.stringify(diagnostics));
+      throw error;
+    }
+  }
+
+  async function enhancementDiagnostics(page: Page) {
+    const [scene, layout, requests, errors, messages] = await Promise.all([
+      metrics(page),
+      page.evaluate(() => {
+        const canvas = document.querySelector<HTMLCanvasElement>('[data-island-canvas]');
+        const bounds = canvas?.getBoundingClientRect();
+        return {
+          hidden: document.hidden, viewport: [innerWidth, innerHeight], dpr: devicePixelRatio,
+          canvas: bounds && [bounds.x, bounds.y, bounds.width, bounds.height].map(Math.round),
+          framebuffer: canvas && [canvas.width, canvas.height],
+        };
+      }),
+      page.requests(), page.pageErrors(), page.consoleMessages(),
+    ]);
+    const assets = requests.filter(request => request.url().includes('/island/baked/')).slice(-8).map(request => ({
+      path: new URL(request.url()).pathname, status: request.existingResponse()?.status() ?? null,
+      responseEndMs: Math.round(request.timing().responseEnd), failure: request.failure()?.errorText ?? null,
+    }));
+    return {
+      scene, layout, assets,
+      errors: errors.slice(-4).map(error => error.message.slice(0, 300)),
+      consoleErrors: messages.filter(message => message.type() === 'error').slice(-4).map(message => message.text().slice(0, 300)),
+    };
   }
 
   async function frozenFrames(page: Page) {
@@ -53,6 +89,7 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
     await ready(page);
     const initial = await metrics(page);
     expect(initial.quality).toBe('high');
+    expect(initial.pixelRatio).toBe(0.5);
     expect(initial.drawCalls).toBeGreaterThan(10);
     expect(initial.triangles).toBeGreaterThan(10_000);
     expect(initial.textures).toBeGreaterThan(3);

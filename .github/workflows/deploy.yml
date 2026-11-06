@@ -22,7 +22,12 @@ jobs:
       - run: npm run astro -- check
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
-      - run: npm run test:e2e
+      # The real WebGL cases use the runner CPU as a GPU. Give them the
+      # machine before starting the Chromium/WebKit interface checks.
+      - name: Verify the software-rendered scene
+        run: npm run test:e2e -- --project=chromium --workers=1 --grep 'software Chromium'
+      - name: Verify the portfolio interface in both browsers
+        run: npm run test:e2e -- --grep-invert 'software Chromium'
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         with:
