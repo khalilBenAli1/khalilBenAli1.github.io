@@ -195,7 +195,9 @@ test.describe('the work belongs to the keep', () => {
     await expect(near).toBeInViewport();
     /* Measured only once the page has stopped: a box taken mid-glide can put
        the pointer below the window, where it is not a torch at all. */
-    const box = await atRest(page, '#project-maison-sol');
+    const box = await atRest(page, '#project-maison-sol .keep-demo__body');
+    /* Held over the words of the plaque, not over its picture: a hovered
+       picture shows its true colours whatever the torch is doing. */
     const x = box.x + box.width / 2;
     const y = box.y + box.height / 2;
     /* The torch is carried again before each reading. */
@@ -213,6 +215,8 @@ test.describe('the work belongs to the keep', () => {
     await page.mouse.move(x, y);
     await expect(page.locator('.keep-torch')).toHaveClass(/is-carried/);
     await expect(near.locator('img')).toHaveCSS('filter', /brightness\(0\.98\)/);
+    await near.locator('.keep-demo__shot').hover();
+    await expect(near.locator('img')).toHaveCSS('filter', 'none');
 
     /* A keyboard visitor lights a plaque by reaching into it. */
     await page.locator('#project-atelier-no8 .keep-links a').last().focus();
