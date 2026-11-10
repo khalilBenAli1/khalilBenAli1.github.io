@@ -29,6 +29,10 @@ function start(root: HTMLElement): void {
   let scene: KeepScene | null = null;
   let stops: number[] = [];
   let queued = false;
+  /* The window height the stops were measured against. It is not re-read
+     while a phone toolbar slides, so the road does not twitch mid-scroll. */
+  let view = window.innerHeight;
+  let lastWidth = window.innerWidth;
 
   function storedMotion(): boolean {
     try {
@@ -44,7 +48,8 @@ function start(root: HTMLElement): void {
 
   /** Scroll offsets at which the camera reaches each station (see scene.ts). */
   function measure(): void {
-    const view = window.innerHeight;
+    view = window.innerHeight;
+    lastWidth = window.innerWidth;
     const end = Math.max(document.documentElement.scrollHeight - view, 1);
     const top = (element: HTMLElement | null): number =>
       element ? element.getBoundingClientRect().top + window.scrollY : end;
@@ -77,23 +82,30 @@ function start(root: HTMLElement): void {
 
   function update(): void {
     queued = false;
-    const view = window.innerHeight;
-    const position = roadPosition();
-    scene?.setTarget(position);
+    scene?.setTarget(roadPosition());
+
+    /* Read every position first, then write, so that no write forces the
+       browser to lay the page out a second time in the same frame. */
+    const passageTops = passages.map((passage) => {
+      const rect = passage.getBoundingClientRect();
+      return rect.bottom < 0 || rect.top > view ? null : rect.top;
+    });
+    const sectionTops = sections.map((section) =>
+      section ? section.getBoundingClientRect().top : Infinity,
+    );
+    const milestoneTops = milestones.map((milestone) => milestone.getBoundingClientRect().top);
 
     /* Each section title settles into place as it rises into the window. */
-    for (const passage of passages) {
-      const rect = passage.getBoundingClientRect();
-      if (rect.bottom < 0 || rect.top > view) continue;
-      const entered = Math.min(Math.max(1 - rect.top / (view * 0.7), 0), 1);
+    passages.forEach((passage, index) => {
+      const top = passageTops[index];
+      if (top === null) return;
+      const entered = Math.min(Math.max(1 - top / (view * 0.7), 0), 1);
       passage.style.setProperty("--enter", entered.toFixed(3));
-    }
+    });
 
     let current = "home";
-    sections.forEach((section, index) => {
-      if (section && section.getBoundingClientRect().top <= view * 0.45) {
-        current = sectionIds[index];
-      }
+    sectionTops.forEach((top, index) => {
+      if (top <= view * 0.45) current = sectionIds[index];
     });
     for (const link of links) {
       if (link.dataset.keepLink === current) link.setAttribute("aria-current", "location");
@@ -103,10 +115,9 @@ function start(root: HTMLElement): void {
 
     /* A career marker lights once its entry has come up the page, like the
        fire that stands for it on the stair. */
-    for (const milestone of milestones) {
-      const lit = milestone.getBoundingClientRect().top < view * 0.72;
-      milestone.classList.toggle("is-lit", lit);
-    }
+    milestones.forEach((milestone, index) => {
+      milestone.classList.toggle("is-lit", milestoneTops[index] < view * 0.72);
+    });
   }
 
   function queue(): void {
@@ -121,13 +132,19 @@ function start(root: HTMLElement): void {
     queue();
   }
 
+  function onWindowResize(): void {
+    /* Same width and a small change in height is a toolbar, not a new screen. */
+    const toolbar =
+      window.innerWidth === lastWidth && Math.abs(window.innerHeight - view) < 160;
+    if (!toolbar) relayout();
+  }
+
   /* ---------- motion preference ---------- */
 
   function showMotion(): void {
     const enabled = motionEnabled();
     root.dataset.motion = enabled ? "on" : "off";
     if (!motionButton) return;
-    motionButton.setAttribute("aria-pressed", String(enabled));
     motionButton.textContent =
       (enabled ? motionButton.dataset.labelOn : motionButton.dataset.labelOff) ?? "";
     /* Nothing to toggle when the system already asks for stillness. */
@@ -217,7 +234,7 @@ function start(root: HTMLElement): void {
   window.setInterval(tellTime, 30_000);
 
   window.addEventListener("scroll", queue, { passive: true });
-  window.addEventListener("resize", relayout);
+  window.addEventListener("resize", onWindowResize);
   window.addEventListener("load", relayout);
   /* Lazy images and late fonts change section heights after first layout. */
   if ("ResizeObserver" in window) {
@@ -225,8 +242,12 @@ function start(root: HTMLElement): void {
   }
 
   /* The text is the first paint; the world arrives after it. */
-  const idle = (window as Window & { requestIdleCallback?: (run: () => void) => void })
-    .requestIdleCallback;
-  if (idle) idle(() => void loadScene());
+  const idle = (
+    window as Window & {
+      requestIdleCallback?: (run: () => void, options?: { timeout: number }) => void;
+    }
+  ).requestIdleCallback;
+  /* The deadline keeps a busy phone from putting the scene off forever. */
+  if (idle) idle(() => void loadScene(), { timeout: 1500 });
   else window.setTimeout(() => void loadScene(), 60);
 }

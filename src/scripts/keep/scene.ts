@@ -269,7 +269,7 @@ void main() {
   /* A teardrop: full at the bowl, drawn to a point, torn by the tongues. */
   float profile = (0.4 * (1.0 - t) * (0.5 + 0.5 * sqrt(1.0 - t)) + 0.015) * (0.72 + 0.62 * tongues);
   float across = abs(x) / profile;
-  float body = smoothstep(1.0, 0.3, across);
+  float body = 1.0 - smoothstep(0.3, 1.0, across);
   body *= smoothstep(-0.05, 0.07, p.y) * (1.0 - smoothstep(0.8, 1.0, t));
   body *= smoothstep(0.0, 0.3, tongues + (1.0 - t) * 1.15 - 0.42);
   body *= vLit;
@@ -315,7 +315,7 @@ precision highp float;
 varying float vAlpha;
 void main() {
   vec2 p = gl_PointCoord - 0.5;
-  float dot2 = smoothstep(0.25, 0.0, dot(p, p));
+  float dot2 = 1.0 - smoothstep(0.0, 0.25, dot(p, p));
   gl_FragColor = vec4(vec3(1.0, 0.56, 0.2) * dot2 * vAlpha * 1.5, 1.0);
 }
 `;
@@ -346,7 +346,7 @@ precision highp float;
 varying float vAlpha;
 void main() {
   vec2 p = gl_PointCoord - 0.5;
-  float flake = smoothstep(0.25, 0.05, dot(p, p));
+  float flake = 1.0 - smoothstep(0.05, 0.25, dot(p, p));
   gl_FragColor = vec4(vec3(0.56, 0.62, 0.58) * flake * vAlpha, 1.0);
 }
 `;
@@ -432,12 +432,11 @@ function ashGeometry(count: number): BufferGeometry {
 }
 
 export function createKeepScene(options: KeepSceneOptions): KeepScene | null {
-  const { canvas, low } = options;
   let renderer: WebGLRenderer;
   try {
     renderer = new WebGLRenderer({
-      canvas,
-      antialias: !low,
+      canvas: options.canvas,
+      antialias: !options.low,
       alpha: false,
       powerPreference: "high-performance",
       stencil: false,
@@ -445,14 +444,25 @@ export function createKeepScene(options: KeepSceneOptions): KeepScene | null {
   } catch {
     return null;
   }
-  if (!renderer.capabilities.isWebGL2) {
+  try {
+    if (!renderer.capabilities.isWebGL2) throw new Error("WebGL2 required");
+    return assemble(options, renderer);
+  } catch {
     renderer.dispose();
     return null;
   }
+}
+
+function assemble(options: KeepSceneOptions, renderer: WebGLRenderer): KeepScene {
+  const { canvas, low } = options;
   renderer.setClearColor(FOG, 1);
 
   const world = buildWorld(options.milestones);
-  const fires = world.fires.slice(0, MAX_FIRES);
+  /* The signal fire is built last and must never be the one left out. */
+  const fires =
+    world.fires.length > MAX_FIRES
+      ? [...world.fires.slice(0, MAX_FIRES - 1), world.fires[world.fires.length - 1]]
+      : world.fires;
   const fireUniform = Array.from({ length: MAX_FIRES }, () => new Vector4());
   const shared = {
     uTime: { value: 0 },
@@ -474,11 +484,11 @@ export function createKeepScene(options: KeepSceneOptions): KeepScene | null {
       fragmentShader: SKY_FRAGMENT,
       side: BackSide,
       depthWrite: false,
-      depthTest: false,
     }),
   );
   sky.frustumCulled = false;
-  sky.renderOrder = -1;
+  /* Drawn after the stone, at the far plane: only open sky is ever shaded. */
+  sky.renderOrder = 1;
   scene.add(sky);
 
   const stone = new Mesh(
@@ -565,6 +575,7 @@ export function createKeepScene(options: KeepSceneOptions): KeepScene | null {
   let pixelRatio = 1;
   const maxPixelRatio = low ? 1.25 : 1.75;
   let slowFrames = 0;
+  let failed = false;
   /* The fires catch over the first moments instead of popping in lit. */
   let kindle = motion ? 0 : 1;
 
@@ -630,12 +641,25 @@ export function createKeepScene(options: KeepSceneOptions): KeepScene | null {
     lit.needsUpdate = true;
   }
 
+  /* A shader the GPU rejects, or a render that throws, hands the page back
+     to its painted backdrop instead of leaving a blank canvas over it. */
+  function fail(): void {
+    if (failed || disposed) return;
+    failed = true;
+    window.setTimeout(options.onLost, 0);
+  }
+  renderer.debug.onShaderError = fail;
+
   function draw(): void {
-    if (disposed || width === 0) return;
-    place();
-    shared.uTime.value = clock;
-    renderer.render(scene, camera);
-    frames += 1;
+    if (disposed || failed || width === 0) return;
+    try {
+      place();
+      shared.uTime.value = clock;
+      renderer.render(scene, camera);
+      frames += 1;
+    } catch {
+      fail();
+    }
   }
 
   function settled(): boolean {
@@ -645,15 +669,16 @@ export function createKeepScene(options: KeepSceneOptions): KeepScene | null {
   function tick(now: number): void {
     frame = 0;
     if (disposed) return;
-    const delta = Math.min((now - previous) / 1000, 0.1);
+    const delta = Math.min(Math.max((now - previous) / 1000, 0), 0.1);
     previous = now;
     if (motion) {
       clock += delta;
       kindle = Math.min(kindle + delta / 1.8, 1);
       current += (goal - current) * (1 - Math.exp(-delta * 3.6));
 
-      /* Shed resolution rather than frames when the GPU cannot keep up. */
-      slowFrames = delta > 0.034 ? slowFrames + 1 : Math.max(slowFrames - 1, 0);
+      /* Shed resolution rather than frames when the GPU cannot keep up. A
+         steady 30 fps (a phone saving power) is left alone. */
+      slowFrames = delta > 0.045 ? slowFrames + 1 : Math.max(slowFrames - 1, 0);
       if (slowFrames > 40 && pixelRatio > 0.75) {
         pixelRatio = Math.max(pixelRatio - 0.25, 0.75);
         slowFrames = 0;
@@ -664,7 +689,7 @@ export function createKeepScene(options: KeepSceneOptions): KeepScene | null {
       kindle = 1;
     }
     draw();
-    if (motion || !settled()) schedule();
+    if (!failed && (motion || !settled())) schedule();
     else running = false;
   }
 

@@ -9,6 +9,15 @@ const places = ['work', 'about', 'experience', 'contact'] as const;
 
 const root = (page: Page) => page.locator('[data-keep-root]');
 
+/** Scrolls so the first section title has only just begun to enter the window. */
+async function toRisingTitle(page: Page) {
+  await page.evaluate(() => {
+    const passage = document.querySelector<HTMLElement>('[data-keep-passage]')!;
+    const top = passage.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: top - window.innerHeight * 0.6, behavior: 'instant' });
+  });
+}
+
 async function noSidewaysScroll(page: Page) {
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -96,21 +105,26 @@ test.describe('keep interface', () => {
     await page.goto('/?view=lite');
     const button = page.locator('[data-keep-motion]');
     await expect(button).toBeVisible();
-    await expect(button).toHaveAttribute('aria-pressed', 'true');
+    await expect(button).toHaveText('Motion on');
     await expect(root(page)).toHaveAttribute('data-motion', 'on');
 
+    /* With motion on, a title that is still rising is only partly shown. */
+    await toRisingTitle(page);
+    await expect
+      .poll(() => page.locator('#work-title').evaluate((title) => Number(getComputedStyle(title).opacity)))
+      .toBeLessThan(0.9);
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+
     await button.click();
-    await expect(button).toHaveAttribute('aria-pressed', 'false');
+    await expect(button).toHaveText('Motion off');
     await expect(root(page)).toHaveAttribute('data-motion', 'off');
+    await expect(page.locator('html')).toHaveCSS('scroll-behavior', 'auto');
 
     await page.reload();
     await expect(root(page)).toHaveAttribute('data-motion', 'off');
-    await expect(page.locator('[data-keep-motion]')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('[data-keep-motion]')).toHaveText('Motion off');
     /* A title that is only just entering the window is already fully shown. */
-    await page.evaluate(() => {
-      const passage = document.querySelector<HTMLElement>('[data-keep-passage]')!;
-      window.scrollTo(0, passage.offsetTop - window.innerHeight * 0.9);
-    });
+    await toRisingTitle(page);
     await expect(page.locator('#work-title')).toHaveCSS('opacity', '1');
   });
 
@@ -122,10 +136,7 @@ test.describe('keep interface', () => {
       await expect(root(page)).toHaveAttribute('data-motion', 'off');
       await expect(page.locator('[data-keep-motion]')).toBeDisabled();
       await expect(page.locator('.keep-hero__copy > *').first()).toHaveCSS('animation-name', 'none');
-      await page.evaluate(() => {
-        const passage = document.querySelector<HTMLElement>('[data-keep-passage]')!;
-        window.scrollTo(0, passage.offsetTop - window.innerHeight * 0.9);
-      });
+      await toRisingTitle(page);
       await expect(page.locator('#work-title')).toHaveCSS('opacity', '1');
     });
   });
@@ -142,7 +153,7 @@ test.describe('keep interface', () => {
       await expect(page.locator('[data-keep-motion]')).toBeHidden();
       await expect(page.locator('.keep-header__resume')).toHaveAttribute('href', '/resume/');
       const flame = page.locator('.keep-career__flame').first();
-      await expect(flame).not.toHaveCSS('background-color', 'rgb(51, 64, 59)');
+      await expect(flame).toHaveCSS('background-image', /radial-gradient/);
     });
   });
 

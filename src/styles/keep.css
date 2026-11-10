@@ -89,14 +89,17 @@ body.keep-portfolio ::selection {
   z-index: -1;
   inset: 0 0 auto;
   /* The largest viewport: the canvas never resizes as mobile toolbars move. */
+  height: 100vh;
   height: 100lvh;
   /* What is here before, or instead of, the 3D scene: the same night, a moon
      and one distant fire. */
   background:
-    radial-gradient(circle at 78% 22%, rgba(214, 240, 226, 0.5) 0, transparent 1.1rem),
-    radial-gradient(ellipse 34rem 22rem at 78% 22%, rgba(125, 188, 170, 0.16), transparent 70%),
-    radial-gradient(ellipse 16rem 12rem at 62% 64%, rgba(242, 165, 65, 0.3), transparent 70%),
-    linear-gradient(to bottom, #050b0d 0%, #0e1b19 62%, #0a1110 100%);
+    radial-gradient(circle at 66% 17%, #e3f1e8 0, #e3f1e8 1.55rem, transparent 1.65rem),
+    radial-gradient(circle at 66% 17%, rgba(125, 188, 170, 0.34), transparent 15rem),
+    radial-gradient(ellipse 60rem 30rem at 66% 17%, rgba(125, 188, 170, 0.13), transparent 70%),
+    radial-gradient(circle at 66% 61%, #ffd58a 0, rgba(242, 165, 65, 0.85) 0.3rem, transparent 0.9rem),
+    radial-gradient(ellipse 13rem 9rem at 66% 62%, rgba(242, 165, 65, 0.26), transparent 70%),
+    linear-gradient(to bottom, #050b0d 0%, #15292b 60%, #0c1514 61%, #0a1110 100%);
 }
 
 .keep-scene__canvas {
@@ -125,7 +128,7 @@ body.keep-portfolio ::selection {
   background: linear-gradient(
     to bottom,
     rgb(var(--pit)) 0%,
-    rgba(var(--pit), 0.97) 56%,
+    rgb(var(--pit)) 58%,
     rgba(var(--pit), 0) 100%
   );
   pointer-events: none;
@@ -242,7 +245,7 @@ body.keep-portfolio ::selection {
     gap: 0;
     padding-bottom: env(safe-area-inset-bottom, 0px);
     border-top: 1px solid var(--line);
-    background: rgba(var(--pit), 0.94);
+    background: rgb(var(--pit));
   }
 
   .keep-nav a {
@@ -265,6 +268,7 @@ body.keep-portfolio ::selection {
   position: relative;
   display: grid;
   grid-template-rows: 1fr auto;
+  min-height: 100vh;
   min-height: 100svh;
   padding: 6.5rem var(--keep-gutter) 1.75rem;
 }
@@ -443,6 +447,7 @@ body.keep-portfolio ::selection {
 @media (max-width: 47.5rem) {
   .keep-hero {
     /* The place bar covers the foot of the window. */
+    min-height: calc(100vh - var(--keep-bar));
     min-height: calc(100svh - var(--keep-bar));
     padding-top: 5rem;
     padding-bottom: 0.5rem;
@@ -492,6 +497,7 @@ body.keep-portfolio ::selection {
   top: 0;
   display: grid;
   align-content: center;
+  min-height: 100vh;
   min-height: 100svh;
   padding: 5rem var(--keep-gutter);
 }
@@ -518,7 +524,6 @@ body.keep-portfolio ::selection {
 .keep-passage h2 {
   opacity: var(--enter, 1);
   transform: translateY(calc((1 - var(--enter, 1)) * 2.5rem));
-  letter-spacing: calc(-0.024em + (1 - var(--enter, 1)) * 0.09em);
 }
 
 .keep-passage h2::after {
@@ -534,6 +539,7 @@ body.keep-portfolio ::selection {
 
 @media (max-width: 47.5rem) {
   .keep-passage {
+    min-height: 100vh;
     min-height: 100svh;
   }
 
@@ -568,11 +574,13 @@ body.keep-portfolio ::selection {
 
 .keep-veil::before {
   inset: -9rem 0;
+  /* Measured from the column, not the window: the scrim is full strength
+     behind every line of text at any width, then lets the road through. */
   background: linear-gradient(
     90deg,
-    rgba(var(--pit), 0.95) 0%,
-    rgba(var(--pit), 0.9) 36%,
-    rgba(var(--pit), 0) 70%
+    rgba(var(--pit), 0.95) 0,
+    rgba(var(--pit), 0.9) calc(var(--keep-gutter) + 37rem),
+    rgba(var(--pit), 0) calc(var(--keep-gutter) + 50rem)
   );
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 9rem, #000 calc(100% - 9rem), transparent);
   mask-image: linear-gradient(to bottom, transparent, #000 9rem, #000 calc(100% - 9rem), transparent);
@@ -591,6 +599,7 @@ body.keep-portfolio ::selection {
 .keep-veil--open {
   display: grid;
   align-content: end;
+  min-height: 100vh;
   min-height: 100svh;
   padding-top: 7rem;
   padding-bottom: 1.5rem;
@@ -694,6 +703,12 @@ body.keep-portfolio ::selection {
 .keep-demo,
 .keep-system {
   scroll-margin-top: 5.5rem;
+}
+
+/* Tabbing to a link must never leave it under the fixed header or the phone
+   place bar. */
+.keep main :is(a, button) {
+  scroll-margin-block: 5.5rem calc(var(--keep-bar) + 1rem);
 }
 
 .keep-collection__head {
@@ -1212,6 +1227,11 @@ body.keep-portfolio ::selection {
 /* Stillness, by system setting or by the visitor's own switch. */
 .keep[data-motion="off"] .keep-passage {
   --enter: 1 !important;
+}
+
+/* The switch also stops the page gliding between places. */
+:root:has(.keep[data-motion="off"]) {
+  scroll-behavior: auto;
 }
 
 .keep[data-motion="off"] * {

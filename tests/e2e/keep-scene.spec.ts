@@ -37,8 +37,15 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
     page.on('console', (message) => {
       if (message.type() === 'error') errors.push(message.text());
     });
+    /* Positive control for the light-view check in keep.spec.ts: this is the
+       request that view must never make. */
+    const sceneRequests: string[] = [];
+    page.on('request', (request) => {
+      if (/scene\.[\w-]+\.js$/.test(request.url())) sceneRequests.push(request.url());
+    });
     await page.goto('/');
     await live(page);
+    expect(sceneRequests).toHaveLength(1);
     await expect(page.locator('[data-keep-canvas]')).toHaveCSS('opacity', '1', { timeout: 15_000 });
 
     const start = await metrics(page);
@@ -54,7 +61,9 @@ test.describe('real WebGL scene lifecycle (software Chromium)', () => {
     await expect.poll(async () => (await metrics(page)).cameraZ, { timeout: 60_000 }).toBeLessThan(-100);
     const end = await metrics(page);
     expect(end.litFires, 'every fire on the road is lit by the end').toBeGreaterThan(start.litFires);
-    expect(end.litFires).toBeGreaterThanOrEqual(11);
+    /* Two at the gate, the signal fire and one per career entry at the least. */
+    const entries = await page.locator('[data-keep-milestone]').count();
+    expect(end.litFires).toBeGreaterThanOrEqual(3 + entries);
     expect(errors).toEqual([]);
   });
 
