@@ -1,0 +1,1234 @@
+/* ==========================================================================
+   The keep — night theme for the homepage.
+
+   Palette: a green-black night, bone for reading, ash for the quiet parts,
+   ember for anything that burns or can be pressed, verdigris for the cold
+   moonlit details, oxblood for the one seal that means "in production".
+   Type: Instrument Serif for names and titles, Inter for reading, JetBrains
+   Mono only for technology names.
+   ========================================================================== */
+
+:root:has(body.keep-portfolio) {
+  background: #0b1211;
+  /* Section anchors land on a full-height title, so nothing needs clearing. */
+  scroll-padding-top: 0;
+}
+
+body.keep-portfolio {
+  --night: #0b1211;
+  --pit: 8, 13, 12;
+  --bone: #ece4d0;
+  --ash: #a3ab9c;
+  --ember: #f2a541;
+  --ember-hot: #ffc670;
+  --verdigris: #7dbcaa;
+  --oxblood: #a13a2b;
+  --line: rgba(236, 228, 208, 0.16);
+  --keep-gutter: clamp(1.25rem, 5vw, 4.5rem);
+  --keep-serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --keep-bar: 0px;
+
+  /* Legacy tokens, re-pointed so shared pieces (diagrams, skip link) match. */
+  --bg-0: var(--night);
+  --text: var(--bone);
+  --muted: var(--ash);
+  --violet: var(--ember);
+  --violet-soft: var(--ember-hot);
+  --sky: var(--verdigris);
+  --focus-ring: 2px solid var(--ember);
+
+  background: var(--night);
+  color: var(--bone);
+}
+
+body.keep-portfolio ::selection {
+  background: var(--ember);
+  color: #1a0f04;
+}
+
+.keep {
+  position: relative;
+  isolation: isolate;
+  padding-bottom: var(--keep-bar);
+}
+
+/* Resets carry no specificity, so any component class can override them. */
+:where(.keep) a {
+  color: inherit;
+}
+
+:where(.keep) :is(h1, h2, h3, h4) {
+  margin: 0;
+  font-family: var(--keep-serif);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+:where(.keep) :is(p, ul, ol, dl, dd) {
+  margin: 0;
+  padding: 0;
+}
+
+:where(.keep) :is(ul, ol) {
+  list-style: none;
+}
+
+.keep-anchor {
+  position: absolute;
+  top: 0;
+}
+
+/* --------------------------------------------------------------------------
+   The world behind the page
+   -------------------------------------------------------------------------- */
+
+.keep-scene {
+  position: fixed;
+  z-index: -1;
+  inset: 0 0 auto;
+  /* The largest viewport: the canvas never resizes as mobile toolbars move. */
+  height: 100lvh;
+  /* What is here before, or instead of, the 3D scene: the same night, a moon
+     and one distant fire. */
+  background:
+    radial-gradient(circle at 78% 22%, rgba(214, 240, 226, 0.5) 0, transparent 1.1rem),
+    radial-gradient(ellipse 34rem 22rem at 78% 22%, rgba(125, 188, 170, 0.16), transparent 70%),
+    radial-gradient(ellipse 16rem 12rem at 62% 64%, rgba(242, 165, 65, 0.3), transparent 70%),
+    linear-gradient(to bottom, #050b0d 0%, #0e1b19 62%, #0a1110 100%);
+}
+
+.keep-scene__canvas {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1400ms ease-out;
+}
+
+.keep[data-scene="live"] .keep-scene__canvas {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Header and navigation
+   -------------------------------------------------------------------------- */
+
+.keep-header {
+  position: fixed;
+  z-index: 20;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem var(--keep-gutter) 2.2rem;
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--pit)) 0%,
+    rgba(var(--pit), 0.97) 56%,
+    rgba(var(--pit), 0) 100%
+  );
+  pointer-events: none;
+}
+
+.keep-header > * {
+  pointer-events: auto;
+}
+
+.keep-brand {
+  margin-right: auto;
+  font-family: var(--keep-serif);
+  font-size: 1.45rem;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.keep-nav,
+.keep-languages,
+.keep-header__tools {
+  display: flex;
+  align-items: center;
+}
+
+.keep-nav {
+  gap: clamp(1rem, 2.4vw, 2.2rem);
+}
+
+.keep-header__tools {
+  gap: 1.4rem;
+}
+
+.keep-nav a,
+.keep-header__resume,
+.keep-languages a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ash);
+  font-size: 0.92rem;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.keep-nav a {
+  position: relative;
+}
+
+/* The current place burns: a short ember line under its name. */
+.keep-nav a::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0.45rem;
+  height: 2px;
+  background: var(--ember);
+  box-shadow: 0 0 12px rgba(242, 165, 65, 0.8);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.keep-nav a[aria-current]::after {
+  transform: scaleX(1);
+}
+
+.keep-nav a:hover,
+.keep-nav a[aria-current],
+.keep-header__resume:hover,
+.keep-languages a:hover,
+.keep-languages a[aria-current] {
+  color: var(--bone);
+}
+
+.keep-languages {
+  gap: 0.15rem;
+}
+
+.keep-languages a {
+  min-width: 2.2rem;
+  justify-content: center;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.keep-languages a[aria-current] {
+  color: var(--ember);
+}
+
+/* Phones: the four places move to a bar under the thumb. */
+@media (max-width: 47.5rem) {
+  body.keep-portfolio {
+    --keep-bar: calc(3.6rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .keep-header {
+    gap: 0.75rem;
+    padding-bottom: 1.6rem;
+  }
+
+  .keep-brand {
+    font-size: 1.25rem;
+  }
+
+  .keep-header__tools {
+    gap: 0.6rem;
+  }
+
+  .keep-nav {
+    position: fixed;
+    z-index: 21;
+    inset: auto 0 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-top: 1px solid var(--line);
+    background: rgba(var(--pit), 0.94);
+  }
+
+  .keep-nav a {
+    justify-content: center;
+    min-height: 3.6rem;
+    font-size: 0.86rem;
+  }
+
+  .keep-nav a::after {
+    inset: 0 22% auto;
+    transform-origin: center;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Hero
+   -------------------------------------------------------------------------- */
+
+.keep-hero {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  min-height: 100svh;
+  padding: 6.5rem var(--keep-gutter) 1.75rem;
+}
+
+/* Reading sits on the left; the road and its fires stay clear on the right. */
+/* Each scrim stays inside its own block, above the scene and under the text. */
+.keep-hero,
+.keep-passage__pin,
+.keep-veil {
+  isolation: isolate;
+}
+
+.keep-hero::before,
+.keep-passage__pin::before,
+.keep-veil::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+}
+
+.keep-hero::before {
+  background:
+    linear-gradient(to top, rgba(var(--pit), 0.82) 0%, rgba(var(--pit), 0) 34%),
+    linear-gradient(
+      98deg,
+      rgba(var(--pit), 0.9) 0%,
+      rgba(var(--pit), 0.66) 30%,
+      rgba(var(--pit), 0) 58%
+    );
+}
+
+.keep-hero__copy {
+  align-self: end;
+  max-width: 39rem;
+  padding-bottom: clamp(1.5rem, 5vh, 4rem);
+}
+
+.keep-hero h1 {
+  font-size: clamp(3.7rem, 10.4vw, 9.25rem);
+  line-height: 0.88;
+  letter-spacing: -0.028em;
+}
+
+.keep-hero__role {
+  margin-top: 1.4rem;
+  color: var(--ember);
+  font-size: 1.05rem;
+}
+
+.keep-hero__lead {
+  max-width: 34rem;
+  margin-top: 1rem;
+  font-size: clamp(1.1rem, 1.5vw, 1.28rem);
+  line-height: 1.55;
+}
+
+.keep-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.keep-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 3.1rem;
+  padding: 0 1.5rem;
+  border: 1px solid var(--ember);
+  border-radius: 2px;
+  background: var(--ember);
+  color: #1a0f04;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 240ms ease;
+}
+
+.keep-button:hover {
+  border-color: var(--ember-hot);
+  background: var(--ember-hot);
+  box-shadow: 0 0 34px rgba(242, 165, 65, 0.38);
+}
+
+.keep-button--quiet {
+  border-color: rgba(236, 228, 208, 0.4);
+  background: rgba(var(--pit), 0.5);
+  color: var(--bone);
+  font-weight: 500;
+}
+
+.keep-button--quiet:hover {
+  border-color: var(--bone);
+  background: rgba(var(--pit), 0.7);
+  box-shadow: none;
+}
+
+.keep-button svg,
+.keep-links svg,
+.keep-seal svg,
+.keep-work__more svg {
+  width: 1.05em;
+  height: 1.05em;
+}
+
+.keep-status {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 1.6rem;
+  color: var(--ash);
+  font-size: 0.95rem;
+}
+
+/* A small flame, not a dot: lit means available. */
+.keep-status__flame,
+.keep-career__flame {
+  flex: none;
+  width: 0.6rem;
+  height: 0.8rem;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: radial-gradient(circle at 50% 70%, #fff3cf 0, var(--ember) 45%, #c8621b 100%);
+  box-shadow: 0 0 14px rgba(242, 165, 65, 0.75);
+}
+
+.keep-hero__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--ash);
+  font-size: 0.88rem;
+}
+
+.keep-hero__scroll {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  text-decoration: none;
+}
+
+.keep-hero__scroll::before {
+  content: "";
+  width: 1px;
+  height: 2.1rem;
+  background: linear-gradient(to bottom, transparent, var(--ember));
+}
+
+.keep-motion {
+  min-height: 2.75rem;
+  padding: 0 0.25rem;
+  border: 0;
+  background: none;
+  color: var(--ash);
+  font-size: 0.88rem;
+  text-decoration: underline dotted;
+  text-underline-offset: 0.3em;
+  cursor: pointer;
+}
+
+.keep-motion:hover:not(:disabled) {
+  color: var(--bone);
+}
+
+.keep-motion:disabled {
+  cursor: default;
+  text-decoration: none;
+}
+
+@media (max-width: 47.5rem) {
+  .keep-hero {
+    /* The place bar covers the foot of the window. */
+    min-height: calc(100svh - var(--keep-bar));
+    padding-top: 5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .keep-hero__copy {
+    padding-bottom: 1rem;
+  }
+
+  .keep-hero__lead {
+    font-size: 1.05rem;
+  }
+
+  .keep-hero__actions {
+    margin-top: 1.4rem;
+  }
+
+  .keep-button {
+    padding-inline: 1.1rem;
+  }
+
+  /* On a phone the road fills the top half and the words rest below it. */
+  .keep-hero::before {
+    background: linear-gradient(
+      to top,
+      rgba(var(--pit), 0.96) 0%,
+      rgba(var(--pit), 0.8) 40%,
+      rgba(var(--pit), 0) 68%
+    );
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Section titles — each one is a stretch of open road
+   -------------------------------------------------------------------------- */
+
+.keep-section {
+  position: relative;
+}
+
+.keep-passage {
+  min-height: 128svh;
+}
+
+.keep-passage__pin {
+  position: sticky;
+  top: 0;
+  display: grid;
+  align-content: center;
+  min-height: 100svh;
+  padding: 5rem var(--keep-gutter);
+}
+
+.keep-passage__pin::before {
+  background: linear-gradient(
+    98deg,
+    rgba(var(--pit), 0.78) 0%,
+    rgba(var(--pit), 0.42) 32%,
+    rgba(var(--pit), 0) 60%
+  );
+}
+
+.keep-passage h2,
+.keep-veil--open h2 {
+  max-width: 11ch;
+  font-size: clamp(3.1rem, 8.2vw, 7.25rem);
+  line-height: 0.92;
+  letter-spacing: -0.024em;
+  text-shadow: 0 0.1em 1.2em rgba(var(--pit), 0.9);
+}
+
+/* --enter runs 0 → 1 as the title rises into the window (set by main.ts). */
+.keep-passage h2 {
+  opacity: var(--enter, 1);
+  transform: translateY(calc((1 - var(--enter, 1)) * 2.5rem));
+  letter-spacing: calc(-0.024em + (1 - var(--enter, 1)) * 0.09em);
+}
+
+.keep-passage h2::after {
+  content: "";
+  display: block;
+  width: min(100%, 19rem);
+  height: 1px;
+  margin-top: 0.34em;
+  background: linear-gradient(90deg, var(--ember), rgba(242, 165, 65, 0));
+  transform: scaleX(var(--enter, 1));
+  transform-origin: left;
+}
+
+@media (max-width: 47.5rem) {
+  .keep-passage {
+    min-height: 100svh;
+  }
+
+  .keep-passage__pin {
+    align-content: end;
+    padding-bottom: 22svh;
+  }
+
+  .keep-passage__pin::before {
+    background: linear-gradient(
+      to top,
+      rgba(var(--pit), 0.9) 0%,
+      rgba(var(--pit), 0.5) 40%,
+      rgba(var(--pit), 0) 70%
+    );
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Veils — where the reading happens
+   -------------------------------------------------------------------------- */
+
+.keep-veil {
+  position: relative;
+  padding: clamp(2rem, 6vw, 4rem) var(--keep-gutter) clamp(5rem, 12vw, 9rem);
+}
+
+/* Default: a reading column on the left, the world still open on the right. */
+.keep-veil > * {
+  max-width: 37rem;
+}
+
+.keep-veil::before {
+  inset: -9rem 0;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--pit), 0.95) 0%,
+    rgba(var(--pit), 0.9) 36%,
+    rgba(var(--pit), 0) 70%
+  );
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 9rem, #000 calc(100% - 9rem), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 9rem, #000 calc(100% - 9rem), transparent);
+}
+
+/* The work needs the full width, so here the keep dims to a glow. */
+.keep-veil--wide > * {
+  max-width: 78rem;
+  margin-inline: auto;
+}
+
+.keep-veil--wide::before {
+  background: rgba(var(--pit), 0.9);
+}
+
+.keep-veil--open {
+  display: grid;
+  align-content: end;
+  min-height: 100svh;
+  padding-top: 7rem;
+  padding-bottom: 1.5rem;
+}
+
+.keep-veil--open::before {
+  inset: -9rem 0 0;
+  background:
+    linear-gradient(to top, rgba(var(--pit), 0.9) 0%, rgba(var(--pit), 0) 30%),
+    linear-gradient(
+      98deg,
+      rgba(var(--pit), 0.9) 0%,
+      rgba(var(--pit), 0.6) 32%,
+      rgba(var(--pit), 0) 60%
+    );
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 9rem);
+  mask-image: linear-gradient(to bottom, transparent, #000 9rem);
+}
+
+.keep-veil--open > .keep-footer {
+  max-width: none;
+}
+
+@media (max-width: 56rem) {
+  .keep-veil::before {
+    background: rgba(var(--pit), 0.88);
+  }
+
+  .keep-veil--open::before {
+    background: linear-gradient(
+      to top,
+      rgba(var(--pit), 0.96) 0%,
+      rgba(var(--pit), 0.8) 38%,
+      rgba(var(--pit), 0) 66%
+    );
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Shared small parts
+   -------------------------------------------------------------------------- */
+
+.keep-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  color: var(--ash);
+  font-size: 0.85rem;
+}
+
+.keep-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.05rem;
+  color: var(--verdigris);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.keep-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.6rem;
+}
+
+.keep-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
+  text-decoration: underline;
+  text-decoration-color: var(--ember);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.34em;
+  transition: color 160ms ease;
+}
+
+.keep-links a:hover {
+  color: var(--ember-hot);
+}
+
+.keep-note {
+  margin-top: 2.25rem;
+  color: var(--ash);
+  font-size: 0.88rem;
+}
+
+/* --------------------------------------------------------------------------
+   Work
+   -------------------------------------------------------------------------- */
+
+.keep-collection + .keep-collection {
+  margin-top: clamp(4.5rem, 10vw, 8rem);
+}
+
+/* Legacy anchors inside a section still need to clear the fixed header. */
+.keep-collection,
+.keep-block,
+.keep-demo,
+.keep-system {
+  scroll-margin-top: 5.5rem;
+}
+
+.keep-collection__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  margin-bottom: 2.25rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.keep-collection__head h3 {
+  font-size: clamp(2rem, 3.6vw, 2.9rem);
+}
+
+.keep-collection__head p {
+  color: var(--ash);
+}
+
+.keep-demos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19.5rem), 1fr));
+  gap: 3rem 2rem;
+}
+
+.keep-demo {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 1.1rem;
+}
+
+.keep-demo__shot {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #0d1513;
+}
+
+/* Screenshots of bright sites sit back until the visitor reaches for one. */
+.keep-demo__shot img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1440 / 1000;
+  object-fit: cover;
+  filter: brightness(0.82) saturate(0.86);
+  transition:
+    filter 260ms ease,
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.keep-demo__shot:hover img,
+.keep-demo__shot:focus-visible img {
+  filter: none;
+  transform: scale(1.025);
+}
+
+.keep-demo__body {
+  display: grid;
+  align-content: start;
+  gap: 0.6rem;
+}
+
+.keep-demo h4 {
+  font-size: 1.95rem;
+}
+
+.keep-demo__text,
+.keep-system__text {
+  color: rgba(236, 228, 208, 0.84);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.keep-systems {
+  display: grid;
+}
+
+.keep-system {
+  display: grid;
+  gap: 1.75rem clamp(2rem, 5vw, 4.5rem);
+  padding-block: 2.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.keep-system:first-child {
+  padding-top: 0.5rem;
+}
+
+@media (min-width: 60rem) {
+  .keep-system {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: center;
+  }
+
+  .keep-system--plain {
+    grid-template-columns: minmax(0, 5fr);
+  }
+}
+
+.keep-system__body {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.keep-system .keep-meta {
+  justify-content: flex-start;
+  gap: 0.25rem 1.4rem;
+}
+
+.keep-system h4 {
+  font-size: clamp(2.1rem, 3.4vw, 2.75rem);
+}
+
+.keep-system__highlights {
+  display: grid;
+  gap: 0.5rem;
+  color: var(--ash);
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+.keep-system__highlights li {
+  position: relative;
+  padding-left: 1.3rem;
+}
+
+.keep-system__highlights li::before {
+  content: "";
+  position: absolute;
+  top: 0.55em;
+  left: 0.1rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  background: var(--ember);
+  transform: rotate(45deg);
+}
+
+.keep-seals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.3rem;
+}
+
+.keep-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--ash);
+  font-size: 0.82rem;
+}
+
+.keep-seal--production {
+  border-color: var(--oxblood);
+  background: rgba(161, 58, 43, 0.26);
+  color: var(--bone);
+}
+
+.keep-seal--link {
+  min-height: 2.75rem;
+  color: var(--bone);
+  text-decoration: none;
+}
+
+.keep-seal--link:hover {
+  border-color: var(--ember);
+  color: var(--ember-hot);
+}
+
+/* Architecture diagrams become etched plates: one warm tone, no ambient
+   motion. The diagram component keeps its own geometry and labels. */
+.keep-system__diagram {
+  padding: 0.6rem;
+  border: 1px solid var(--line);
+  background: #0d1513;
+  filter: sepia(1) saturate(1.25) hue-rotate(-12deg) brightness(1.04);
+}
+
+.keep-system__diagram .diagram
+  :is(
+    .diagram__field,
+    .diagram__grid,
+    .diagram__frame,
+    .diagram__zone,
+    .diagram__edge-group,
+    .diagram__plate,
+    .diagram__node,
+    .diagram__port,
+    .diagram__led
+  ) {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.keep-system__diagram .diagram :is(.diagram__edge, .diagram__zone-rect) {
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+  transition: none;
+}
+
+.keep-system__diagram .diagram .diagram__packets {
+  display: none;
+}
+
+.keep-system__diagram .diagram .diagram__hit {
+  pointer-events: none;
+}
+
+.keep-work__more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  margin-top: 2.5rem;
+  color: var(--ash);
+  font-size: 0.92rem;
+}
+
+.keep-work__more a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  color: var(--bone);
+}
+
+/* --------------------------------------------------------------------------
+   About
+   -------------------------------------------------------------------------- */
+
+.keep-about {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.keep-identity {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.keep-identity__portrait {
+  width: clamp(5.5rem, 16vw, 7.5rem);
+  height: auto;
+  border: 1px solid var(--line);
+  filter: saturate(0.82) contrast(1.04);
+}
+
+.keep-identity h3 {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+}
+
+.keep-identity__role {
+  margin-top: 0.45rem;
+  color: var(--ember);
+  font-size: 0.98rem;
+}
+
+.keep-about__aside {
+  font-size: 1.1rem;
+  line-height: 1.55;
+}
+
+.keep-block {
+  margin-top: 2.5rem;
+  padding-top: 2.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.keep-block > h3 {
+  margin-bottom: 1.6rem;
+  font-size: clamp(2rem, 3.6vw, 2.6rem);
+}
+
+.keep-practice {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.keep-practice dt {
+  margin-bottom: 0.35rem;
+  font-family: var(--keep-serif);
+  font-size: 1.5rem;
+  line-height: 1.1;
+}
+
+.keep-practice dd {
+  color: var(--ash);
+  line-height: 1.6;
+}
+
+.keep-skills > div {
+  display: grid;
+  gap: 0.35rem 1.5rem;
+  padding-block: 0.95rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.keep-skills > div:first-child {
+  padding-top: 0;
+}
+
+.keep-skills dt {
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+@media (min-width: 34rem) {
+  .keep-skills > div {
+    grid-template-columns: 9.5rem minmax(0, 1fr);
+    align-items: baseline;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Career — one fire for every step
+   -------------------------------------------------------------------------- */
+
+.keep-career {
+  margin-left: 0.35rem;
+  border-left: 1px solid var(--line);
+}
+
+.keep-career__entry {
+  position: relative;
+  padding: 0 0 2.75rem 2rem;
+}
+
+.keep-career__entry:last-child {
+  padding-bottom: 0;
+}
+
+.keep-career__flame {
+  position: absolute;
+  top: 0.2rem;
+  left: -0.33rem;
+}
+
+/* With the controller running, a marker starts cold and catches when its
+   entry comes up the page. Without it, every marker simply burns. */
+.keep-enhanced .keep-career__flame {
+  transition:
+    background 500ms ease,
+    box-shadow 700ms ease,
+    filter 500ms ease;
+}
+
+.keep-enhanced .keep-career__entry:not(.is-lit) .keep-career__flame {
+  background: #33403b;
+  box-shadow: none;
+}
+
+.keep-career__period {
+  color: var(--ash);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+.keep-career h3 {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0.4rem 0 0.7rem;
+  font-size: clamp(1.75rem, 3.4vw, 2.25rem);
+}
+
+.keep-career__company {
+  color: var(--ember);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.keep-career__note {
+  color: rgba(236, 228, 208, 0.84);
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   Contact and footer
+   -------------------------------------------------------------------------- */
+
+.keep-contact {
+  display: grid;
+  justify-items: start;
+  gap: 1.1rem;
+  margin-top: 1.75rem;
+}
+
+.keep-contact__line {
+  max-width: 30rem;
+  font-size: clamp(1.1rem, 1.5vw, 1.28rem);
+  line-height: 1.5;
+}
+
+.keep-contact .keep-status {
+  margin-top: 0;
+}
+
+.keep-contact__email {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.75rem;
+  text-decoration: none;
+}
+
+.keep-contact__email-label {
+  color: var(--ember);
+  font-size: 0.95rem;
+}
+
+/* Set in the reading face: the serif's old-style 1 reads as an l. */
+.keep-contact__email-address {
+  font-size: clamp(1.15rem, 3.3vw, 1.85rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-decoration-color: rgba(242, 165, 65, 0.55);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 160ms ease;
+}
+
+.keep-contact__email:hover .keep-contact__email-address {
+  text-decoration-color: var(--ember-hot);
+}
+
+.keep-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 2.2rem;
+  margin-top: clamp(3rem, 9vh, 6rem);
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--line);
+  color: var(--ash);
+  font-size: 0.84rem;
+}
+
+.keep-footer__clock {
+  margin-left: 0.5rem;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.keep-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  margin-left: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Motion
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The one arrival: the name, then what he does, as the fires catch. It is
+     plain CSS so it starts with the first paint and never replays. */
+  .keep-hero__copy > * {
+    animation: keep-arrive 1100ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .keep-hero__copy > :nth-child(2) {
+    animation-delay: 140ms;
+  }
+
+  .keep-hero__copy > :nth-child(3) {
+    animation-delay: 240ms;
+  }
+
+  .keep-hero__copy > :nth-child(n + 4) {
+    animation-delay: 360ms;
+  }
+
+  .keep[data-motion="on"] .keep-status__flame,
+  .keep[data-motion="on"] .keep-career__entry.is-lit .keep-career__flame {
+    animation: keep-flicker 2.6s ease-in-out infinite;
+  }
+}
+
+@keyframes keep-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(1.4rem);
+  }
+}
+
+@keyframes keep-flicker {
+  0%,
+  100% {
+    filter: brightness(1);
+    transform: scaleY(1);
+  }
+
+  38% {
+    filter: brightness(1.25);
+    transform: scaleY(1.12) translateY(-4%);
+  }
+
+  61% {
+    filter: brightness(0.9);
+    transform: scaleY(0.94);
+  }
+}
+
+/* Stillness, by system setting or by the visitor's own switch. */
+.keep[data-motion="off"] .keep-passage {
+  --enter: 1 !important;
+}
+
+.keep[data-motion="off"] * {
+  transition-duration: 1ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .keep-passage {
+    --enter: 1 !important;
+  }
+}
+
+@media print {
+  .keep-scene,
+  .keep-nav,
+  .keep-motion,
+  .keep-hero__scroll {
+    display: none;
+  }
+}

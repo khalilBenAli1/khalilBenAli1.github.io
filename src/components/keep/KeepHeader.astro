@@ -1,0 +1,42 @@
+---
+import { homePath, locales, resumePath, t, type Locale } from "../../lib/i18n";
+import { getKeepCopy } from "../../lib/keep/copy";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const dict = t(locale);
+const copy = getKeepCopy(locale);
+const links = ["work", "about", "experience", "contact"] as const;
+---
+
+<header class="keep-header">
+  <a class="keep-brand" href="#home" data-keep-link="home">Khalil Ben Ali</a>
+  <nav class="keep-nav" aria-label={copy.navLabel}>
+    {
+      links.map((link) => (
+        <a href={"#" + link} data-keep-link={link}>
+          {copy.nav[link]}
+        </a>
+      ))
+    }
+  </nav>
+  <div class="keep-header__tools">
+    <a class="keep-header__resume" href={resumePath(locale)}>{dict.nav.resume}</a>
+    <nav class="keep-languages" aria-label={copy.languageLabel}>
+      {
+        locales.map((language) => (
+          <a
+            href={homePath(language)}
+            lang={language}
+            hreflang={language}
+            aria-current={language === locale ? "page" : undefined}
+          >
+            {language.toUpperCase()}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>

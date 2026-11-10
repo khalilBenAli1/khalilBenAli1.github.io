@@ -21,6 +21,8 @@ interface Props {
   space?: boolean;
   /** Uses the island homepage without legacy motion or decorative layers. */
   island?: boolean;
+  /** Uses the keep homepage: its own night theme, no legacy chrome. */
+  keep?: boolean;
   lang?: string;
   skipLinkLabel?: string;
   /** locale → path, rendered as hreflang alternates */
@@ -33,11 +35,14 @@ const {
   bodyClass = "",
   space = false,
   island = false,
+  keep = false,
   lang = "en",
   skipLinkLabel = "Skip to content",
   alternates,
 } = Astro.props;
 
+/* Both world homepages own their motion and decorative layers. */
+const bare = island || keep;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const socialImage = new URL("/og.png", Astro.site);
 ---
@@ -48,7 +53,7 @@ const socialImage = new URL("/og.png", Astro.site);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content={island ? "#eeeae1" : "#06070C"} />
+    <meta name="theme-color" content={keep ? "#0b1211" : island ? "#eeeae1" : "#06070C"} />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {
@@ -79,7 +84,7 @@ const socialImage = new URL("/og.png", Astro.site);
       Preloader skip decision, made BEFORE first paint so a repeat visit never
       flashes a curtain. Must stay inline (no bundling, no defer).
     */}
-    {!island && <script is:inline>
+    {!bare && <script is:inline>
       (function () {
         var root = document.documentElement;
         try {
@@ -115,14 +120,14 @@ const socialImage = new URL("/og.png", Astro.site);
       })();
     </script>}
   </head>
-  <body class:list={[bodyClass, { "island-portfolio": island }]}>
+  <body class:list={[bodyClass, { "island-portfolio": island, "keep-portfolio": keep }]}>
     <a class="skip-link" href="#main-content">{skipLinkLabel}</a>
 
     {/*
       Curtain. Content below stays in the DOM and painted underneath, so the
       hero remains the LCP element. motion/preloader.ts removes this node.
     */}
-    {!island && <div class="preloader" data-preloader aria-hidden="true">
+    {!bare && <div class="preloader" data-preloader aria-hidden="true">
       <span class="preloader__mark">KB<span class="gradient-text">.</span></span>
       <span class="preloader__count" data-preloader-count>00</span>
     </div>}
@@ -133,18 +138,18 @@ const socialImage = new URL("/og.png", Astro.site);
       Their glow is now the aurora wash inside the canvas, which is also what
       lets the GL context run with alpha:false. See scripts/space.ts.
     */}
-    {space && !island && <canvas id="space-canvas" aria-hidden="true" />}
+    {space && !bare && <canvas id="space-canvas" aria-hidden="true" />}
     <slot />
 
     {/* Film grain — static noise tile, soft-light, above content, below nav. */}
-    {!island && <div class="grain" aria-hidden="true"></div>}
+    {!bare && <div class="grain" aria-hidden="true"></div>}
 
     {/*
       Cursor augment. CSS keeps it display:none unless the pointer is fine, and
       the native cursor is never hidden. Add data-lenis-prevent to any inner
       scroll container if one is ever introduced.
     */}
-    {!island && <div class="cursor" data-cursor-root aria-hidden="true">
+    {!bare && <div class="cursor" data-cursor-root aria-hidden="true">
       <span class="cursor__ring"></span>
       <span class="cursor__dot"></span>
     </div>}

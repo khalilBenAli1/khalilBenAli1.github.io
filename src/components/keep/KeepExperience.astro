@@ -1,0 +1,27 @@
+---
+import { t, type Locale } from "../../lib/i18n";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const dict = t(locale);
+---
+
+{/* The stair has one fire per entry; main.ts lights the matching marker. */}
+<ol class="keep-career" data-keep-career>
+  {
+    dict.experience.entries.map((entry) => (
+      <li class="keep-career__entry" data-keep-milestone>
+        <span class="keep-career__flame" aria-hidden="true" />
+        <p class="keep-career__period">{entry.period}</p>
+        <h3>
+          <span>{entry.role}</span>
+          {" "}
+          <span class="keep-career__company">{entry.company}</span>
+        </h3>
+        <p class="keep-career__note">{entry.note}</p>
+      </li>
+    ))
+  }
+</ol>

@@ -1,0 +1,73 @@
+---
+import { ui } from "../../lib/icons";
+import { plain } from "../../lib/accent";
+import { cvFile, t, type Locale } from "../../lib/i18n";
+import { getKeepCopy, skillGroups } from "../../lib/keep/copy";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const dict = t(locale);
+const copy = getKeepCopy(locale);
+---
+
+<div class="keep-about">
+  <div class="keep-identity">
+    <img
+      class="keep-identity__portrait"
+      src="/khalil.jpg"
+      alt={dict.resume.photoAlt}
+      width="640"
+      height="640"
+      loading="lazy"
+      decoding="async"
+    />
+    <div>
+      <h3>Khalil Ben Ali</h3>
+      <p class="keep-identity__role">{dict.hero.eyebrow}</p>
+    </div>
+  </div>
+  <p class="keep-about__aside">{copy.aside}</p>
+  <p class="keep-links">
+    <a href={cvFile(locale)} download>
+      {dict.hero.downloadCv}
+      <span aria-hidden="true" set:html={ui.download} />
+    </a>
+  </p>
+
+  {/* #ai and #skills are legacy anchors from the earlier one-page site. */}
+  <section class="keep-block" id="ai" aria-labelledby="ai-title">
+    <h3 id="ai-title">{plain(dict.ai.title)}</h3>
+    <dl class="keep-practice">
+      {
+        dict.ai.cards.map((card) => (
+          <div>
+            <dt>{card.title}</dt>
+            <dd>{card.body}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="keep-block" id="skills" aria-labelledby="skills-title">
+    <h3 id="skills-title">{plain(dict.skills.title)}</h3>
+    <dl class="keep-skills">
+      {
+        skillGroups.map((group) => (
+          <div>
+            <dt>{dict.skills.groups[group.key]}</dt>
+            <dd>
+              <ul class="keep-tech">
+                {group.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+</div>

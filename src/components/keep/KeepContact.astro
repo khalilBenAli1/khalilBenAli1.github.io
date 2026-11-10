@@ -1,0 +1,39 @@
+---
+import { ui } from "../../lib/icons";
+import { t, type Locale } from "../../lib/i18n";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const dict = t(locale);
+const email = "khalil.benali16121@gmail.com";
+---
+
+<div class="keep-contact">
+  <p class="keep-contact__line">{dict.contact.line}</p>
+  <p class="keep-status">
+    <span class="keep-status__flame" aria-hidden="true"></span>{dict.hero.status}
+  </p>
+  <a class="keep-contact__email" href={"mailto:" + email} aria-label={dict.contact.email}>
+    <span class="keep-contact__email-label">{dict.contact.email}</span>
+    <span class="keep-contact__email-address" aria-hidden="true">{email}</span>
+  </a>
+  <p class="keep-links keep-contact__socials">
+    <a href="https://github.com/khalilBenAli1">
+      <span aria-hidden="true" set:html={ui.github} />GitHub
+    </a>
+    <a href="https://linkedin.com/in/khalil-ben-ali">
+      <span aria-hidden="true" set:html={ui.linkedin} />LinkedIn
+    </a>
+  </p>
+</div>
+<footer class="keep-footer">
+  <p>{dict.contact.footerLeft}</p>
+  <p>
+    {dict.contact.localTime}
+    <span class="keep-footer__clock">Faenza <span data-keep-clock>--:--</span></span>
+  </p>
+  <p>{dict.contact.footerRight}</p>
+  <a href="#top">{dict.contact.backToTop}</a>
+</footer>

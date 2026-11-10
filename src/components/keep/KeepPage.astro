@@ -1,0 +1,134 @@
+---
+import "@fontsource/instrument-serif/400.css";
+import Base from "../../layouts/Base.astro";
+import KeepHeader from "./KeepHeader.astro";
+import KeepWork from "./KeepWork.astro";
+import KeepAbout from "./KeepAbout.astro";
+import KeepExperience from "./KeepExperience.astro";
+import KeepContact from "./KeepContact.astro";
+import { ui } from "../../lib/icons";
+import { plain } from "../../lib/accent";
+import { cvFile, homePath, locales, t, type Locale } from "../../lib/i18n";
+import { getKeepCopy } from "../../lib/keep/copy";
+import "../../styles/keep.css";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const dict = t(locale);
+const copy = getKeepCopy(locale);
+const alternates = Object.fromEntries(
+  locales.map((language) => [language, homePath(language)]),
+);
+---
+
+<Base
+  keep
+  lang={locale}
+  title={dict.meta.title}
+  description={dict.meta.description}
+  skipLinkLabel={dict.skipLink}
+  alternates={alternates}
+>
+  <div
+    class="keep"
+    data-keep-root
+    data-scene="pending"
+    data-milestones={dict.experience.entries.length}
+  >
+    {/* Decorative: every word and link lives in the document below. */}
+    <div class="keep-scene" aria-hidden="true">
+      <canvas class="keep-scene__canvas" data-keep-canvas></canvas>
+    </div>
+
+    <KeepHeader locale={locale} />
+
+    <main id="main-content">
+      <span id="top" class="keep-anchor" aria-hidden="true"></span>
+
+      <section class="keep-hero" id="home" aria-labelledby="keep-title">
+        <div class="keep-hero__copy">
+          <h1 id="keep-title">Khalil Ben Ali</h1>
+          <p class="keep-hero__role">{dict.hero.eyebrow}</p>
+          <p class="keep-hero__lead">{plain(dict.hero.lead)}</p>
+          <p class="keep-hero__actions">
+            <a class="keep-button" href="#work">{dict.hero.viewWork}</a>
+            <a class="keep-button keep-button--quiet" href={cvFile(locale)} download>
+              {dict.hero.downloadCv}
+              <span aria-hidden="true" set:html={ui.download} />
+            </a>
+          </p>
+          <p class="keep-status">
+            <span class="keep-status__flame" aria-hidden="true"></span>{dict.hero.status}
+          </p>
+        </div>
+        <div class="keep-hero__foot">
+          <a class="keep-hero__scroll" href="#work">{copy.scroll}</a>
+          <button
+            class="keep-motion"
+            type="button"
+            data-keep-motion
+            data-label-on={copy.motionOn}
+            data-label-off={copy.motionOff}
+            aria-pressed="true"
+            hidden
+          >
+            {copy.motionOn}
+          </button>
+        </div>
+      </section>
+
+      <section class="keep-section" id="work" aria-labelledby="work-title">
+        <header class="keep-passage" data-keep-passage>
+          <div class="keep-passage__pin">
+            <h2 id="work-title">{plain(dict.work.title)}</h2>
+          </div>
+        </header>
+        <div class="keep-veil keep-veil--wide">
+          <KeepWork locale={locale} />
+        </div>
+      </section>
+
+      <section class="keep-section" id="about" aria-labelledby="about-title">
+        <header class="keep-passage" data-keep-passage>
+          <div class="keep-passage__pin">
+            <h2 id="about-title">{copy.aboutTitle}</h2>
+          </div>
+        </header>
+        <div class="keep-veil">
+          <KeepAbout locale={locale} />
+        </div>
+      </section>
+
+      <section
+        class="keep-section"
+        id="experience"
+        aria-labelledby="experience-title"
+      >
+        <header class="keep-passage" data-keep-passage>
+          <div class="keep-passage__pin">
+            <h2 id="experience-title">{plain(dict.experience.title)}</h2>
+          </div>
+        </header>
+        <div class="keep-veil">
+          <KeepExperience locale={locale} />
+        </div>
+      </section>
+
+      <section
+        class="keep-section keep-section--last"
+        id="contact"
+        aria-labelledby="contact-title"
+      >
+        <div class="keep-veil keep-veil--open">
+          <h2 id="contact-title">{plain(dict.contact.title)}</h2>
+          <KeepContact locale={locale} />
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+    import "../../scripts/keep/main";
+  </script>
+</Base>
