@@ -287,6 +287,11 @@ function start(root: HTMLElement): void {
 
   /* ---------- go ---------- */
 
+  /* Anything already on screen, or already passed, is simply shown: only
+     blocks still ahead of the visitor get to come out of the dark. */
+  for (const block of hidden) {
+    if (block.getBoundingClientRect().top < window.innerHeight) block.classList.add("is-seen");
+  }
   root.classList.add("keep-enhanced");
   if (motionButton) motionButton.hidden = false;
   applyMotion();

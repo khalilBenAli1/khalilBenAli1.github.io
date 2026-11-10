@@ -63,13 +63,24 @@ export function startGlide(): Glide {
     if (event.target.matches(":focus-visible")) lenis.scrollTo(window.scrollY, { immediate: true });
   };
 
+  /* Back, Forward or a typed hash moves the page natively; a glide still in
+     flight is dropped so that it cannot pull the page back. */
+  const yieldToBrowser = (): void => {
+    lenis.stop();
+    lenis.start();
+  };
+
   document.addEventListener("click", onClick);
   document.addEventListener("focusin", onFocus);
+  window.addEventListener("popstate", yieldToBrowser);
+  window.addEventListener("hashchange", yieldToBrowser);
 
   return {
     stop() {
       document.removeEventListener("click", onClick);
       document.removeEventListener("focusin", onFocus);
+      window.removeEventListener("popstate", yieldToBrowser);
+      window.removeEventListener("hashchange", yieldToBrowser);
       lenis.destroy();
     },
   };

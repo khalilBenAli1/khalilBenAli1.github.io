@@ -22,6 +22,9 @@ function ease(a: number, b: number, x: number): number {
 
 export function createLight(root: HTMLElement): Light {
   const plaques = [...root.querySelectorAll<HTMLElement>("[data-keep-lit]")];
+  const walls = [...root.querySelectorAll<HTMLElement>("[data-keep-wall]")];
+  /* What each plaque was last given, so an unchanged value is never rewritten. */
+  const shown = plaques.map(() => -1);
   const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
   const torch = document.createElement("div");
   torch.className = "keep-torch";
@@ -33,7 +36,6 @@ export function createLight(root: HTMLElement): Light {
   let pointerX = 0;
   let pointerY = 0;
   let carrying = false;
-  let atWall = false;
 
   function paint(): void {
     queued = false;
@@ -41,6 +43,14 @@ export function createLight(root: HTMLElement): Light {
     const view = window.innerHeight;
     const rects = plaques.map((plaque) => plaque.getBoundingClientRect());
     const withTorch = carrying && fine.matches;
+    /* Asked of the layout on every frame, not only when the pointer moves:
+       scrolling can carry a wall away from under a pointer that is at rest. */
+    const atWall =
+      withTorch &&
+      walls.some((wall) => {
+        const rect = wall.getBoundingClientRect();
+        return rect.top <= pointerY && pointerY <= rect.bottom;
+      });
 
     plaques.forEach((plaque, index) => {
       const rect = rects[index];
@@ -60,14 +70,22 @@ export function createLight(root: HTMLElement): Light {
         x = rect.width / 2;
         y = Math.min(Math.max(view * 0.5 - rect.top, 0), rect.height);
       }
-      plaque.style.setProperty("--light", light.toFixed(3));
-      plaque.style.setProperty("--lx", `${x.toFixed(0)}px`);
-      plaque.style.setProperty("--ly", `${y.toFixed(0)}px`);
+      /* Twenty steps of light are plenty, and a plaque that is fully dark or
+         whose light has not changed costs nothing. */
+      light = Math.round(light * 20) / 20;
+      if (light !== shown[index]) {
+        shown[index] = light;
+        plaque.style.setProperty("--light", light.toFixed(2));
+      }
+      if (light > 0) {
+        plaque.style.setProperty("--lx", `${x.toFixed(0)}px`);
+        plaque.style.setProperty("--ly", `${y.toFixed(0)}px`);
+      }
     });
 
     /* The glow itself only shows against a wall; over open road it would
        read as a smudge on the scene. */
-    torch.classList.toggle("is-carried", withTorch && atWall);
+    torch.classList.toggle("is-carried", atWall);
     if (withTorch) {
       torch.style.transform = `translate3d(${pointerX.toFixed(1)}px, ${pointerY.toFixed(1)}px, 0)`;
     }
@@ -81,6 +99,7 @@ export function createLight(root: HTMLElement): Light {
 
   function clear(): void {
     torch.classList.remove("is-carried");
+    shown.fill(-1);
     for (const plaque of plaques) {
       plaque.style.removeProperty("--light");
       plaque.style.removeProperty("--lx");
@@ -95,11 +114,11 @@ export function createLight(root: HTMLElement): Light {
       pointerX = event.clientX;
       pointerY = event.clientY;
       carrying = true;
-      atWall = event.target instanceof Element && event.target.closest("[data-keep-wall]") !== null;
       queue();
     },
     { passive: true },
   );
+  /* The torch goes out when the pointer leaves the page. */
   document.documentElement.addEventListener("pointerleave", () => {
     carrying = false;
     queue();

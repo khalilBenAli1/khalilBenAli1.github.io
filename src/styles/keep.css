@@ -523,6 +523,23 @@ body.keep-portfolio ::selection {
   filter: drop-shadow(0 0.08em 0.5em rgba(var(--pit), 0.85));
 }
 
+/* Room above and below the glyphs: the glint is painted inside the box of
+   the heading, and these tight lines would otherwise cut a tail or an accent.
+   The matching negative margin leaves the layout where it was. */
+.keep-hero h1,
+.keep-veil--open h2,
+.keep-passage :is(h2, h3) {
+  padding-block: 0.14em;
+  margin-block: -0.14em;
+}
+
+/* A section reached through the navigation takes focus only so that Tab
+   continues from it; it is a landing place, not a control. */
+.keep [tabindex="-1"]:focus,
+.keep [tabindex="-1"]:focus-visible {
+  outline: none;
+}
+
 /* Where this stretch of the page stands on the road. */
 .keep-place {
   display: flex;
@@ -1422,6 +1439,11 @@ body.keep-portfolio ::selection {
 
   .keep[data-motion="on"] .keep-button:not(.keep-button--quiet) {
     animation: keep-breathe 4.4s ease-in-out infinite;
+  }
+
+  /* A hovered button shows its own glow, not the idle one. */
+  .keep[data-motion="on"] .keep-button:not(.keep-button--quiet):hover {
+    animation: none;
   }
 
   .keep[data-motion="on"] .keep-hero__scroll::before {

@@ -18,6 +18,21 @@ async function toRisingTitle(page: Page) {
   });
 }
 
+/** Waits until the page has stopped gliding, then returns where the element is. */
+async function atRest(page: Page, selector: string) {
+  const top = () => page.locator(selector).evaluate((element) => element.getBoundingClientRect().top);
+  let last = await top();
+  await expect
+    .poll(async () => {
+      const now = await top();
+      const still = Math.abs(now - last) < 0.5;
+      last = now;
+      return still;
+    }, { intervals: [200] })
+    .toBe(true);
+  return (await page.locator(selector).boundingBox())!;
+}
+
 async function noSidewaysScroll(page: Page) {
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -26,6 +41,10 @@ async function noSidewaysScroll(page: Page) {
 }
 
 test.describe('keep interface', () => {
+  /* Each press glides the page to its place; five glides in a software-rendered
+     browser on a busy machine need more than the default half minute. */
+  test.describe.configure({ timeout: 60_000 });
+
   for (const { locale, path } of locales) {
     for (const width of [390, 820, 1440]) {
       test.describe(`${locale} / ${width}px`, () => {
@@ -174,13 +193,24 @@ test.describe('the work belongs to the keep', () => {
     await page.goto('/?view=lite#frontend');
     const near = page.locator('#project-maison-sol');
     await expect(near).toBeInViewport();
-    const box = (await near.boundingBox())!;
-    await page.mouse.move(box.x + box.width / 2 - 30, box.y + box.height / 2 - 30);
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 4 });
+    /* Measured only once the page has stopped: a box taken mid-glide can put
+       the pointer below the window, where it is not a torch at all. */
+    const box = await atRest(page, '#project-maison-sol');
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    /* The torch is carried again before each reading. */
+    const carried = async (id: string) => {
+      await page.mouse.move(x - 3, y - 3);
+      await page.mouse.move(x, y);
+      await page.waitForTimeout(60);
+      return light(page, id);
+    };
 
-    await expect.poll(() => light(page, 'maison-sol')).toBe(1);
+    await expect.poll(() => carried('maison-sol')).toBe(1);
     /* Atelier No.8 hangs two plaques to the right, out of the torch's reach. */
-    await expect.poll(() => light(page, 'atelier-no8')).toBeLessThan(0.25);
+    await expect.poll(() => carried('atelier-no8')).toBeLessThan(0.25);
+    await page.mouse.move(x - 3, y - 3);
+    await page.mouse.move(x, y);
     await expect(page.locator('.keep-torch')).toHaveClass(/is-carried/);
     await expect(near.locator('img')).toHaveCSS('filter', /brightness\(0\.98\)/);
 
