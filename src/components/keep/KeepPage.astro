@@ -81,17 +81,17 @@ const alternates = Object.fromEntries(
       <section class="keep-section" id="work" aria-labelledby="work-title">
         <header class="keep-passage" data-keep-passage>
           <div class="keep-passage__pin">
+            <p class="keep-place">{copy.places.work}</p>
             <h2 id="work-title">{plain(dict.work.title)}</h2>
           </div>
         </header>
-        <div class="keep-veil keep-veil--wide">
-          <KeepWork locale={locale} />
-        </div>
+        <KeepWork locale={locale} />
       </section>
 
       <section class="keep-section" id="about" aria-labelledby="about-title">
         <header class="keep-passage" data-keep-passage>
           <div class="keep-passage__pin">
+            <p class="keep-place">{copy.places.about}</p>
             <h2 id="about-title">{copy.aboutTitle}</h2>
           </div>
         </header>
@@ -107,6 +107,7 @@ const alternates = Object.fromEntries(
       >
         <header class="keep-passage" data-keep-passage>
           <div class="keep-passage__pin">
+            <p class="keep-place">{copy.places.experience}</p>
             <h2 id="experience-title">{plain(dict.experience.title)}</h2>
           </div>
         </header>
@@ -121,6 +122,7 @@ const alternates = Object.fromEntries(
         aria-labelledby="contact-title"
       >
         <div class="keep-veil keep-veil--open">
+          <p class="keep-place">{copy.places.contact}</p>
           <h2 id="contact-title">{plain(dict.contact.title)}</h2>
           <KeepContact locale={locale} />
         </div>

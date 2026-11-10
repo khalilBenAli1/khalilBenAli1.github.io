@@ -162,3 +162,90 @@ test.describe('keep interface', () => {
     await expect(page.locator('[data-keep-clock]')).toHaveText(/^\d{2}:\d{2}$/);
   });
 });
+
+test.describe('the work belongs to the keep', () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  const light = (page: Page, id: string) =>
+    page.locator(`#project-${id}`).evaluate((plaque: HTMLElement) =>
+      plaque.style.getPropertyValue('--light') === '' ? null : Number(plaque.style.getPropertyValue('--light')));
+
+  test('a plaque is lit by the torch beside it and dark far from it', async ({ page }) => {
+    await page.goto('/?view=lite#frontend');
+    const near = page.locator('#project-maison-sol');
+    await expect(near).toBeInViewport();
+    const box = (await near.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2 - 30, box.y + box.height / 2 - 30);
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 4 });
+
+    await expect.poll(() => light(page, 'maison-sol')).toBe(1);
+    /* Atelier No.8 hangs two plaques to the right, out of the torch's reach. */
+    await expect.poll(() => light(page, 'atelier-no8')).toBeLessThan(0.25);
+    await expect(page.locator('.keep-torch')).toHaveClass(/is-carried/);
+    await expect(near.locator('img')).toHaveCSS('filter', /brightness\(0\.98\)/);
+
+    /* A keyboard visitor lights a plaque by reaching into it. */
+    await page.locator('#project-atelier-no8 .keep-links a').last().focus();
+    await expect(page.locator('#project-atelier-no8 img')).toHaveCSS('filter', /brightness\(0\.98\)/);
+    /* The picture itself, once focused, shows its true colours. */
+    await page.locator('#project-atelier-no8 .keep-demo__shot').focus();
+    await expect(page.locator('#project-atelier-no8 img')).toHaveCSS('filter', 'none');
+
+    /* With motion off nothing is left in the dark. */
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await page.locator('[data-keep-motion]').click();
+    await expect.poll(() => light(page, 'maison-sol')).toBeNull();
+    await expect(page.locator('.keep-torch')).not.toHaveClass(/is-carried/);
+  });
+
+  test('blocks come out of the dark once, when they are reached', async ({ page }) => {
+    await page.goto('/?view=lite');
+    const plaque = page.locator('#project-cuddy');
+    await expect(plaque).not.toHaveClass(/is-seen/);
+    await expect(plaque).toHaveCSS('opacity', '0');
+    await plaque.scrollIntoViewIfNeeded();
+    await expect(plaque).toHaveClass(/is-seen/);
+    await expect(plaque).toHaveCSS('opacity', '1');
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await expect(plaque).toHaveClass(/is-seen/);
+  });
+
+  test('each stretch of the page names its place on the road', async ({ page }) => {
+    await page.goto('/fr/?view=lite');
+    await expect(page.locator('#work .keep-place')).toHaveText('La nef');
+    await expect(page.locator('#about .keep-place')).toHaveText('La cour');
+    await expect(page.locator('#experience .keep-place')).toHaveText('L’escalier');
+    await expect(page.locator('#contact .keep-place')).toHaveText('Le fanal');
+  });
+
+  test('the wheel glides, and a focused link is never pulled away', async ({ page }) => {
+    await page.goto('/?view=lite');
+    await expect(page.locator('html')).toHaveClass(/lenis/);
+    await page.mouse.move(700, 450);
+    await page.mouse.wheel(0, 900);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(600);
+
+    const email = page.locator('a[href^="mailto:"]');
+    await email.focus();
+    await expect(email).toBeInViewport();
+    await page.waitForTimeout(700);
+    await expect(email, 'still in view once the glide has settled').toBeInViewport();
+
+    /* The motion switch hands scrolling back to the browser. */
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await page.locator('[data-keep-motion]').click();
+    await expect(page.locator('html')).not.toHaveClass(/lenis/);
+  });
+
+  test.describe('without JavaScript', () => {
+    test.use({ javaScriptEnabled: false });
+
+    test('every plaque is lit and nothing waits to be revealed', async ({ page }) => {
+      await page.goto('/');
+      const plaque = page.locator('#project-cuddy');
+      await expect(plaque).toHaveCSS('opacity', '1');
+      await expect(page.locator('#project-sora img')).toHaveCSS('filter', /brightness\(0\.98\)/);
+      await expect(page.locator('.keep-torch')).toHaveCount(0);
+    });
+  });
+});

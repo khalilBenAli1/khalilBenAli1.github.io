@@ -7,6 +7,8 @@ import type { Locale } from "../i18n";
 export interface KeepCopy {
   nav: { work: string; about: string; experience: string; contact: string };
   navLabel: string;
+  /** Where each part of the page stands on the road through the keep. */
+  places: { work: string; about: string; experience: string; contact: string };
   languageLabel: string;
   sceneLabel: string;
   scroll: string;
@@ -33,6 +35,12 @@ const copy: Record<Locale, KeepCopy> = {
       contact: "Contact",
     },
     navLabel: "Primary",
+    places: {
+      work: "The nave",
+      about: "The courtyard",
+      experience: "The stair",
+      contact: "The signal fire",
+    },
     languageLabel: "Language",
     sceneLabel: "A ruined keep at night, lit by fires",
     scroll: "Scroll to walk in",
@@ -58,6 +66,12 @@ const copy: Record<Locale, KeepCopy> = {
       contact: "Contact",
     },
     navLabel: "Navigation principale",
+    places: {
+      work: "La nef",
+      about: "La cour",
+      experience: "L’escalier",
+      contact: "Le fanal",
+    },
     languageLabel: "Langue",
     sceneLabel: "Une forteresse en ruine, la nuit, éclairée par des feux",
     scroll: "Défiler pour entrer",
@@ -83,6 +97,12 @@ const copy: Record<Locale, KeepCopy> = {
       contact: "Contatti",
     },
     navLabel: "Navigazione principale",
+    places: {
+      work: "La navata",
+      about: "Il cortile",
+      experience: "La scalinata",
+      contact: "Il fuoco di vedetta",
+    },
     languageLabel: "Lingua",
     sceneLabel: "Una fortezza in rovina, di notte, illuminata dai fuochi",
     scroll: "Scorri per entrare",

@@ -9,6 +9,8 @@
  * `data-scene` on the root reports what the visitor is getting:
  * pending → live | lite (asked for, or reduced data) | unsupported.
  */
+import type { Glide } from "./glide";
+import { createLight } from "./light";
 import type { KeepScene } from "./scene";
 
 const MOTION_KEY = "kb-keep-motion";
@@ -25,8 +27,12 @@ function start(root: HTMLElement): void {
   const sectionIds = ["work", "about", "experience", "contact"] as const;
   const sections = sectionIds.map((id) => document.getElementById(id));
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const mouse = window.matchMedia("(hover: hover) and (pointer: fine)");
+  const light = createLight(root);
 
   let scene: KeepScene | null = null;
+  let glide: Glide | null = null;
+  let glideWanted = false;
   let stops: number[] = [];
   let queued = false;
   /* The window height the stops were measured against. It is not re-read
@@ -118,6 +124,7 @@ function start(root: HTMLElement): void {
     milestones.forEach((milestone, index) => {
       milestone.classList.toggle("is-lit", milestoneTops[index] < view * 0.72);
     });
+    light.refresh();
   }
 
   function queue(): void {
@@ -151,6 +158,33 @@ function start(root: HTMLElement): void {
     motionButton.disabled = reduced.matches;
   }
 
+  /** Eased wheel scrolling: only with a mouse, only while motion is on. */
+  function syncGlide(): void {
+    glideWanted = motionEnabled() && mouse.matches;
+    if (!glideWanted) {
+      glide?.stop();
+      glide = null;
+      return;
+    }
+    if (glide) return;
+    void import("./glide")
+      .then(({ startGlide }) => {
+        if (glideWanted && !glide) glide = startGlide();
+      })
+      .catch(() => {
+        /* Native scrolling is a complete fallback. */
+      });
+  }
+
+  /** One place where the preference reaches everything that moves. */
+  function applyMotion(): void {
+    const enabled = motionEnabled();
+    showMotion();
+    scene?.setMotion(enabled);
+    light.setEnabled(enabled);
+    syncGlide();
+  }
+
   motionButton?.addEventListener("click", () => {
     wantsMotion = !motionEnabled();
     try {
@@ -158,13 +192,41 @@ function start(root: HTMLElement): void {
     } catch {
       /* The preference still holds for this visit. */
     }
-    showMotion();
-    scene?.setMotion(motionEnabled());
+    applyMotion();
   });
-  reduced.addEventListener("change", () => {
-    showMotion();
-    scene?.setMotion(motionEnabled());
-  });
+  reduced.addEventListener("change", applyMotion);
+  mouse.addEventListener("change", syncGlide);
+
+  /* The view leans a little toward the pointer. */
+  window.addEventListener(
+    "pointermove",
+    (event) => {
+      if (event.pointerType !== "mouse" || !scene) return;
+      scene.setPointer(
+        (event.clientX / window.innerWidth) * 2 - 1,
+        (event.clientY / window.innerHeight) * 2 - 1,
+      );
+    },
+    { passive: true },
+  );
+
+  /* Blocks come out of the dark the first time they are reached. */
+  const hidden = [...root.querySelectorAll<HTMLElement>("[data-keep-reveal]")];
+  if ("IntersectionObserver" in window) {
+    const watcher = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add("is-seen");
+          watcher.unobserve(entry.target);
+        }
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+    );
+    for (const block of hidden) watcher.observe(block);
+  } else {
+    for (const block of hidden) block.classList.add("is-seen");
+  }
 
   /* ---------- the 3D scene ---------- */
 
@@ -227,7 +289,7 @@ function start(root: HTMLElement): void {
 
   root.classList.add("keep-enhanced");
   if (motionButton) motionButton.hidden = false;
-  showMotion();
+  applyMotion();
   measure();
   update();
   tellTime();

@@ -52,6 +52,8 @@ export interface KeepMetrics {
 export interface KeepScene {
   setTarget(u: number, instant?: boolean): void;
   setMotion(enabled: boolean): void;
+  /** Where the pointer is, -1…1 across and down the window. The view leans toward it. */
+  setPointer(x: number, y: number): void;
   resize(): void;
   metrics(): KeepMetrics;
   dispose(): void;
@@ -128,6 +130,7 @@ const STONE_FRAGMENT = /* glsl */ `
 precision highp float;
 uniform vec3 uMoon;
 uniform vec4 uFires[${MAX_FIRES}];
+uniform float uTime;
 varying vec3 vWorld;
 varying float vTint;
 ${NOISE}
@@ -179,7 +182,13 @@ void main() {
     color += stone * vec3(1.0, 0.5, 0.17) * falloff * (0.14 + 0.86 * facing) * 3.4;
   }
 
-  color = mix(color, uFog, fogAmount(vWorld));
+  /* Mist lies on the low ground and drifts across it in slow banks. */
+  float fog = fogAmount(vWorld);
+  vec2 drift = vWorld.xz * 0.065 + vec2(uTime * 0.05, uTime * 0.032);
+  float bank = noise(drift) * 0.65 + noise(drift * 2.3 + 7.0) * 0.35;
+  float low = exp(-max(vWorld.y, 0.0) * 0.55) * (1.0 - exp(-length(vWorld - uCamera) * 0.07));
+  fog = clamp(fog + low * (bank - 0.44) * 0.95, 0.0, 1.0);
+  color = mix(color, uFog * (1.0 + 0.3 * bank * low), fog);
   /* A soft shoulder so firelit stone near a flame does not clip. */
   color = color / (1.0 + color * 0.35);
   gl_FragColor = vec4(pow(color, vec3(0.86)), 1.0);
@@ -264,7 +273,8 @@ void main() {
 
   float drift = fbm(vec2(p.x * 2.4 + vSeed * 9.0, p.y * 1.9 - time));
   float tongues = fbm(vec2(p.x * 5.2 - vSeed * 4.0, p.y * 3.1 - time * 1.8));
-  float x = p.x - (drift - 0.5) * 0.62 * t;
+  float wind = sin(uTime * 0.43 + vSeed * 2.0) * 0.17 + sin(uTime * 0.14) * 0.15;
+  float x = p.x - (drift - 0.5) * 0.62 * t - wind * t * t * 1.3;
 
   /* A teardrop: full at the bowl, drawn to a point, torn by the tongues. */
   float profile = (0.4 * (1.0 - t) * (0.5 + 0.5 * sqrt(1.0 - t)) + 0.015) * (0.72 + 0.62 * tongues);
@@ -298,8 +308,9 @@ void main() {
   vec4 fire = uFires[int(aFire)];
   float life = fract(uTime * (0.1 + aSeed.x * 0.16) + aSeed.y);
   float reach = 1.4 + aSeed.z * 3.2;
+  float wind = sin(uTime * 0.43) * 0.17 + sin(uTime * 0.14) * 0.15;
   vec3 world = position + vec3(
-    sin(life * 7.0 + aSeed.w * 6.28) * 0.5 * life,
+    sin(life * 7.0 + aSeed.w * 6.28) * 0.5 * life + wind * life * life * reach * 1.6,
     life * reach,
     cos(life * 5.0 + aSeed.z * 6.28) * 0.5 * life
   );
@@ -576,6 +587,14 @@ function assemble(options: KeepSceneOptions, renderer: WebGLRenderer): KeepScene
   const maxPixelRatio = low ? 1.25 : 1.75;
   let slowFrames = 0;
   let failed = false;
+  /* The view leans toward the pointer, and when the page has been still for
+     a while the camera starts to look about on its own, like someone waiting. */
+  let pointerX = 0;
+  let pointerY = 0;
+  let leanX = 0;
+  let leanY = 0;
+  let idle = 0;
+  const forward = new Vector3();
   /* The fires catch over the first moments instead of popping in lit. */
   let kindle = motion ? 0 : 1;
 
@@ -615,8 +634,19 @@ function assemble(options: KeepSceneOptions, renderer: WebGLRenderer): KeepScene
     gaze.getPoint(t, target);
     if (motion) {
       /* Breath: a slow drift so a still page is never a frozen frame. */
-      position.x += Math.sin(clock * 0.31) * 0.05;
-      position.y += Math.sin(clock * 0.47) * 0.035;
+      position.x += Math.sin(clock * 0.31) * (0.05 + idle * 0.07);
+      position.y += Math.sin(clock * 0.47) * (0.035 + idle * 0.03);
+
+      const yaw =
+        leanX * 0.045 + idle * (Math.sin(clock * 0.19) * 0.05 + Math.sin(clock * 0.073 + 1.3) * 0.03);
+      const pitch = -leanY * 0.025 + idle * Math.sin(clock * 0.127) * 0.014;
+      forward.subVectors(target, position);
+      const reach = forward.length();
+      /* Right of the view on level ground is (-z, 0, x). */
+      const flat = Math.hypot(forward.x, forward.z) || 1;
+      target.x += (-forward.z / flat) * yaw * reach;
+      target.z += (forward.x / flat) * yaw * reach;
+      target.y += pitch * reach;
     }
     camera.position.copy(position);
     camera.lookAt(target);
@@ -629,7 +659,9 @@ function assemble(options: KeepSceneOptions, renderer: WebGLRenderer): KeepScene
         continue;
       }
       const reached = smoothstep(fire.igniteZ + 3.5, fire.igniteZ - 1.5, position.z);
-      const level = (fire.base + (1 - fire.base) * reached) * kindle;
+      /* A fire flares as it catches, then settles. */
+      const flare = 1 + 0.75 * Math.sin(Math.PI * reached) * (1 - fire.base);
+      const level = (fire.base + (1 - fire.base) * reached) * kindle * flare;
       const flicker = motion
         ? 0.86 +
           0.09 * Math.sin(clock * 9.1 + i * 2.7) +
@@ -675,6 +707,11 @@ function assemble(options: KeepSceneOptions, renderer: WebGLRenderer): KeepScene
       clock += delta;
       kindle = Math.min(kindle + delta / 1.8, 1);
       current += (goal - current) * (1 - Math.exp(-delta * 3.6));
+      const ease = 1 - Math.exp(-delta * 2.4);
+      leanX += (pointerX - leanX) * ease;
+      leanY += (pointerY - leanY) * ease;
+      const still = Math.abs(goal - current) < 0.003;
+      idle += ((still ? 1 : 0) - idle) * (1 - Math.exp(-delta * (still ? 0.3 : 3)));
 
       /* Shed resolution rather than frames when the GPU cannot keep up. A
          steady 30 fps (a phone saving power) is left alone. */
@@ -745,6 +782,10 @@ function assemble(options: KeepSceneOptions, renderer: WebGLRenderer): KeepScene
         kindle = 1;
         draw();
       }
+    },
+    setPointer(x, y) {
+      pointerX = Math.min(Math.max(x, -1), 1);
+      pointerY = Math.min(Math.max(y, -1), 1);
     },
     resize,
     metrics() {

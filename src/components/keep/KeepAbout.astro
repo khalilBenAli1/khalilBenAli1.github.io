@@ -13,7 +13,7 @@ const copy = getKeepCopy(locale);
 ---
 
 <div class="keep-about">
-  <div class="keep-identity">
+  <div class="keep-identity" data-keep-reveal>
     <img
       class="keep-identity__portrait"
       src="/khalil.jpg"
@@ -37,7 +37,7 @@ const copy = getKeepCopy(locale);
   </p>
 
   {/* #ai and #skills are legacy anchors from the earlier one-page site. */}
-  <section class="keep-block" id="ai" aria-labelledby="ai-title">
+  <section class="keep-block" id="ai" aria-labelledby="ai-title" data-keep-reveal>
     <h3 id="ai-title">{plain(dict.ai.title)}</h3>
     <dl class="keep-practice">
       {
@@ -51,7 +51,7 @@ const copy = getKeepCopy(locale);
     </dl>
   </section>
 
-  <section class="keep-block" id="skills" aria-labelledby="skills-title">
+  <section class="keep-block" id="skills" aria-labelledby="skills-title" data-keep-reveal>
     <h3 id="skills-title">{plain(dict.skills.title)}</h3>
     <dl class="keep-skills">
       {

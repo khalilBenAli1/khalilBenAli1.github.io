@@ -35,139 +35,159 @@ const professional = islandProjects.filter(
 );
 ---
 
+{/*
+  The work hangs on the walls of the nave. Each project is a plaque
+  (data-keep-lit) that scripts/keep/light.ts lights as a torch comes near;
+  between the two walls the road opens again.
+*/}
 <div class="keep-work">
   {/* #frontend is a legacy anchor from the earlier one-page site. */}
   <section class="keep-collection" id="frontend" aria-labelledby="frontend-title">
-    <header class="keep-collection__head">
-      <h3 id="frontend-title">{copy.frontendTitle}</h3>
-      <p>{copy.frontendIntro}</p>
-    </header>
-    <div class="keep-demos">
-      {
-        frontend.map((project) => {
-          const sector = project.sectorLabel?.[locale] ?? sectors[project.sector];
-          return (
-            <article
-              class="keep-demo frontend-demo"
-              id={"project-" + project.id}
-              aria-labelledby={"project-" + project.id + "-title"}
-            >
-              <a
-                class="keep-demo__shot"
-                href={project.demo}
-                aria-label={copy.visit + " — " + project.name}
+    <div class="keep-veil keep-veil--wide keep-wall" data-keep-wall>
+      <header class="keep-collection__head" data-keep-reveal>
+        <h3 id="frontend-title">{copy.frontendTitle}</h3>
+        <p>{copy.frontendIntro}</p>
+      </header>
+      <div class="keep-demos">
+        {
+          frontend.map((project, index) => {
+            const sector = project.sectorLabel?.[locale] ?? sectors[project.sector];
+            return (
+              <article
+                class="keep-plaque keep-demo frontend-demo"
+                id={"project-" + project.id}
+                aria-labelledby={"project-" + project.id + "-title"}
+                data-keep-lit
+                data-keep-reveal
+                style={"--i:" + (index % 3)}
               >
-                <img
-                  src={project.image}
-                  alt={project.name + " — " + sector}
-                  width="1440"
-                  height="1000"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </a>
-              <div class="keep-demo__body">
-                <p class="keep-meta">
-                  <span>{sector}</span>
-                  <span>{project.year}</span>
-                </p>
-                <h4 id={"project-" + project.id + "-title"}>{project.name}</h4>
-                <p class="keep-demo__text">{project.description[locale]}</p>
-                <ul class="keep-tech">
-                  {project.technologies.map((technology) => (
-                    <li>{technology}</li>
-                  ))}
-                </ul>
-                <p class="keep-links">
-                  <a href={project.demo}>
-                    {copy.visit}
-                    <span aria-hidden="true" set:html={arrowUpRight} />
-                  </a>
-                  <a href={project.source}>{copy.source}</a>
-                </p>
-              </div>
-            </article>
-          );
-        })
-      }
+                <a
+                  class="keep-demo__shot"
+                  href={project.demo}
+                  aria-label={copy.visit + " — " + project.name}
+                >
+                  <img
+                    src={project.image}
+                    alt={project.name + " — " + sector}
+                    width="1440"
+                    height="1000"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </a>
+                <div class="keep-demo__body">
+                  <p class="keep-meta">
+                    <span>{sector}</span>
+                    <span>{project.year}</span>
+                  </p>
+                  <h4 id={"project-" + project.id + "-title"}>{project.name}</h4>
+                  <p class="keep-demo__text">{project.description[locale]}</p>
+                  <ul class="keep-tech">
+                    {project.technologies.map((technology) => (
+                      <li>{technology}</li>
+                    ))}
+                  </ul>
+                  <p class="keep-links">
+                    <a class="keep-links__main" href={project.demo}>
+                      {copy.visit}
+                      <span aria-hidden="true" set:html={arrowUpRight} />
+                    </a>
+                    <a href={project.source}>{copy.source}</a>
+                  </p>
+                </div>
+              </article>
+            );
+          })
+        }
+      </div>
+      <p class="keep-note">{demoNote}</p>
     </div>
-    <p class="keep-note">{demoNote}</p>
   </section>
 
   <section class="keep-collection" aria-labelledby="professional-title">
-    <header class="keep-collection__head">
-      <h3 id="professional-title">{copy.professionalTitle}</h3>
-      <p>{copy.professionalIntro}</p>
+    <header class="keep-passage keep-passage--minor" data-keep-passage>
+      <div class="keep-passage__pin">
+        <h3 id="professional-title">{copy.professionalTitle}</h3>
+        <p class="keep-passage__note">{copy.professionalIntro}</p>
+      </div>
     </header>
-    <div class="keep-systems">
-      {
-        professional.map((project) => {
-          const diagram = project.diagram ? diagrams[project.diagram] : undefined;
-          const highlights = project.highlights[locale];
-          return (
-            <article
-              class:list={["keep-system", { "keep-system--plain": !diagram }]}
-              id={"project-" + project.id}
-              aria-labelledby={"project-" + project.id + "-title"}
-            >
-              <div class="keep-system__body">
-                {(project.client || project.year) && (
-                  <p class="keep-meta">
-                    {project.client && <span>{project.client}</span>}
-                    {project.year && <span>{project.year}</span>}
-                  </p>
-                )}
-                <h4 id={"project-" + project.id + "-title"}>{project.name}</h4>
-                <p class="keep-system__text">{project.description[locale]}</p>
-                {highlights.length > 0 && (
-                  <ul class="keep-system__highlights">
-                    {highlights.map((highlight) => (
-                      <li>{highlight}</li>
+    <div class="keep-veil keep-veil--wide keep-wall" data-keep-wall>
+      <div class="keep-systems">
+        {
+          professional.map((project) => {
+            const diagram = project.diagram ? diagrams[project.diagram] : undefined;
+            const highlights = project.highlights[locale];
+            return (
+              <article
+                class:list={[
+                  "keep-plaque keep-system",
+                  { "keep-system--plain": !diagram },
+                ]}
+                id={"project-" + project.id}
+                aria-labelledby={"project-" + project.id + "-title"}
+                data-keep-lit
+                data-keep-reveal
+              >
+                <div class="keep-system__body">
+                  {(project.client || project.year) && (
+                    <p class="keep-meta">
+                      {project.client && <span>{project.client}</span>}
+                      {project.year && <span>{project.year}</span>}
+                    </p>
+                  )}
+                  <h4 id={"project-" + project.id + "-title"}>{project.name}</h4>
+                  <p class="keep-system__text">{project.description[locale]}</p>
+                  {highlights.length > 0 && (
+                    <ul class="keep-system__highlights">
+                      {highlights.map((highlight) => (
+                        <li>{highlight}</li>
+                      ))}
+                    </ul>
+                  )}
+                  <ul class="keep-tech">
+                    {project.technologies.map((technology) => (
+                      <li>{technology}</li>
                     ))}
                   </ul>
-                )}
-                <ul class="keep-tech">
-                  {project.technologies.map((technology) => (
-                    <li>{technology}</li>
-                  ))}
-                </ul>
-                <p class="keep-seals">
-                  {project.production && (
-                    <span class="keep-seal keep-seal--production">
-                      {dict.work.production}
-                    </span>
-                  )}
-                  {!project.source && (
-                    <span class="keep-seal">
-                      <span aria-hidden="true" set:html={ui.lock} />
-                      {dict.work.privateRepo}
-                    </span>
-                  )}
-                  {project.source && (
-                    <a class="keep-seal keep-seal--link" href={project.source}>
-                      <span aria-hidden="true" set:html={ui.github} />
-                      {copy.sourceOnly}
-                    </a>
-                  )}
-                </p>
-              </div>
-              {diagram && (
-                <div class="keep-system__diagram">
-                  <Diagram {...diagram} />
+                  <p class="keep-seals">
+                    {project.production && (
+                      <span class="keep-seal keep-seal--production">
+                        <span class="keep-seal__wax" aria-hidden="true" />
+                        {dict.work.production}
+                      </span>
+                    )}
+                    {!project.source && (
+                      <span class="keep-seal">
+                        <span aria-hidden="true" set:html={ui.lock} />
+                        {dict.work.privateRepo}
+                      </span>
+                    )}
+                    {project.source && (
+                      <a class="keep-seal keep-seal--link" href={project.source}>
+                        <span aria-hidden="true" set:html={ui.github} />
+                        {copy.sourceOnly}
+                      </a>
+                    )}
+                  </p>
                 </div>
-              )}
-            </article>
-          );
-        })
-      }
+                {diagram && (
+                  <div class="keep-system__diagram">
+                    <Diagram {...diagram} />
+                  </div>
+                )}
+              </article>
+            );
+          })
+        }
+      </div>
+
+      <p class="keep-work__more">
+        <span>{dict.work.moreLine}</span>
+        <a href="https://github.com/khalilBenAli1">
+          <span aria-hidden="true" set:html={ui.github} />
+          github.com/khalilBenAli1
+        </a>
+      </p>
     </div>
   </section>
-
-  <p class="keep-work__more">
-    <span>{dict.work.moreLine}</span>
-    <a href="https://github.com/khalilBenAli1">
-      <span aria-hidden="true" set:html={ui.github} />
-      github.com/khalilBenAli1
-    </a>
-  </p>
 </div>
